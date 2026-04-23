@@ -77,7 +77,7 @@ Agent obsługuje 3 role operacyjne. W zależności od zadania, zmienia tryb prac
    - Narzędzia: `browser`, `task_boundary`.
    - Zasada dostępu: Pracuje na `plans/`, `tasks.md`. NIE PISZE KODU GŁÓWNEGO W `/src`. Jest kierownikiem budowy.
 2. **Builder (Inżynieria Zmian)**
-   - Typ: Claude 4.6 Thinking
+   - Typ: Claude 3.5 Sonnet / Opus (lub Model Thinking)
    - Narzędzia: `view_file`, `execution`, terminal.
    - Zasada dostępu: Pisze "atomiowy pancerz" kodu wewnątrz `src/` oraz `execution/`. Optymalizuje na żywo.
 3. **Auditor (Zabezpieczenie & QA)**
@@ -183,7 +183,7 @@ The Agent supports 3 operational roles. Depending on the task, it switches work 
    - Tools: `browser`, `task_boundary`.
    - Access Rule: Works on `plans/`, `tasks.md`. DOES NOT WRITE MAIN CODE IN `/src`. Serves as the construction manager.
 2. **Builder (Change Engineering)**
-   - Type: Claude 4.6 Thinking
+   - Type: Claude 3.5 Sonnet / Opus (or Thinking Model)
    - Tools: `view_file`, `execution`, terminal.
    - Access Rule: Writes the "atomic armor" of code inside `src/` and `execution/`. Optimizes live.
 3. **Auditor (Security & QA)**
