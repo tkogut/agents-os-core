@@ -19,6 +19,11 @@ if ! command -v gemini &> /dev/null; then
   sudo snap install gemini-cli
 fi
 
+if ! command -v gh &> /dev/null; then
+  echo "📦 Instalacja github-cli (gh)..."
+  sudo snap install gh
+fi
+
 # 2. Instalacja wtyczki Caveman
 echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."
 gemini extensions install https://github.com/JuliusBrussee/caveman || echo "UWAGA: Wtyczka caveman mogła być już zainstalowana."
