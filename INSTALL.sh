@@ -41,7 +41,11 @@ echo "🧠 Wdrażanie systemów automatyzacji (Swarm Bootstrapper)..."
 mkdir -p "$GEMINI_DIR/antigravity/skills/swarm-bootstrapper"
 cp -ra ./global_skills/swarm-bootstrapper/. "$GEMINI_DIR/antigravity/skills/swarm-bootstrapper/"
 
-# 5. CLI Shortcut (os-init)
+mkdir -p "$GEMINI_DIR/antigravity/skills/browser-connectivity"
+cp -ra ./global_skills/browser-connectivity/. "$GEMINI_DIR/antigravity/skills/browser-connectivity/"
+
+mkdir -p "$GEMINI_DIR/antigravity/skills/github-orchestrator"
+cp -ra ./global_skills/github-orchestrator/. "$GEMINI_DIR/antigravity/skills/github-orchestrator/"
 echo "⚙️ Rejestracja globalnego skrótu CLI (os-init)..."
 if [ -f "./os-init" ]; then
     sudo cp ./os-init /usr/local/bin/os-init
