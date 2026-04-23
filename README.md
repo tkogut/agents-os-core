@@ -93,7 +93,7 @@ Agent obsługuje 3 role operacyjne. W zależności od zadania, zmienia tryb prac
 System jest wyposażony domyślnie w "Agentic Skills" dostarczane jako globalne rozszerzenia możliwości Agenta:
 - **`swarm-bootstrapper` (os-init)**: Automatyzacja tworzenia środowisk deweloperskich. Agent czyta architekturę systemu, konfiguruje i loguje projekt w pamięci podręcznej.
 - **`github-orchestrator`**: Operator Zdalnego Składowania. Możesz napisać: *"github init"* by utworzył chmurę, lub *"zapisz i pushnij"* by od razu skompresował Twoje intencje w commit i je wdrożył. Odpala i czyta także `github actions` bez wychodzenia na stronę WWW.
-- **`browser-connectivity`**: Zarządzanie mostkiem CDP dla WSL2. Wymusza połączenie z Twoją przeglądarką na Windows (profil `roostertk`), eliminując błędy braku interfejsu graficznego.
+- **`browser-connectivity`**: Zarządzanie mostkiem CDP dla WSL2. Wymusza połączenie z Twoją aktywną instancją przeglądarki na Windows, eliminując błędy braku interfejsu graficznego.
 - **`caveman`**: Redukcja szumu języka naturalnego. Oszczędność tokenów wejściowych o ~75%.
 
 ## 7. Umiejętności Lokalne Projektu (Local Project Skills)
@@ -200,7 +200,7 @@ The Agent supports 3 operational roles. Depending on the task, it switches work 
 The system comes pre-equipped with "Agentic Skills" layered as global extensions of your Agent's capabilities:
 - **`swarm-bootstrapper` (os-init)**: Developer environment setup automation. The Agent reads system architecture, configures paths, and primes the project into sub-memory.
 - **`github-orchestrator`**: Remote Storage Operator. You can command: *"github init"* to auto-create the repository in the cloud, or *"auto commit"* to compress intents into conventional commits and push them. It can run and read `github actions` silently in the terminal.
-- **`browser-connectivity`**: WSL2 CDP Bridge Management. Forces integration with your Windows-hosted browser (profile `roostertk`), eliminating headless environment errors.
+- **`browser-connectivity`**: WSL2 CDP Bridge Management. Forces integration with your active Windows-hosted browser session, eliminating headless environment errors.
 - **`caveman`**: Heavy NLP reduction. Shrinks input token overhead by ~75%.
 
 ## 7. Local Project Skills
