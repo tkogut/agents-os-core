@@ -53,15 +53,22 @@ for item in os.listdir(VAULT_DIR):
 
 print("🧩 Aktywne rozszerzenia (Gemini CLI):")
 try:
-    ext_result = subprocess.run(["gemini", "extensions", "list"], capture_output=True, text=True, check=False)
-    if ext_result.returncode == 0 and ext_result.stdout.strip():
-        for line in ext_result.stdout.strip().split("\n"):
-            if line.strip():
-                print(f"   - {line.strip()}")
+    gemini_cmd = "/snap/bin/gemini" if os.path.exists("/snap/bin/gemini") else "gemini"
+    ext_result = subprocess.run([gemini_cmd, "extensions", "list"], capture_output=True, text=True, check=False)
+    output = ext_result.stdout.strip() + "\n" + ext_result.stderr.strip()
+    
+    found_exts = []
+    for line in output.split("\n"):
+        if line.strip().startswith("✓"):
+            found_exts.append(line.strip())
+            
+    if found_exts:
+        for ext in found_exts:
+            print(f"   {ext}")
     else:
-        print("   Brak zainstalowanych rozszerzeń lub polecenie niedostępne.")
-except Exception:
-    pass
+        print("   Brak zainstalowanych rozszerzeń lub środowisko zablokowane.")
+except Exception as e:
+    print(f"   [Błąd sprawdzania: {e}]")
 
 print("✨ AGENTS-OS v3.2 Swarm Edition - ACTIVE.")
 print(f"Handshake Verified. Gotowy w {TARGET_DIR}")
