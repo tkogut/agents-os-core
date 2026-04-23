@@ -7,7 +7,7 @@
 ---
 
 ## 1. Czym jest AGENTS-OS v3.2 Swarm?
-AGENTS-OS to rygorystyczny framework konfiguracyjny zmuszający modele AI udostępnione przez Google (Gemini, Claude) do pracy w trybie "Swarm" (Rozproszenie Ról) z wykorzystaniem agresywnej optymalizacji użycia tokenów "Caveman Ultra+".
+AGENTS-OS to rygorystyczny framework konfiguracyjny (Dotfiles) zaprojektowany specjalnie dla ekosystemu **Google Cloud Antigravity** oraz nakładki na terminal **Gemini CLI**. Zmusza modele AI udostępnione przez Google (Gemini, Claude) do pracy w trybie "Swarm" (Rozproszenie Ról) z wykorzystaniem agresywnej optymalizacji użycia tokenów "Caveman Ultra+".
 
 Zapewnia to:
 - Maksymalną efektywność kodu.
@@ -103,7 +103,7 @@ Dokument wygenerowany przez Instancję Antigravity w dniu ostatecznej weryfikacj
 ---
 
 ## 1. What is AGENTS-OS v3.2 Swarm?
-AGENTS-OS is a rigorous configuration framework forcing Google-provided AI models (Gemini, Claude) to operate in "Swarm" mode (Role Distribution) utilizing aggressive token usage optimization known as "Caveman Ultra+".
+AGENTS-OS is a rigorous configuration framework (Dotfiles) designed specifically for the **Google Cloud Antigravity Ecosystem** and the **Gemini CLI**. It forces Google-provided AI models (Gemini, Claude) to operate in "Swarm" mode (Role Distribution) utilizing aggressive token usage optimization known as "Caveman Ultra+".
 
 This ensures:
 - Maximum code efficiency.
