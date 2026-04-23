@@ -13,7 +13,7 @@ Zarządzanie połączeniem przeglądarki w środowisku WSL2 przy użyciu mostka 
 Agent używa \`browserType.connectOverCDP\` zamiast \`browser.launch()\`.
 
 1. **Endpoint**: \`http://127.0.0.1:9222\` (Zmapowany tunel w WSL).
-2. **Profil**: Używaj profilu \`roostertk\`.
+2. **Profil**: Używaj bieżącej aktywnej instancji lub wykryj profil przez \`GET /json/version\`. Jeśli wymagane, poproś użytkownika o wskazanie sesji.
 
 🚀 **Verification Workflow (Check_Bridge_Health)**
 1. **Wykrywanie IP**: \`ip route show | grep default | awk '{print $3}'\`.
