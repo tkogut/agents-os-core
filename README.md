@@ -18,6 +18,15 @@ Zapewnia to:
 
 Stworzyliśmy absolutnie samowystarczalny system. Nie musisz już ręcznie kopiować plików z poprzednich projektów.
 
+### Instalacja systemu na nowym komputerze:
+Aby zaaplikować cały ekosystem i stworzyć Złoty Standard od zera, wystarczy pobrać repozytorium i uruchomić skrypt instalacyjny:
+
+```bash
+git clone https://github.com/tkogut/agents-os-core.git
+cd agents-os-core
+bash INSTALL.sh
+```
+
 ### Jak utworzyć nowy projekt (The Bootstrapper):
 Wpisz w terminalu OS:
 ```bash
@@ -104,6 +113,15 @@ This ensures:
 ## 2. Initializing a New Project (`os-init`)
 
 We have created an absolutely self-sufficient system. You no longer need to manually copy files from previous projects.
+
+### System installation on a new machine:
+To apply the entire ecosystem and create the Golden Standard from scratch, just clone the repository and run the installation script:
+
+```bash
+git clone https://github.com/tkogut/agents-os-core.git
+cd agents-os-core
+bash INSTALL.sh
+```
 
 ### How to create a new project (The Bootstrapper):
 Type in the OS terminal:
