@@ -51,5 +51,17 @@ for item in os.listdir(VAULT_DIR):
         if not os.path.exists(dst):
             shutil.copy2(src, dst)
 
+print("🧩 Aktywne rozszerzenia (Gemini CLI):")
+try:
+    ext_result = subprocess.run(["gemini", "extensions", "list"], capture_output=True, text=True, check=False)
+    if ext_result.returncode == 0 and ext_result.stdout.strip():
+        for line in ext_result.stdout.strip().split("\n"):
+            if line.strip():
+                print(f"   - {line.strip()}")
+    else:
+        print("   Brak zainstalowanych rozszerzeń lub polecenie niedostępne.")
+except Exception:
+    pass
+
 print("✨ AGENTS-OS v3.2 Swarm Edition - ACTIVE.")
 print(f"Handshake Verified. Gotowy w {TARGET_DIR}")
