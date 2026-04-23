@@ -53,18 +53,22 @@ for item in os.listdir(VAULT_DIR):
 
 print("🧩 Aktywne rozszerzenia (Gemini CLI):")
 try:
-    gemini_cmd = "/snap/bin/gemini" if os.path.exists("/snap/bin/gemini") else "gemini"
-    ext_result = subprocess.run([gemini_cmd, "extensions", "list"], capture_output=True, text=True, check=False)
-    output = ext_result.stdout.strip() + "\n" + ext_result.stderr.strip()
-    
+    ext_dirs = [
+        os.path.expanduser("~/.gemini/extensions"),
+        os.path.expanduser("~/snap/gemini-cli/current/.gemini/extensions")
+    ]
     found_exts = []
-    for line in output.split("\n"):
-        if line.strip().startswith("✓"):
-            found_exts.append(line.strip())
-            
+    for edir in ext_dirs:
+        if os.path.exists(edir):
+            for ext in os.listdir(edir):
+                if os.path.isdir(os.path.join(edir, ext)):
+                    found_exts.append(ext)
+    
+    found_exts = list(set(found_exts))
+    
     if found_exts:
         for ext in found_exts:
-            print(f"   {ext}")
+            print(f"   ✓ {ext} (Zainstalowane)")
     else:
         print("   Brak zainstalowanych rozszerzeń lub środowisko zablokowane.")
 except Exception as e:
