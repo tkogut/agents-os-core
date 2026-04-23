@@ -76,3 +76,10 @@ except Exception as e:
 
 print("✨ AGENTS-OS v3.2 Swarm Edition - ACTIVE.")
 print(f"Handshake Verified. Gotowy w {TARGET_DIR}")
+
+print("\n💡 Pamiętaj: Utwórz puste repozytorium na Github, a następnie przypnij je:")
+if len(sys.argv) > 1:
+    print(f"   git remote add origin https://github.com/[twoj-nick]/{project_name}.git")
+else:
+    print("   git remote add origin https://github.com/[twoj-nick]/[nazwa-projektu].git")
+print("   git push -u origin master\n")
