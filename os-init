@@ -1,0 +1,12 @@
+#!/bin/bash
+# Trigger: os-init
+# Engine: Caveman Ultra+
+
+SKILL_SCRIPT="$HOME/.gemini/antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py"
+
+if [ -f "$SKILL_SCRIPT" ]; then
+    python3 "$SKILL_SCRIPT" "$@"
+else
+    echo "ERR: Skill swarm-bootstrapper.py nie znaleziony w $SKILL_SCRIPT"
+    exit 1
+fi

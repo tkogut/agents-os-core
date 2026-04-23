@@ -1,0 +1,9 @@
+{
+  "project": "[PROJECT NAME]",
+  "version": "1.0",
+  "nodes": [],
+  "edges": [],
+  "metadata": {
+    "arch": "AGENTS-OS v3.2 Swarm"
+  }
+}
