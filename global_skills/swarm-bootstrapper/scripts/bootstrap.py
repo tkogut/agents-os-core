@@ -39,6 +39,19 @@ if not os.path.exists(git_path):
     print("📦 Git repo: BRAK. Inicjalizowanie...")
     subprocess.run(["git", "init"], check=True)
 
+# Check GitHub Auth
+print("🔍 Sprawdzanie autoryzacji GitHub CLI...")
+try:
+    status = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True)
+    if status.returncode != 0:
+        print("⚠️  Brak zalogowanego GitHub CLI. Rozpoczynanie logowania...")
+        subprocess.run(["gh", "auth", "login"], check=True)
+    else:
+        print("✅ GitHub CLI zalogowany.")
+except FileNotFoundError:
+    print("❌ ERROR: GitHub CLI (gh) nie jest zainstalowany. Zainstaluj go: sudo apt install gh")
+    sys.exit(1)
+
 # Copy Vault
 print("🛡️ Transfer tożsamości (Kopiowanie Złotego Standardu)...")
 for item in os.listdir(VAULT_DIR):
