@@ -16,12 +16,12 @@ fi
 
 if ! command -v gemini &> /dev/null; then
   echo "📦 Instalacja gemini-cli..."
-  sudo snap install gemini-cli
+  sudo snap install gemini-cli --classic
 fi
 
 if ! command -v gh &> /dev/null; then
   echo "📦 Instalacja github-cli (gh)..."
-  sudo snap install gh
+  sudo snap install gh --classic
 fi
 
 # 2. Instalacja wtyczki Caveman
