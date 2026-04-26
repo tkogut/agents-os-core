@@ -2,7 +2,7 @@
 name: github-orchestrator
 description: >
   [Trigger Words: "github init", "sync github", "github push", "github test",
-  "deploy workflow", "auto commit", "zapisz i pushnij"]
+  "deploy workflow", "auto commit", "zapisz i pushnij", "create pr", "open pull request"]
   [Domain: DevOps, Cloud CI/CD, GitOps, AntiGravity v3.2]
   [Outcomes: automated remote repo creation, structured caveman commits, workflow monitoring]
 ---
