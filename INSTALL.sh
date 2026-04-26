@@ -46,6 +46,12 @@ cp -ra ./global_skills/browser-connectivity/. "$GEMINI_DIR/antigravity/skills/br
 
 mkdir -p "$GEMINI_DIR/antigravity/skills/github-orchestrator"
 cp -ra ./global_skills/github-orchestrator/. "$GEMINI_DIR/antigravity/skills/github-orchestrator/"
+
+mkdir -p "$GEMINI_DIR/antigravity/skills/logic-auditor"
+cp -ra ./global_skills/logic-auditor/. "$GEMINI_DIR/antigravity/skills/logic-auditor/"
+
+mkdir -p "$GEMINI_DIR/antigravity/skills/rebuild-skill"
+cp -ra ./global_skills/rebuild-skill/. "$GEMINI_DIR/antigravity/skills/rebuild-skill/"
 echo "⚙️ Rejestracja globalnego skrótu CLI (os-init)..."
 if [ -f "./os-init" ]; then
     sudo cp ./os-init /usr/local/bin/os-init

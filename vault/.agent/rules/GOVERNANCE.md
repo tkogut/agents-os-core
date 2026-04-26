@@ -72,4 +72,10 @@ No task is marked `[x] COMPLETE` without the following confirmation:
 - **Auto-Activation**: Caveman mode Ultra+ intensity. Logic-First Speech. Prompt Compaction. Context Caching.
 - **Git Commits**: All commit messages must follow the `caveman-commit` standard (Conventional Commits ≤ 50 chars).
 
+## 7. FRAMEWORK PRESETS [ALPHA-TRACK]
+
+- **React/Next.js**: Use Vite, Vanilla CSS. Strict component isolation in `src/components`.
+- **Python/Backend**: FastAPI/Pydantic. Strict type hinting. SQLite for local state.
+- **Odoo**: Modular structure. XML views + Python logic separation. Quality RGG audits.
+
 Standard v3.2 Swarm | Precision, Economy, and Swarm Speed.
