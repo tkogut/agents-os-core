@@ -1,9 +1,16 @@
 {
-  "project": "[PROJECT NAME]",
-  "version": "1.0",
-  "nodes": [],
+  "project": "AGENTS-OS Project",
+  "version": "3.2",
+  "nodes": [
+    {
+      "id": "root",
+      "label": "Project Core",
+      "type": "concept"
+    }
+  ],
   "edges": [],
   "metadata": {
-    "arch": "AGENTS-OS v3.2 Swarm"
+    "last_distillation": "2026-04-26",
+    "source": "NotebookLM"
   }
 }

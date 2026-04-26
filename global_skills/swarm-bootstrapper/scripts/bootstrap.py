@@ -87,6 +87,19 @@ try:
 except Exception as e:
     print(f"   [Błąd sprawdzania: {e}]")
 
+# Create .gitignore if missing
+gitignore_path = os.path.join(TARGET_DIR, ".gitignore")
+if not os.path.exists(gitignore_path):
+    print("📝 Tworzenie domyślonego .gitignore...")
+    with open(gitignore_path, "w") as f:
+        f.write("# AGENTS-OS v3.2 Default ignore\n")
+        f.write("tmp/\n")
+        f.write("*.log\n")
+        f.write("__pycache__/\n")
+        f.write(".DS_Store\n")
+        f.write("node_modules/\n")
+        f.write(".env\n")
+
 print("✨ AGENTS-OS v3.2 Swarm Edition - ACTIVE.")
 print(f"Handshake Verified. Gotowy w {TARGET_DIR}")
 
