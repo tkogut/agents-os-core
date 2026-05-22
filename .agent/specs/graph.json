@@ -1,0 +1,40 @@
+{
+  "project": "agents-os-core",
+  "version": "3.2",
+  "nodes": [
+    {
+      "id": "INSTALL.sh",
+      "label": "INSTALL.sh",
+      "type": "Critical Infrastructure",
+      "description": "Installer script for AGENTS-OS dependencies, global skills, and snap compatibility links."
+    },
+    {
+      "id": "os-init",
+      "label": "os-init",
+      "type": "Critical Infrastructure",
+      "description": "System bootstrap tool to initialize new workspace nodes with v3.2 Swarm Template Vault."
+    },
+    {
+      "id": "vault",
+      "label": "vault/",
+      "type": "Critical Infrastructure",
+      "description": "Standard directory vault acting as the blueprint standard for all new sub-agents."
+    }
+  ],
+  "edges": [
+    {
+      "source": "INSTALL.sh",
+      "target": "vault",
+      "relation": "references"
+    },
+    {
+      "source": "os-init",
+      "target": "vault",
+      "relation": "replicates"
+    }
+  ],
+  "metadata": {
+    "last_distillation": "2026-05-22",
+    "source": "Inception Engine"
+  }
+}
