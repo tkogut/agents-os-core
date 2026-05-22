@@ -15,7 +15,7 @@ Automatyzacja procesu pobierania surowych notatek z NotebookLM i konwertowania i
 1. Fetch: Pobranie danych z `/raw_notes` (lub wejścia bezpośredniego).
 2. Distill: Uruchomienie `scripts/format_notes.py`.
 3. Tag: Automatyczne dodanie `#NotebookLM` oraz `#ExpertKnowledge`.
-4. Deploy: Zapisanie w `.agent/specs/knowledge/`.
+4. Deploy: Zapisanie w `.agents/specs/knowledge/`.
 5. Update Graph: Powiadomienie Audytora o konieczności aktualizacji `graph.json`.
 
 ## Reguły Krytyczne

@@ -57,7 +57,7 @@ Zawiera ona pusty, czysty stan systemu oparty o sprawdzone mechanizmy.
 ├── execution/                 <-- Pliki uruchomieniowe The Buildera.
 ├── tmp/                       <-- Logi (zgodnie z protokołem Command Logging Protocol).
 ├── .github/                   <-- Konfiguracja CI/CD.
-└── .agent/                    <-- Pamięć Podświadoma Agenta
+└── .agents/                    <-- Pamięć Podświadoma Agenta
     ├── rules/
     │   ├── GOVERNANCE.md      <-- Prawo Lokalne (Czy to Python? Czy Vue? Odoo?)
     │   └── GEMINI.md          <-- Context Guard dla Snapa.
@@ -97,7 +97,7 @@ System jest wyposażony domyślnie w "Agentic Skills" dostarczane jako globalne 
 - **`caveman`**: Redukcja szumu języka naturalnego. Oszczędność tokenów wejściowych o ~75%.
 
 ## 7. Umiejętności Lokalne Projektu (Local Project Skills)
-Oprócz skilli globalnych, każdy projekt inicjowany jest ze specjalnymi umiejętnościami osadzonymi wewnątrz lokalnego katalogu `.agent/skills/`:
+Oprócz skilli globalnych, każdy projekt inicjowany jest ze specjalnymi umiejętnościami osadzonymi wewnątrz lokalnego katalogu `.agents/skills/`:
 - **`skill-creator`**: Meta-programowanie. Komenda *"new-skill"* wyzwala procedurę tworzenia nowych, ustandaryzowanych (Anatomy v2.2) folderów skilli wprost dla bieżącego projektu. Agent instruuje samego siebie.
 - **`notebooklm-sync`**: Automatyzacja zarządzania wiedzą RAG. Domyślny instruktarz do destylacji i importowania danych z Google NotebookLM do `graph.json`.
 
@@ -164,7 +164,7 @@ When you create a new project, an inviolable hierarchy (Topology) is copied into
 ├── execution/                 <-- Runtime files for The Builder.
 ├── tmp/                       <-- Logs (according to the Command Logging Protocol).
 ├── .github/                   <-- CI/CD configuration.
-└── .agent/                    <-- Agent's Subconscious Memory
+└── .agents/                    <-- Agent's Subconscious Memory
     ├── rules/
     │   ├── GOVERNANCE.md      <-- Local Law (Is it Python? Vue? Odoo?)
     │   └── GEMINI.md          <-- Context Guard for Snap.
@@ -204,7 +204,7 @@ The system comes pre-equipped with "Agentic Skills" layered as global extensions
 - **`caveman`**: Heavy NLP reduction. Shrinks input token overhead by ~75%.
 
 ## 7. Local Project Skills
-In addition to global skills, each project is initialized with specialized skills embedded directly within the local `.agent/skills/` directory:
+In addition to global skills, each project is initialized with specialized skills embedded directly within the local `.agents/skills/` directory:
 - **`skill-creator`**: Meta-programming. The *"new-skill"* trigger allows the Agent to train itself, generating robust skill scaffolding based on the Skill Anatomy v2.2 standard for the current project.
 - **`notebooklm-sync`**: Knowledge management. A built-in protocol mapping out the distillation of insights from Google NotebookLM down into the project's atomic `graph.json` state.
 

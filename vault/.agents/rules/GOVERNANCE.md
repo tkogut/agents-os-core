@@ -7,7 +7,7 @@ version: 3.2-AG Swarm
 
 **Status:** Universal Project Governance Template
 **Principle:** Separation of Planning (Coordinator), Execution (Builder), and Audit (Auditor).
-**Root Directory:** `.agent/`
+**Root Directory:** `.agents/`
 
 ---
 
@@ -18,13 +18,13 @@ Every agent session operates under the Triad model. Switching roles requires a f
 ### Persona Definitions & Tool Constraints:
 
 1. **The Coordinator (Manager & DevOps Architect)**
-   - **Mandate**: High-level orchestration, git push, plan management (`.agent/plans/`).
+   - **Mandate**: High-level orchestration, git push, plan management (`.agents/plans/`).
    - **Constraint**: Forbidden from writing feature code in `/src`. Must delegate all implementation tasks to The Builder.
    - **Tools**: Browser (CDP), Task Boundary, `git`.
 
 2. **The Builder (Feature Architect)**
    - **Mandate**: Implementation (React, Python, etc.), coding, local testing.
-   - **Constraint**: Forbidden from modifying `.agent/plans/` without Coordinator approval.
+   - **Constraint**: Forbidden from modifying `.agents/plans/` without Coordinator approval.
    - **Tools**: `execution/*`, `python`, `terminal`, `browser`.
 
 3. **The Auditor (QA & Security Specialist)**
@@ -38,7 +38,7 @@ Every agent session operates under the Triad model. Switching roles requires a f
 
 ### G-01: Deployment Supervision
 - **Commit Strategy**: Coordinator is the only role allowed to trigger production pushes.
-- **Sequential Pattern [SEQ]**: No code changes allowed without a numbered plan in `.agent/plans/`.
+- **Sequential Pattern [SEQ]**: No code changes allowed without a numbered plan in `.agents/plans/`.
 
 ---
 
@@ -52,7 +52,7 @@ Every agent session operates under the Triad model. Switching roles requires a f
 
 ## 4. SKILL ANATOMY (v2.2)
 
-Every skill in `.agent/skills/` must contain:
+Every skill in `.agents/skills/` must contain:
 - `SKILL.md`: Manifest with YAML Frontmatter.
 - `scripts/`: Implementation logic.
 - `assets/`: Static resources.

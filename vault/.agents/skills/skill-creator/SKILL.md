@@ -31,7 +31,7 @@ Definiowanie i egzekwowanie standardów dla modularnych umiejętności (Skills) 
 Wywołaj `skill-creator`, gdy:
 - Projektujesz nową funkcjonalność requiring a separate workflow.
 - Aktualizujesz istniejący moduł.
-- Przeprowadzasz audyt struktury `.agent/skills/`.
+- Przeprowadzasz audyt struktury `.agents/skills/`.
 
 ## Workflow
 
