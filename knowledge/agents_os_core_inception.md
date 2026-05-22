@@ -3,17 +3,17 @@
 **Cel:** Przebudowa repozytorium `tkogut/agents-os-core` pod standard AGENTS-OS v3.2 / Antigravity 2.0.
 
 ## 1. Problem Architektoniczny
-* Repozytorium źródłowe instalatora nie posiada własnej struktury agentowej. Agent GEM nie może nim autonomicznie zarządzać bez folderu `.agent/` oraz plików konfiguracyjnych.
+* Repozytorium źródłowe instalatora nie posiada własnej struktury agentowej. Agent GEM nie może nim autonomicznie zarządzać bez folderu `.agents/` oraz plików konfiguracyjnych.
 
 ## 2. Wymagana Topologia (Skill Anatomy v2.3)
 Należy wdrożyć pełną strukturę w głównym katalogu (root) repozytorium:
 * `agents.yaml` - Rejestr ról (GEM, Coordinator, Builder, Auditor).
 * `task.md` - Dynamiczny backlog dla agenta GEM.
 * `design-tokens.md` - Pusty plik (lub zasady formatowania terminala).
-* `.agent/skills/` - Pusty katalog przygotowany na skille systemowe.
-* `.agent/rules/` - Reguły (w tym zakaz używania File Edit Tool).
-* `.agent/specs/graph.json` - Pusty szkielet Graph RAG dla śledzenia zależności między `INSTALL.sh`, a `vault/`.
-* `.agent/plans/` oraz `.agent/swarm/` - Katalogi na logi i planowanie asynchroniczne.
+* `.agents/skills/` - Pusty katalog przygotowany na skille systemowe.
+* `.agents/rules/` - Reguły (w tym zakaz używania File Edit Tool).
+* `.agents/specs/graph.json` - Pusty szkielet Graph RAG dla śledzenia zależności między `INSTALL.sh`, a `vault/`.
+* `.agents/plans/` oraz `.agents/swarm/` - Katalogi na logi i planowanie asynchroniczne.
 
 ## 3. Adaptacja katalogu src/
 W standardowych projektach kod ląduje w `src/`. Ponieważ jest to repozytorium systemowe/instalacyjne, pliki takie jak `INSTALL.sh`, `os-init` oraz folder `vault/` i `global_skills/` zostają w głównym katalogu, ale należy je opisać w `graph.json` jako "Core Infrastructure".

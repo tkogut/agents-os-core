@@ -1,7 +1,8 @@
 import os
 import shutil
-import subprocess
 import sys
+import git
+from github import Github, GithubException
 
 VAULT_DIR = os.path.expanduser("~/.gemini/antigravity/templates/v3.2-swarm")
 TARGET_DIR = os.getcwd()
@@ -33,24 +34,24 @@ if not os.path.exists(VAULT_DIR):
 # Check context
 os.chdir(TARGET_DIR)
 
-# Init Git
+# Init Git using GitPython
 git_path = os.path.join(TARGET_DIR, ".git")
 if not os.path.exists(git_path):
     print("📦 Git repo: BRAK. Inicjalizowanie...")
-    subprocess.run(["git", "init"], check=True)
+    git.Repo.init(TARGET_DIR)
 
-# Check GitHub Auth
-print("🔍 Sprawdzanie autoryzacji GitHub CLI...")
-try:
-    status = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True)
-    if status.returncode != 0:
-        print("⚠️  Brak zalogowanego GitHub CLI. Rozpoczynanie logowania...")
-        subprocess.run(["gh", "auth", "login"], check=True)
-    else:
-        print("✅ GitHub CLI zalogowany.")
-except FileNotFoundError:
-    print("❌ ERROR: GitHub CLI (gh) nie jest zainstalowany. Zainstaluj go: sudo apt install gh")
-    sys.exit(1)
+# Check GitHub Auth using PyGithub
+print("🔍 Sprawdzanie autoryzacji GitHub API...")
+github_token = os.environ.get("GITHUB_TOKEN")
+if github_token:
+    g = Github(github_token)
+    try:
+        user = g.get_user()
+        print(f"✅ GitHub API zalogowany jako: {user.login}")
+    except GithubException:
+        print("⚠️  Błąd autoryzacji tokenu GitHub.")
+else:
+    print("⚠️  Brak zmiennej GITHUB_TOKEN w środowisku. Autoryzacja ograniczona.")
 
 # Copy Vault
 print("🛡️ Transfer tożsamości (Kopiowanie Złotego Standardu)...")
@@ -64,7 +65,7 @@ for item in os.listdir(VAULT_DIR):
         if not os.path.exists(dst):
             shutil.copy2(src, dst)
 
-print("🧩 Aktywne rozszerzenia (Gemini CLI):")
+print("🧩 Aktywne rozszerzenia (Antigravity CLI):")
 try:
     ext_dirs = [
         os.path.expanduser("~/.gemini/extensions"),

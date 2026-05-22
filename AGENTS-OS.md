@@ -7,7 +7,7 @@ Wersja: 3.2-AG | Status: STABLE | Architekt: Antigravity Orchestrator 2026
 - Weryfikacja: `gemini --version`.
 
 🛠️ 2. THE SWARM TRIAD (MODELS)
-- Coordinator (Gemini Pro): Strategic planning. Context Master. Manages .agent/plans/.
+- Coordinator (Gemini Pro): Strategic planning. Context Master. Manages .agents/plans/.
 - Builder (Claude Thinking): Code architecture & logic. Complex refactors.
 - Auditor (Gemini Flash): Fast QA. Linting. Port check. WSL-Bridge sync.
 - YOU (Orchestrator): Final EXECUTE authority.
@@ -18,7 +18,7 @@ Wersja: 3.2-AG | Status: STABLE | Architekt: Antigravity Orchestrator 2026
 ├── agents.md             # Model registry & active roles (Root).
 ├── task.md               # Dynamic backlog (State Token Sync).
 ├── design-tokens.md      # UI/Vibe DNA.
-└── .agent/
+└── .agents/
     ├── rules/            # Core directives (GOVERNANCE.md).
     ├── swarm/            # Multi-model handshake logs.
     ├── plans/           # Sequential tracks [SEQ-PRO].
