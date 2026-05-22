@@ -4,7 +4,7 @@ import sys
 import git
 from github import Github, GithubException
 
-VAULT_DIR = os.path.expanduser("~/.gemini/antigravity/templates/v3.2-swarm")
+VAULT_DIR = os.path.expanduser("~/.gemini/antigravity/templates/v4.0-swarm")
 TARGET_DIR = os.getcwd()
 
 # Argument handling
@@ -25,7 +25,7 @@ if os.path.abspath(TARGET_DIR) == os.path.expanduser("~"):
     print("Wróć do planowania. Wybierz inny folder (np. ~/projects/...).")
     sys.exit(1)
 
-print(f"🚀 INICJACJA AGENTS-OS v3.2 SWARM W: {TARGET_DIR}")
+print(f"🚀 INICJACJA AGENTS-OS v4.0 SWARM W: {TARGET_DIR}")
 
 if not os.path.exists(VAULT_DIR):
     print(f"ERR: Złoty Standard nie istnieje w {VAULT_DIR}. Przerwanie.")
@@ -93,7 +93,7 @@ gitignore_path = os.path.join(TARGET_DIR, ".gitignore")
 if not os.path.exists(gitignore_path):
     print("📝 Tworzenie domyślonego .gitignore...")
     with open(gitignore_path, "w") as f:
-        f.write("# AGENTS-OS v3.2 Default ignore\n")
+        f.write("# AGENTS-OS v4.0 Default ignore\n")
         f.write("tmp/\n")
         f.write("*.log\n")
         f.write("__pycache__/\n")
@@ -101,7 +101,7 @@ if not os.path.exists(gitignore_path):
         f.write("node_modules/\n")
         f.write(".env\n")
 
-print("✨ AGENTS-OS v3.2 Swarm Edition - ACTIVE.")
+print("✨ AGENTS-OS v4.0 Swarm Edition - ACTIVE.")
 print(f"Handshake Verified. Gotowy w {TARGET_DIR}")
 
 print("\n💡 Pamiętaj: Utwórz puste repozytorium na Github, a następnie przypnij je:")

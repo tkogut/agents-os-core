@@ -1,4 +1,4 @@
-# AGENTS-OS v3.2 Default ignore
+# AGENTS-OS v4.0 Default ignore
 tmp/
 *.log
 __pycache__/
