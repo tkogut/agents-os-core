@@ -1,16 +1,17 @@
 {
   "project": "AGENTS-OS Project",
-  "version": "3.2",
+  "version": "4.0",
   "nodes": [
     {
-      "id": "root",
-      "label": "Project Core",
-      "type": "concept"
+      "id": ".agents/specs/AGENTS-OS.md",
+      "label": "AGENTS-OS.md",
+      "type": "Ultimate Source of Truth",
+      "description": "Constitution of AGENTS-OS v4.0 governing all Swarm rules and system operations."
     }
   ],
   "edges": [],
   "metadata": {
-    "last_distillation": "2026-04-26",
-    "source": "NotebookLM"
+    "last_distillation": "2026-05-22",
+    "source": "Inception Engine"
   }
 }

@@ -1,10 +1,10 @@
 ---
 name: logic-auditor
-description: Globalny systemowy skill dla logic-auditor w AGENTS-OS v3.2.
+description: Globalny systemowy skill dla logic-auditor w AGENTS-OS v4.0.
 trigger_words: ["audit logic", "check consistency", "math check", "caveman-review"]
 ---
 
-# ⚖️ Logic Auditor (v3.2)
+# ⚖️ Logic Auditor (v4.0)
 
 🎯 **Purpose**
 Weryfikacja spójności logicznej, architektonicznej i matematycznej kodu przed wdrożeniem (Audit Handshake). 

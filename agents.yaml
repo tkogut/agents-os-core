@@ -1,6 +1,6 @@
 # AGENTS-OS Swarm Role Registry
 project: agents-os-core
-version: 3.2
+version: 4.0
 
 roles:
   gem:
@@ -13,7 +13,7 @@ roles:
 
   coordinator:
     name: Coordinator
-    model: Gemini 3.1 Pro
+    model: Gemini 3.5 Flash
     description: High-level orchestration, git push, plan management.
 
   builder:

@@ -1,4 +1,4 @@
-# AGENTS-OS v3.2 Swarm Edition (Ultra+) - Master Manual
+# AGENTS-OS v4.0 Swarm Edition (Ultra+) - Master Manual
 
 **Data Zbudowania Systemu**: Kwiecień 2026
 **Architekt**: Antigravity Orchestrator & User tkogut
@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Czym jest AGENTS-OS v3.2 Swarm?
+## 1. Czym jest AGENTS-OS v4.0 Swarm?
 AGENTS-OS to rygorystyczny framework konfiguracyjny (Dotfiles) zaprojektowany specjalnie dla ekosystemu **Google Cloud Antigravity** oraz nakładki na terminal **Gemini CLI**. Zmusza modele AI udostępnione przez Google (Gemini, Claude) do pracy w trybie "Swarm" (Rozproszenie Ról) z wykorzystaniem agresywnej optymalizacji użycia tokenów "Caveman Ultra+".
 
 Zapewnia to:
@@ -35,7 +35,7 @@ os-init nazwa-mojego-projektu
 
 **Co zrobi sztuczna inteligencja?**
 1. System sam utworzy folder `/home/tkogut/projects/nazwa-mojego-projektu`.
-2. Skopiuje do niego "Złoty Standard" tzw. The Template Vault z rezerwuaru `~/.gemini/antigravity/templates/v3.2-swarm/`.
+2. Skopiuje do niego "Złoty Standard" tzw. The Template Vault z rezerwuaru `~/.gemini/antigravity/templates/v4.0-swarm/`.
 3. Zainicjalizuje puste repozytorium GiT.
 4. Zgłosi się w trybie "ACTIVE" z odpowiednim "State Token".
 
@@ -73,7 +73,7 @@ Zawiera ona pusty, czysty stan systemu oparty o sprawdzone mechanizmy.
 Agent obsługuje 3 role operacyjne. W zależności od zadania, zmienia tryb pracy:
 
 1. **Coordinator (Zarządzanie)**
-   - Typ: Gemini 3.1 Pro
+   - Typ: Gemini 3.5 Flash
    - Narzędzia: `browser`, `task_boundary`.
    - Zasada dostępu: Pracuje na `plans/`, `tasks.md`. NIE PISZE KODU GŁÓWNEGO W `/src`. Jest kierownikiem budowy.
 2. **Builder (Inżynieria Zmian)**
@@ -106,7 +106,7 @@ Dokument wygenerowany przez Instancję Antigravity w dniu ostatecznej weryfikacj
 
 <br><hr><br>
 
-# [EN] AGENTS-OS v3.2 Swarm Edition (Ultra+) - Master Manual
+# [EN] AGENTS-OS v4.0 Swarm Edition (Ultra+) - Master Manual
 
 **System Build Date**: April 2026
 **Architect**: Antigravity Orchestrator & User tkogut
@@ -114,7 +114,7 @@ Dokument wygenerowany przez Instancję Antigravity w dniu ostatecznej weryfikacj
 
 ---
 
-## 1. What is AGENTS-OS v3.2 Swarm?
+## 1. What is AGENTS-OS v4.0 Swarm?
 AGENTS-OS is a rigorous configuration framework (Dotfiles) designed specifically for the **Google Cloud Antigravity Ecosystem** and the **Gemini CLI**. It forces Google-provided AI models (Gemini, Claude) to operate in "Swarm" mode (Role Distribution) utilizing aggressive token usage optimization known as "Caveman Ultra+".
 
 This ensures:
@@ -143,7 +143,7 @@ os-init my-new-project-name
 
 **What will the AI do?**
 1. The system will auto-create the directory `/home/tkogut/projects/my-new-project-name`.
-2. It will copy the "Golden Standard", aka The Template Vault from `~/.gemini/antigravity/templates/v3.2-swarm/` into it.
+2. It will copy the "Golden Standard", aka The Template Vault from `~/.gemini/antigravity/templates/v4.0-swarm/` into it.
 3. Initializes an empty GiT repository.
 4. Reports back in "ACTIVE" state with the corresponding "State Token".
 
@@ -180,7 +180,7 @@ When you create a new project, an inviolable hierarchy (Topology) is copied into
 The Agent supports 3 operational roles. Depending on the task, it switches work modes:
 
 1. **Coordinator (Management)**
-   - Type: Gemini 3.1 Pro
+   - Type: Gemini 3.5 Flash
    - Tools: `browser`, `task_boundary`.
    - Access Rule: Works on `plans/`, `tasks.md`. DOES NOT WRITE MAIN CODE IN `/src`. Serves as the construction manager.
 2. **Builder (Change Engineering)**

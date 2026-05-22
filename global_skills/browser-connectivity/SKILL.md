@@ -1,6 +1,6 @@
 ---
 name: browser-connectivity
-description: Globalny systemowy skill dla browser-connectivity (CDP Bridge) w AGENTS-OS v3.2.
+description: Globalny systemowy skill dla browser-connectivity (CDP Bridge) w AGENTS-OS v4.0.
 ---
 
 # 🌐 Browser Connectivity (CDP Bridge)
@@ -24,4 +24,4 @@ Agent używa \`browserType.connectOverCDP\` zamiast \`browser.launch()\`.
 - Jeśli mostek leży: Wykonaj \`python3 ~/.gemini/antigravity/skills/browser-connectivity/scripts/start_tunnel.py\`.
 - Jeśli port 9223 zablokowany: Poproś użytkownika o \`netsh interface portproxy reset\` na Windows.
 
-Standard AntiGravity v3.2 Swarm | Browser Bridge Active.
+Standard AntiGravity v4.0 Swarm | Browser Bridge Active.

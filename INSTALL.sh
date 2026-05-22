@@ -1,12 +1,12 @@
 #!/bin/bash
 # ==============================================================================
-# AGENTS-OS v3.2 SWARM EDITION - UNIVERSAL INSTALLER
+# AGENTS-OS v4.0 SWARM EDITION - UNIVERSAL INSTALLER
 # Architekt: Antigravity Orchestrator & User tkogut
 # ==============================================================================
 
 set -e
 
-echo "🚀 Rozpoczynam instalację AGENTS-OS v3.2 Swarm Edition..."
+echo "🚀 Rozpoczynam instalację AGENTS-OS v4.0 Swarm Edition..."
 
 # 1. Zależności systemu
 if ! command -v snap &> /dev/null; then
@@ -38,7 +38,7 @@ agy extensions install https://github.com/JuliusBrussee/caveman || echo "UWAGA: 
 
 # 3. Kopiowanie The Vault
 AGY_DIR="$HOME/.antigravity"
-VAULT_DIR="$AGY_DIR/templates/v3.2-swarm"
+VAULT_DIR="$AGY_DIR/templates/v4.0-swarm"
 
 echo "✨ Deploy: The Template Vault (Złoty Standard)..."
 mkdir -p "$VAULT_DIR"
