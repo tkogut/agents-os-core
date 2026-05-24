@@ -99,7 +99,24 @@ if [ "$remote_url" != "$expected_url" ]; then
 fi
 echo "   ✅ Adres remote origin jest poprawny: $remote_url"
 
-# 5. Sprzątanie po teście
+# 5. Weryfikacja dynamicznego dociągania skilli (os-add-skill)
+echo "🔍 [TEST] Weryfikacja dynamicznego dociągania skilli (os-add-skill)..."
+if command -v os-add-skill-run &>/dev/null; then
+    os-add-skill-run "postgresql-optimization"
+elif [ -f "$PROJECTS_ROOT/agents-os-core/os-add-skill" ]; then
+    python3 "$PROJECTS_ROOT/agents-os-core/os-add-skill" "postgresql-optimization"
+else
+    echo "❌ [TEST] Nie znaleziono skryptu os-add-skill!"
+    exit 1
+fi
+
+if [ ! -f "$TEST_DIR/.agents/skills/postgresql-optimization/SKILL.md" ]; then
+    echo "❌ [TEST] BŁĄD: Skill 'postgresql-optimization' nie został pobrany!"
+    exit 1
+fi
+echo "   ✅ Skill 'postgresql-optimization' pobrany pomyślnie."
+
+# 6. Sprzątanie po teście
 echo "🧹 [TEST] Rozpoczynam sprzątanie po zakończonym teście..."
 
 # Powrót do katalogu głównego

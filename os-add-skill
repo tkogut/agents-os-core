@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import urllib.request
+import urllib.error
+
+API_URL = "https://api.github.com/repos/sickn33/antigravity-awesome-skills/contents/skills/{skill_name}"
+HEADERS = {"User-Agent": "Antigravity-Agent-Swarm"}
+
+def find_project_root():
+    curr = os.getcwd()
+    while curr != os.path.dirname(curr):
+        if os.path.exists(os.path.join(curr, ".agents")):
+            return curr
+        curr = os.path.dirname(curr)
+    return None
+
+def download_item(url, dest_path):
+    print(f"   📥 Pobieranie: {os.path.basename(dest_path)}...")
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    req = urllib.request.Request(url, headers=HEADERS)
+    try:
+        with urllib.request.urlopen(req) as response, open(dest_path, "wb") as out_file:
+            out_file.write(response.read())
+    except Exception as e:
+        print(f"   ❌ Nie udało się pobrać {url}: {e}")
+
+def fetch_dir(skill_name, api_url, dest_dir):
+    req = urllib.request.Request(api_url, headers=HEADERS)
+    try:
+        with urllib.request.urlopen(req) as response:
+            items = json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            print(f"❌ Skill '{skill_name}' nie został odnaleziony w oficjalnym rejestrze.")
+        else:
+            print(f"❌ Błąd API GitHub ({e.code}): {e.reason}")
+        return False
+    except Exception as e:
+        print(f"❌ Błąd połączenia z API GitHub: {e}")
+        return False
+
+    if not isinstance(items, list):
+        print(f"❌ Niepoprawny format odpowiedzi z API.")
+        return False
+
+    for item in items:
+        name = item.get("name")
+        item_type = item.get("type")
+        download_url = item.get("download_url")
+        path = item.get("path")
+        
+        # Relatywna ścieżka od folderu skilla
+        prefix = f"skills/{skill_name}/"
+        if path.startswith(prefix):
+            rel_path = path[len(prefix):]
+        else:
+            rel_path = name
+        
+        target_path = os.path.join(dest_dir, rel_path)
+
+        if item_type == "file" and download_url:
+            download_item(download_url, target_path)
+        elif item_type == "dir":
+            # Rekurencyjne pobranie podkatalogu
+            fetch_dir(skill_name, item.get("url"), target_path)
+            
+    return True
+
+def main():
+    if len(sys.argv) < 2:
+        print("Użycie: os-add-skill <nazwa-skilla>")
+        sys.exit(1)
+
+    skill_name = sys.argv[1]
+    project_root = find_project_root()
+    if not project_root:
+        print("❌ BŁĄD: Nie jesteś w katalogu projektu AGENTS-OS (brak folderu .agents/).")
+        sys.exit(1)
+
+    dest_dir = os.path.join(project_root, ".agents", "skills", skill_name)
+    print(f"🪐 Pobieranie skilla '{skill_name}' z oficjalnego katalogu...")
+    
+    success = fetch_dir(skill_name, API_URL.format(skill_name=skill_name), dest_dir)
+    if success:
+        print(f"✅ Skill '{skill_name}' został pomyślnie dodany do projektu.")
+        print(f"   Lokalizacja: {dest_dir}")
+    else:
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Auditor logic for PR and local changes. Standard v4.1.
+description: Auditor logic for PR and local changes. Standard v4.2.
 trigger_words: ["review code", "review pr", "check changes"]
 ---
 

@@ -1,12 +1,12 @@
 #!/bin/bash
 # ==============================================================================
-# AGENTS-OS v4.1 SWARM EDITION - UNIVERSAL INSTALLER
+# AGENTS-OS v4.2 SWARM EDITION - UNIVERSAL INSTALLER
 # Architekt: Antigravity Orchestrator & User tkogut
 # ==============================================================================
 
 set -e
 
-echo "🚀 Rozpoczynam instalację AGENTS-OS v4.1 Swarm Edition..."
+echo "🚀 Rozpoczynam instalację AGENTS-OS v4.2 Swarm Edition..."
 
 # 1. Zależności systemu
 if ! command -v snap &> /dev/null; then
@@ -91,7 +91,7 @@ echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."
 
 # 3. Kopiowanie The Vault
 AGY_DIR="$HOME/.antigravity"
-VAULT_DIR="$AGY_DIR/templates/v4.1-swarm"
+VAULT_DIR="$AGY_DIR/templates/v4.2-swarm"
 
 # Czyszczenie starych wersji szablonów w celu zachowania czystości systemu
 echo "🧹 Czyszczenie starych szablonów..."
@@ -121,35 +121,131 @@ cp -ra ./global_skills/logic-auditor/. "$AGY_DIR/skills/logic-auditor/"
 mkdir -p "$AGY_DIR/skills/rebuild-skill"
 cp -ra ./global_skills/rebuild-skill/. "$AGY_DIR/skills/rebuild-skill/"
 
-echo "⚙️ Integracja Awesome Skills..."
-npx -y antigravity-awesome-skills --path .agents/skills --risk safe,none
+echo "⚙️ Pobieranie katalogu skilli RAG..."
+mkdir -p "$VAULT_DIR/.agents/specs"
+curl -fsSL -o "$VAULT_DIR/.agents/specs/awesome-skills-catalog.md" "https://raw.githubusercontent.com/sickn33/antigravity-awesome-skills/main/CATALOG.md" || echo "⚠️  Nie udało się pobrać katalogu skilli."
 
-echo "⚙️ Rejestracja skryptu os-init-run (wykonywalny backend)..."
+echo "⚙️ Rejestracja narzędzi systemowych (backend)..."
 if [ -f "./os-init" ]; then
     if sudo -n cp ./os-init /usr/local/bin/os-init-run 2>/dev/null; then
         sudo -n chmod +x /usr/local/bin/os-init-run
-        echo "✓ Backend zarejestrowany w /usr/local/bin/os-init-run"
+        echo "✓ os-init-run zarejestrowany w /usr/local/bin/os-init-run"
     else
-        echo "⚠️ Brak uprawnień sudo. Rejestracja w ~/.local/bin/os-init-run..."
         mkdir -p "$HOME/.local/bin"
         cp ./os-init "$HOME/.local/bin/os-init-run"
         chmod +x "$HOME/.local/bin/os-init-run"
-        echo "✓ Backend zarejestrowany w $HOME/.local/bin/os-init-run"
+        echo "✓ os-init-run zarejestrowany w $HOME/.local/bin/os-init-run"
     fi
-else
-    echo "⚠️ Nie odnaleziono pliku os-init w repozytorium!"
 fi
 
-echo "⚙️ Rejestracja shell function os-init w ~/.bashrc.d/antigravity..."
-SHELL_RC="$HOME/.bashrc.d/antigravity"
-if ! grep -q 'os-init()' "$SHELL_RC" 2>/dev/null; then
-    echo "⚠️ Shell function os-init nie znaleziona. Dodaj ją ręcznie lub uruchom skrypt ponownie."
-else
-    echo "✓ Shell function os-init() jest zarejestrowana w $SHELL_RC"
+if [ -f "./os-add-skill" ]; then
+    if sudo -n cp ./os-add-skill /usr/local/bin/os-add-skill-run 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-add-skill-run
+        echo "✓ os-add-skill-run zarejestrowany w /usr/local/bin/os-add-skill-run"
+    else
+        mkdir -p "$HOME/.local/bin"
+        cp ./os-add-skill "$HOME/.local/bin/os-add-skill-run"
+        chmod +x "$HOME/.local/bin/os-add-skill-run"
+        echo "✓ os-add-skill-run zarejestrowany w $HOME/.local/bin/os-add-skill-run"
+    fi
+fi
+
+echo "⚙️ Generowanie i rejestracja konfiguracji powłoki w ~/.bashrc.d/antigravity..."
+mkdir -p "$HOME/.bashrc.d"
+cat << 'EOF' > "$HOME/.bashrc.d/antigravity"
+# Antigravity launch function for IDE
+antigravity() {
+    local win_user
+    win_user=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+    if [ -z "$win_user" ]; then
+        local user_dir
+        for user_dir in /mnt/c/Users/*; do
+            if [ -f "${user_dir}/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide" ]; then
+                win_user=$(basename "$user_dir")
+                break
+            fi
+        done
+    fi
+    if [ -z "$win_user" ]; then
+        win_user="admin_tk"
+    fi
+    "/mnt/c/Users/${win_user}/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide" --remote wsl+Ubuntu "$(pwd)"
+}
+alias antigravity-ide='antigravity'
+
+# ==============================================================================
+# os-init <nazwa-projektu>
+# Shell function wrapper — umożliwia cd do nowego projektu po jego utworzeniu.
+# Wywołuje właściwy skrypt os-init-run, a następnie wchodzi do nowego katalogu.
+# ==============================================================================
+os-init() {
+    local script
+    # Szukaj zainstalowanego skryptu
+    if command -v os-init-run &>/dev/null; then
+        script="os-init-run"
+    elif [ -f "$HOME/.local/bin/os-init-run" ]; then
+        script="$HOME/.local/bin/os-init-run"
+    elif [ -f "/usr/local/bin/os-init-run" ]; then
+        script="/usr/local/bin/os-init-run"
+    else
+        echo "❌ os-init: skrypt nie znaleziony. Uruchom INSTALL.sh."
+        return 1
+    fi
+
+    # Uruchom skrypt i przechwytuj ścieżkę projektu
+    local output
+    output=$(bash "$script" "$@")
+    local exit_code=$?
+
+    # Wyświetl cały output
+    echo "$output"
+
+    if [ $exit_code -ne 0 ]; then
+        return $exit_code
+    fi
+
+    # Wyciągnij ścieżkę i wejdź do folderu projektu
+    local project_dir
+    project_dir=$(echo "$output" | grep "^__PROJECT_DIR__:" | sed 's/^__PROJECT_DIR__://')
+    if [ -n "$project_dir" ] && [ -d "$project_dir" ]; then
+        echo ""
+        echo "🔀 Przechodzę do katalogu projektu..."
+        cd "$project_dir" && echo "📁 Jesteś w: $(pwd)"
+    fi
+}
+
+# ==============================================================================
+# os-add-skill <nazwa-skilla>
+# Shell function wrapper — wywołuje instalator skilla z venv lub ścieżki.
+# ==============================================================================
+os-add-skill() {
+    local script
+    if command -v os-add-skill-run &>/dev/null; then
+        script="os-add-skill-run"
+    elif [ -f "$HOME/.local/bin/os-add-skill-run" ]; then
+        script="$HOME/.local/bin/os-add-skill-run"
+    elif [ -f "/usr/local/bin/os-add-skill-run" ]; then
+        script="/usr/local/bin/os-add-skill-run"
+    else
+        echo "❌ os-add-skill: skrypt nie znaleziony. Uruchom INSTALL.sh."
+        return 1
+    fi
+    "$script" "$@"
+}
+EOF
+chmod +x "$HOME/.bashrc.d/antigravity"
+echo "✓ Plik ~/.bashrc.d/antigravity został zapisany."
+
+# Dodaj do ~/.bashrc
+if ! grep -q "source ~/.bashrc.d/antigravity" "$HOME/.bashrc" 2>/dev/null; then
+    echo "" >> "$HOME/.bashrc"
+    echo "# Import Antigravity environment settings" >> "$HOME/.bashrc"
+    echo "source ~/.bashrc.d/antigravity" >> "$HOME/.bashrc"
+    echo "✓ Dodano import do ~/.bashrc"
 fi
 
 echo ""
-echo "ℹ️  Aby aktywować os-init w bieżącym terminalu:"
+echo "ℹ️  Aby aktywować os-init i os-add-skill w bieżącym terminalu:"
 echo "   source ~/.bashrc.d/antigravity"
 
 # 5. Autoryzacja i logowanie do usług CLI (tylko w trybie interaktywnym)

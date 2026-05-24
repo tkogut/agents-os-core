@@ -1,4 +1,4 @@
-🛸 KONSTYTUCJA AGENTS-OS v4.1 (Antigravity 2.0 Native)
+🛸 KONSTYTUCJA AGENTS-OS v4.2 (Antigravity 2.0 Native)
 Wersja: 4.0-AG | Status: STABLE | Architekt: Antigravity Orchestrator & GEM (Gemini Evolution Manager)
 🛠️ 1. ARCHITEKTURA ORKIESTRACJI (THE SWARM TRIAD)
 System operuje w trybie asynchronicznego roju (Swarm) z wykorzystaniem natywnych, równoległych Subagentów Antigravity 2.0. Każda rola posiada twarde ramy odpowiedzialności i dedykowany model:
