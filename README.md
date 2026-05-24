@@ -75,8 +75,8 @@ bash INSTALL.sh
 ```
 
 Instalator automatycznie:
-- Instaluje GitHub CLI (`gh`)
-- Instaluje potrzebne biblioteki Python
+- Instaluje GitHub CLI (`gh`) przez repozytorium APT
+- Tworzy izolowane środowisko wirtualne Python (`~/.antigravity/venv`) z zależnościami (`GitPython`, `PyGithub`)
 - Kopiuje szablony projektów do `~/.antigravity/templates/`
 - Rejestruje komendę `os-init` w systemie
 - Dodaje konfigurację do `~/.bashrc.d/antigravity`
@@ -127,7 +127,7 @@ os-init moja-aplikacja
 3. 📝  Tworzy .gitignore i README.md
 4. 🔀  Inicjalizuje lokalne repozytorium Git
 5. 📝  Robi pierwszy commit ("init: agents-os v4.0 swarm bootstrap")
-6. 🐙  Tworzy publiczne repozytorium na GitHubie: github.com/tkogut/moja-aplikacja
+6. 🐙  Tworzy publiczne repozytorium na GitHubie: github.com/<twój-użytkownik-git>/moja-aplikacja
 7. 🚀  Wysyła (push) kod na GitHub
 8. 🖥️  Otwiera Antigravity IDE w środowisku WSL:Ubuntu w folderze projektu
 9. 🔀  Przechodzi do folderu projektu w Twoim terminalu (cd)
@@ -138,12 +138,12 @@ os-init moja-aplikacja
 Twój terminal automatycznie przejdzie do nowego folderu:
 
 ```bash
-📁 Jesteś w: /home/tkogut/projects/moja-aplikacja
+📁 Jesteś w: /home/<użytkownik-linux>/projects/moja-aplikacja
 ```
 
 A na GitHub pojawi się nowe repozytorium:
 ```
-https://github.com/tkogut/moja-aplikacja
+https://github.com/<twój-użytkownik-git>/moja-aplikacja
 ```
 
 ---
@@ -203,7 +203,7 @@ antigravity .
 **Opcja B — z Menu Start Windows:**
 1. Uruchom **Antigravity IDE**
 2. `File` → `Open Folder`
-3. W pasku adresu Eksploratora wpisz: `\\wsl.localhost\Ubuntu\home\tkogut\projects\`
+3. W pasku adresu Eksploratora wpisz: `\\wsl.localhost\Ubuntu\home\<użytkownik-linux>\projects\`
 4. Wybierz folder projektu
 
 > ⚠️ **Uwaga:** Jeśli Eksplorator Windows się zawiesza przy otwieraniu folderu WSL, wykonaj reset:
@@ -430,7 +430,7 @@ os-init my-project-name
 3. 📝  Creates .gitignore and README.md
 4. 🔀  Initializes local Git repository
 5. 📝  Makes first commit
-6. 🐙  Creates public GitHub repo: github.com/tkogut/my-project-name
+6. 🐙  Creates public GitHub repo: github.com/<your-github-username>/my-project-name
 7. 🚀  Pushes code to GitHub
 8. 🖥️  Opens Antigravity IDE in WSL:Ubuntu environment
 9. 🔀  Changes terminal directory to the new project (cd)

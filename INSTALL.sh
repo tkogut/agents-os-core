@@ -35,16 +35,56 @@ else
 fi
 
 if ! command -v gh &> /dev/null; then
-  echo "📦 Instalacja github-cli (gh)..."
-  if sudo -n snap install gh --classic &>/dev/null; then
-      echo "✓ gh zainstalowany"
+  echo "📦 Instalacja github-cli (gh) przez APT..."
+  if sudo -n true 2>/dev/null; then
+      sudo apt-get update -y &>/dev/null
+      sudo apt-get install -y curl gpg &>/dev/null
+      sudo mkdir -p /etc/apt/keyrings
+      sudo chmod 0755 /etc/apt/keyrings
+      curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+      sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+      sudo apt-get update -y &>/dev/null
+      sudo apt-get install -y gh &>/dev/null
+      echo "✓ gh zainstalowany przez APT"
   else
-      echo "⚠️ Nie udało się zainstalować gh. Zainstaluj ręcznie."
+      echo "⚠️ Brak bezhasłowego sudo. Próba instalacji interaktywnej gh..."
+      if sudo apt-get update && sudo apt-get install -y curl gpg && \
+         sudo mkdir -p /etc/apt/keyrings && sudo chmod 0755 /etc/apt/keyrings && \
+         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
+         sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+         echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
+         sudo apt-get update && sudo apt-get install -y gh; then
+          echo "✓ gh zainstalowany przez APT"
+      else
+          echo "⚠️ Nie udało się zainstalować gh. Zainstaluj ręcznie."
+      fi
   fi
 fi
 
-echo "📦 Instalacja zależności Python (GitPython, PyGithub)..."
-pip3 install GitPython PyGithub --break-system-packages || pip3 install GitPython PyGithub || echo "UWAGA: Problemy z instalacją pip, użyj środowiska wirtualnego jeśli wymagane."
+echo "📦 Konfiguracja izolowanego środowiska Python (venv)..."
+if python3 -m venv "$HOME/.antigravity/venv" 2>/dev/null; then
+    "$HOME/.antigravity/venv/bin/pip" install --upgrade pip &>/dev/null || true
+    echo "📦 Instalacja zależności Python (GitPython, PyGithub) w venv..."
+    "$HOME/.antigravity/venv/bin/pip" install GitPython PyGithub
+else
+    echo "⚠️ Nie udało się utworzyć venv. Próba instalacji python3-venv..."
+    if sudo -n true 2>/dev/null; then
+        sudo apt-get update -y &>/dev/null
+        sudo apt-get install -y python3-venv &>/dev/null
+    else
+        sudo apt-get update && sudo apt-get install -y python3-venv
+    fi
+    
+    if python3 -m venv "$HOME/.antigravity/venv" 2>/dev/null; then
+        "$HOME/.antigravity/venv/bin/pip" install --upgrade pip &>/dev/null || true
+        echo "📦 Instalacja zależności Python (GitPython, PyGithub) w venv..."
+        "$HOME/.antigravity/venv/bin/pip" install GitPython PyGithub
+    else
+        echo "⚠️ Nie można utworzyć venv. Instalacja globalna bibliotek Python..."
+        pip3 install GitPython PyGithub --break-system-packages || pip3 install GitPython PyGithub || echo "⚠️ Nie udało się zainstalować zależności Pythona."
+    fi
+fi
 
 # 2. Integracja z modułem kompresji tożsamości (Caveman)
 echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."

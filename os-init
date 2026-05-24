@@ -23,7 +23,11 @@ fi
 # 1. Uruchom bootstrapper i przechwyć output
 # --------------------------------------------------------------------------- #
 echo "🚀 os-init: Uruchamianie bootstrappera..."
-OUTPUT=$(python3 "$SKILL_SCRIPT" "$@" 2>&1)
+PYTHON_BIN="python3"
+if [ -f "$HOME/.antigravity/venv/bin/python" ]; then
+    PYTHON_BIN="$HOME/.antigravity/venv/bin/python"
+fi
+OUTPUT=$("$PYTHON_BIN" "$SKILL_SCRIPT" "$@" 2>&1)
 
 # Wyświetl output (bez ostatniej linii z ścieżką)
 echo "$OUTPUT" | grep -v "^__PROJECT_DIR__:" || true
@@ -48,7 +52,12 @@ echo "📁 Projekt gotowy w: $PROJECT_DIR"
 # To samo co funkcja antigravity() w ~/.bashrc.d/antigravity.
 # NIE używamy .exe ani wslpath — --remote obsługuje mapowanie ścieżki.
 
-IDE_BIN="/mnt/c/Users/admin_tk/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide"
+WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+if [ -n "$WIN_USER" ]; then
+    IDE_BIN="/mnt/c/Users/${WIN_USER}/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide"
+else
+    IDE_BIN="/mnt/c/Users/admin_tk/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide"
+fi
 
 echo "🖥️  Otwieranie Antigravity IDE (WSL:Ubuntu) w: $PROJECT_DIR"
 
@@ -64,13 +73,19 @@ else
     echo "   \"$IDE_BIN\" --remote wsl+Ubuntu \"$PROJECT_DIR\""
 fi
 
-# --------------------------------------------------------------------------- #
-# 4. Zmień katalog roboczy w bieżącym shellu
-# --------------------------------------------------------------------------- #
+# Wykryj użytkownika GitHub do wyświetlenia
+GH_USER="twoj-github-username"
+if command -v gh &>/dev/null; then
+    GH_USER=$(gh api user -q .login 2>/dev/null || echo "twoj-github-username")
+fi
+if [ "$GH_USER" = "twoj-github-username" ]; then
+    GH_USER=$(git config github.user 2>/dev/null || git config user.name 2>/dev/null | tr -d ' ' || echo "twoj-github-username")
+fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  ✅ PROJEKT GOTOWY: $PROJECT_DIR"
-echo "  🐙 GitHub: https://github.com/tkogut/${1:-$PROJECT_DIR}"
+echo "  🐙 GitHub: https://github.com/${GH_USER}/${1:-$PROJECT_DIR}"
 echo ""
 echo "  Aby przejść do projektu w terminalu:"
 echo "  cd \"$PROJECT_DIR\""
