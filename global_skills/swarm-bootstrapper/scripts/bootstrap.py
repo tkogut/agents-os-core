@@ -109,15 +109,39 @@ else:
 # --------------------------------------------------------------------------- #
 # 6. GitHub repo — utwórz jeśli nie istnieje, ustaw remote
 # --------------------------------------------------------------------------- #
-print("🐙 Sprawdzanie repo na GitHubie...")
+# Ustal dynamicznie użytkownika GitHub
+gh_user = "twoj-github-username"
+try:
+    gh_user_proc = subprocess.run(
+        ["gh", "api", "user", "-q", ".login"],
+        capture_output=True, text=True, check=True
+    )
+    gh_user = gh_user_proc.stdout.strip()
+except Exception:
+    # Fallback do git config github.user lub user.name
+    git_user_proc = subprocess.run(
+        ["git", "config", "github.user"],
+        capture_output=True, text=True
+    )
+    if git_user_proc.returncode == 0 and git_user_proc.stdout.strip():
+        gh_user = git_user_proc.stdout.strip()
+    else:
+        git_user_name_proc = subprocess.run(
+            ["git", "config", "user.name"],
+            capture_output=True, text=True
+        )
+        if git_user_name_proc.returncode == 0 and git_user_name_proc.stdout.strip():
+            gh_user = git_user_name_proc.stdout.strip().replace(" ", "")
+
+print(f"🐙 Sprawdzanie repo na GitHubie dla użytkownika {gh_user}...")
 gh_check = subprocess.run(
-    ["gh", "repo", "view", f"tkogut/{project_name}"],
+    ["gh", "repo", "view", f"{gh_user}/{project_name}"],
     cwd=TARGET_DIR, capture_output=True
 )
 
 if gh_check.returncode != 0:
     # Repo nie istnieje — utwórz BEZ --push (commitujemy sami w kroku 5 i 7)
-    print(f"🐙 Tworzenie publicznego repo: tkogut/{project_name}...")
+    print(f"🐙 Tworzenie publicznego repo: {gh_user}/{project_name}...")
     result = subprocess.run(
         ["gh", "repo", "create", project_name,
          "--public",
@@ -127,25 +151,25 @@ if gh_check.returncode != 0:
         cwd=TARGET_DIR, capture_output=True, text=True
     )
     if result.returncode == 0:
-        print(f"   ✅ Repo utworzone: https://github.com/tkogut/{project_name}")
+        print(f"   ✅ Repo utworzone: https://github.com/{gh_user}/{project_name}")
     else:
         print(f"   ⚠️  gh repo create failed: {result.stderr.strip()}")
         # Fallback: ustaw remote ręcznie
-        remote_url = f"https://github.com/tkogut/{project_name}.git"
+        remote_url = f"https://github.com/{gh_user}/{project_name}.git"
         subprocess.run(
             ["git", "remote", "add", "origin", remote_url],
             cwd=TARGET_DIR, capture_output=True
         )
         print(f"   🔗 Remote origin ustawiony ręcznie: {remote_url}")
 else:
-    print(f"   ✅ Repo już istnieje: tkogut/{project_name}")
+    print(f"   ✅ Repo już istnieje: {gh_user}/{project_name}")
     # Upewnij się że remote origin jest ustawiony
     remote_check = subprocess.run(
         ["git", "remote", "get-url", "origin"],
         cwd=TARGET_DIR, capture_output=True, text=True
     )
     if remote_check.returncode != 0:
-        remote_url = f"https://github.com/tkogut/{project_name}.git"
+        remote_url = f"https://github.com/{gh_user}/{project_name}.git"
         subprocess.run(["git", "remote", "add", "origin", remote_url], cwd=TARGET_DIR, capture_output=True)
 
 # --------------------------------------------------------------------------- #
@@ -177,7 +201,7 @@ else:
         print(f"      Możesz pushować ręcznie: git push -u origin {current_branch}")
 
 print(f"\n✨ AGENTS-OS v4.0 Swarm — projekt GOTOWY.")
-print(f"   GitHub: https://github.com/tkogut/{project_name}")
+print(f"   GitHub: https://github.com/{gh_user}/{project_name}")
 
 # WAŻNE: ostatnia linia = sygnał dla os-init (shell function) do cd
 print(f"__PROJECT_DIR__:{TARGET_DIR}")
