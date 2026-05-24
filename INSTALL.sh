@@ -11,7 +11,6 @@ echo "🚀 Rozpoczynam instalację AGENTS-OS v4.0 Swarm Edition..."
 # 1. Zależności systemu
 if ! command -v snap &> /dev/null; then
   echo "📦 Inicjalizacja snapd..."
-  # Pomijamy apt-get update jeśli nie mamy sudo bez hasła, ale informujemy użytkownika
   if sudo -n apt update &>/dev/null; then
       sudo apt install -y snapd
   else
@@ -49,12 +48,7 @@ pip3 install GitPython PyGithub --break-system-packages || pip3 install GitPytho
 
 # 2. Integracja z modułem kompresji tożsamości (Caveman)
 echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."
-# Pomijamy interaktywne pobieranie z agy jeśli nie jesteśmy zalogowani, nie wieszamy skryptu
-if command -v agy &>/dev/null && agy auth status &>/dev/null; then
-    timeout 5 agy extensions install https://github.com/JuliusBrussee/caveman || echo "UWAGA: Wtyczka caveman mogła być już zainstalowana."
-else
-    echo "⚠️ Pomijam agy extensions install (brak autoryzacji). Zostanie uruchomione po zalogowaniu."
-fi
+echo "⚠️ Pomijam agy extensions install. Rozszerzenie Caveman zostanie zainstalowane automatycznie po zalogowaniu do agy."
 
 # 3. Kopiowanie The Vault
 AGY_DIR="$HOME/.antigravity"
