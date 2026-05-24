@@ -10,6 +10,3 @@ else
     echo "ERR: Skill swarm-bootstrapper.py nie znaleziony w $SKILL_SCRIPT"
     exit 1
 fi
-
-echo "⚙️ Integracja Awesome Skills dla nowego projektu..."
-npx antigravity-awesome-skills --path .agents/skills --risk safe,none

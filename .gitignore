@@ -5,3 +5,10 @@ __pycache__/
 .DS_Store
 node_modules/
 .env
+
+# Dynamically installed skills
+.agents/skills/
+
+# Agent session artifacts
+implementation_plan.md
+walkthrough.md

@@ -1,6 +1,6 @@
 # WIEDZA: AGENTS-OS Core Inception (Repozytorium Systemowe)
 **Tag:** #NotebookLM | **Priorytet:** KRYTYCZNY
-**Cel:** Przebudowa repozytorium `tkogut/agents-os-core` pod standard AGENTS-OS v3.2 / Antigravity 2.0.
+**Cel:** Przebudowa repozytorium `tkogut/agents-os-core` pod standard AGENTS-OS v4.0 / Antigravity 2.0.
 
 ## 1. Problem Architektoniczny
 * Repozytorium źródłowe instalatora nie posiada własnej struktury agentowej. Agent GEM nie może nim autonomicznie zarządzać bez folderu `.agents/` oraz plików konfiguracyjnych.

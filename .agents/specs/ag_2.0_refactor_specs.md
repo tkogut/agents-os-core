@@ -1,10 +1,10 @@
-# WIEDZA: AGENTS-OS v3.2 -> Antigravity 2.0 (Refactoring Specs)
+# WIEDZA: AGENTS-OS v4.0 -> Antigravity 2.0 (Refactoring Specs)
 **Tag:** #NotebookLM | **Priorytet:** KRYTYCZNY
 **Środowisko docelowe:** Windows WSL (Brak wsparcia dla macOS/brew)
 
 ## 1. Aktualizacja Zależności (Terminal)
 * **Wygaszenie gemini-cli:** Środowisko `gemini-cli` zostało wchłonięte przez nowe narzędzie `Antigravity CLI` napisane w języku Go. 
-* **Zadanie dla instalatora:** Skrypty `INSTALL.sh` i `os-init` muszą zostać zaktualizowane, aby pobierały i inicjowały `Antigravity CLI` z natywnym wsparciem dla wieloagentowości w terminalu.
+* **Zadanie dla instalatora:** Skrypty `INSTALL.sh` i `os-init` must zostać zaktualizowane, aby pobierały i inicjowały `Antigravity CLI` z natywnym wsparciem dla wieloagentowości w terminalu.
 
 ## 2. Refaktoryzacja Bootstrappera (`bootstrap.py`)
 * **Problem:** Obecny system wykorzystuje ryzykowne, surowe wywołania systemowe (np. `subprocess.run` dla komend gita).

@@ -14,4 +14,4 @@ version: 1.0
 Przy wywołaniu komendy, uruchomić skrypt z lokalizacji startowej użytkownika (Target CWD).
 
 **Komenda do wpisania przez Agenta:**
-`python3 ~/.gemini/antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py`
+`python3 ~/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py`

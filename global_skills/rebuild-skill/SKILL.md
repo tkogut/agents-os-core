@@ -11,7 +11,7 @@ Wymuszenie synchronizacji lokalnego środowiska Agenta z najnowszą wersją Zło
 
 🛠️ **Implementation Logic**
 Uruchamia skrypt \`INSTALL.sh\` z folderu repozytorium \`agents-os-core\`.
-1. Aktualizuje \`~/.gemini/antigravity/templates/\`.
+1. Aktualizuje \`~/.antigravity/templates/\`.
 2. Odświeża symlinki w piaskownicy Snapa.
 
 🗣️ **Usage Rule**

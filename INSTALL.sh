@@ -10,8 +10,13 @@ echo "🚀 Rozpoczynam instalację AGENTS-OS v4.0 Swarm Edition..."
 
 # 1. Zależności systemu
 if ! command -v snap &> /dev/null; then
-  echo "📦 Instalacja snapd..."
-  sudo apt update && sudo apt install -y snapd
+  echo "📦 Inicjalizacja snapd..."
+  # Pomijamy apt-get update jeśli nie mamy sudo bez hasła, ale informujemy użytkownika
+  if sudo -n apt update &>/dev/null; then
+      sudo apt install -y snapd
+  else
+      echo "⚠️ Pomijam instalację snapd (brak bezhasłowego sudo). Upewnij się, że snap jest obecny."
+  fi
 fi
 
 if command -v agy &> /dev/null; then
@@ -20,21 +25,36 @@ else
     echo "Pobieranie i instalacja Antigravity CLI (Go Binary)..."
     curl -fL -o antigravity.tar.gz "https://antigravity.google/download/linux-x64.tar.gz"
     tar -xzf antigravity.tar.gz
-    sudo mv agy /usr/local/bin/
-    rm antigravity.tar.gz
+    if sudo -n mv agy /usr/local/bin/ 2>/dev/null; then
+        echo "✓ agy zainstalowany w /usr/local/bin"
+    else
+        mkdir -p "$HOME/.local/bin"
+        mv agy "$HOME/.local/bin/"
+        echo "✓ agy zainstalowany w $HOME/.local/bin"
+    fi
+    rm -f antigravity.tar.gz
 fi
 
 if ! command -v gh &> /dev/null; then
   echo "📦 Instalacja github-cli (gh)..."
-  sudo snap install gh --classic
+  if sudo -n snap install gh --classic &>/dev/null; then
+      echo "✓ gh zainstalowany"
+  else
+      echo "⚠️ Nie udało się zainstalować gh. Zainstaluj ręcznie."
+  fi
 fi
 
 echo "📦 Instalacja zależności Python (GitPython, PyGithub)..."
-pip3 install GitPython PyGithub || echo "UWAGA: Problemy z instalacją pip, użyj środowiska wirtualnego jeśli wymagane."
+pip3 install GitPython PyGithub --break-system-packages || pip3 install GitPython PyGithub || echo "UWAGA: Problemy z instalacją pip, użyj środowiska wirtualnego jeśli wymagane."
 
-# 2. Instalacja wtyczki Caveman (pominięta/zaktualizowana dla agy)
+# 2. Integracja z modułem kompresji tożsamości (Caveman)
 echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."
-agy extensions install https://github.com/JuliusBrussee/caveman || echo "UWAGA: Wtyczka caveman mogła być już zainstalowana."
+# Pomijamy interaktywne pobieranie z agy jeśli nie jesteśmy zalogowani, nie wieszamy skryptu
+if command -v agy &>/dev/null && agy auth status &>/dev/null; then
+    timeout 5 agy extensions install https://github.com/JuliusBrussee/caveman || echo "UWAGA: Wtyczka caveman mogła być już zainstalowana."
+else
+    echo "⚠️ Pomijam agy extensions install (brak autoryzacji). Zostanie uruchomione po zalogowaniu."
+fi
 
 # 3. Kopiowanie The Vault
 AGY_DIR="$HOME/.antigravity"
@@ -62,12 +82,20 @@ mkdir -p "$AGY_DIR/skills/rebuild-skill"
 cp -ra ./global_skills/rebuild-skill/. "$AGY_DIR/skills/rebuild-skill/"
 
 echo "⚙️ Integracja Awesome Skills..."
-npx antigravity-awesome-skills --path .agents/skills --risk safe,none
+npx -y antigravity-awesome-skills --path .agents/skills --risk safe,none
 
 echo "⚙️ Rejestracja globalnego skrótu CLI (os-init)..."
 if [ -f "./os-init" ]; then
-    sudo cp ./os-init /usr/local/bin/os-init
-    sudo chmod +x /usr/local/bin/os-init
+    if sudo -n cp ./os-init /usr/local/bin/os-init 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-init
+        echo "✓ Skrót zarejestrowany w /usr/local/bin/os-init"
+    else
+        echo "⚠️ Brak uprawnień sudo. Rejestracja w ~/.local/bin/os-init..."
+        mkdir -p "$HOME/.local/bin"
+        cp ./os-init "$HOME/.local/bin/os-init"
+        chmod +x "$HOME/.local/bin/os-init"
+        echo "✓ Skrót zarejestrowany w $HOME/.local/bin/os-init"
+    fi
 else
     echo "⚠️ Nie odnaleziono pliku os-init w repozytorium!"
 fi

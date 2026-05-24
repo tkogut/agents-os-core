@@ -19,12 +19,27 @@ Zapewnia to:
 Stworzyliśmy absolutnie samowystarczalny system. Nie musisz już ręcznie kopiować plików z poprzednich projektów.
 
 ### Instalacja systemu na nowym komputerze:
-Aby zaaplikować cały ekosystem i stworzyć Złoty Standard od zera, wystarczy pobrać repozytorium i uruchomić skrypt instalacyjny:
+
+#### Wymagania wstępne:
+1. **Python 3** oraz `pip3` zainstalowane w systemie.
+2. Dodanie `~/.local/bin` do zmiennej `PATH` (w przypadku instalacji bez uprawnień root):
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+#### Instalacja:
+Pobierz repozytorium i uruchom skrypt instalacyjny:
 
 ```bash
 git clone https://github.com/tkogut/agents-os-core.git
 cd agents-os-core
 bash INSTALL.sh
+```
+
+Po instalacji zaloguj się do narzędzi CLI:
+```bash
+gh auth login
+agy auth login
 ```
 
 ### Jak utworzyć nowy projekt (The Bootstrapper):
@@ -35,7 +50,7 @@ os-init nazwa-mojego-projektu
 
 **Co zrobi sztuczna inteligencja?**
 1. System sam utworzy folder `/home/tkogut/projects/nazwa-mojego-projektu`.
-2. Skopiuje do niego "Złoty Standard" tzw. The Template Vault z rezerwuaru `~/.gemini/antigravity/templates/v4.0-swarm/`.
+2. Skopiuje do niego "Złoty Standard" tzw. The Template Vault z rezerwuaru `~/.antigravity/templates/v4.0-swarm/`.
 3. Zainicjalizuje puste repozytorium GiT.
 4. Zgłosi się w trybie "ACTIVE" z odpowiednim "State Token".
 
@@ -101,6 +116,11 @@ Oprócz skilli globalnych, każdy projekt inicjowany jest ze specjalnymi umieję
 - **`skill-creator`**: Meta-programowanie. Komenda *"new-skill"* wyzwala procedurę tworzenia nowych, ustandaryzowanych (Anatomy v2.2) folderów skilli wprost dla bieżącego projektu. Agent instruuje samego siebie.
 - **`notebooklm-sync`**: Automatyzacja zarządzania wiedzą RAG. Domyślny instruktarz do destylacji i importowania danych z Google NotebookLM do `graph.json`.
 
+### Dynamiczne Umiejętności (Dynamic Skills - Awesome Skills):
+Wersja v4.0 automatycznie pobiera i aktualizuje bazę gotowych, dynamicznych skilli podczas uruchomienia `INSTALL.sh`. Skille te są umieszczane w katalogu `.agents/skills/` (który jest ignorowany przez Gita w `.gitignore`, aby uniknąć zaśmiecenia repozytorium).
+* **Jak z nich korzystać:** W panelu konwersacji asystenta Antigravity możesz wywołać dowolny z tych skilli bezpośrednio, wpisując `@nazwa-skilla` (np. `@git-pr-review`, `@audio-transcriber`).
+* **Filtrowanie zakresu:** Zakres pobieranych skilli można dostosować w pliku `INSTALL.sh` poprzez modyfikację argumentów narzędzia `antigravity-awesome-skills` (np. dodając filtry `--risk safe,none` lub `--tags`).
+
 ---
 Dokument wygenerowany przez Instancję Antigravity w dniu ostatecznej weryfikacji. Zakończono protokół.
 
@@ -127,12 +147,27 @@ This ensures:
 We have created an absolutely self-sufficient system. You no longer need to manually copy files from previous projects.
 
 ### System installation on a new machine:
-To apply the entire ecosystem and create the Golden Standard from scratch, just clone the repository and run the installation script:
+
+#### Prerequisites:
+1. **Python 3** and `pip3` installed on the system.
+2. Add `~/.local/bin` to your `PATH` variable (if installing without root privileges):
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+#### Installation:
+Clone the repository and run the installation script:
 
 ```bash
 git clone https://github.com/tkogut/agents-os-core.git
 cd agents-os-core
 bash INSTALL.sh
+```
+
+After installation, authorize the CLI clients:
+```bash
+gh auth login
+agy auth login
 ```
 
 ### How to create a new project (The Bootstrapper):
@@ -143,7 +178,7 @@ os-init my-new-project-name
 
 **What will the AI do?**
 1. The system will auto-create the directory `/home/tkogut/projects/my-new-project-name`.
-2. It will copy the "Golden Standard", aka The Template Vault from `~/.gemini/antigravity/templates/v4.0-swarm/` into it.
+2. It will copy the "Golden Standard", aka The Template Vault from `~/.antigravity/templates/v4.0-swarm/` into it.
 3. Initializes an empty GiT repository.
 4. Reports back in "ACTIVE" state with the corresponding "State Token".
 
@@ -207,6 +242,11 @@ The system comes pre-equipped with "Agentic Skills" layered as global extensions
 In addition to global skills, each project is initialized with specialized skills embedded directly within the local `.agents/skills/` directory:
 - **`skill-creator`**: Meta-programming. The *"new-skill"* trigger allows the Agent to train itself, generating robust skill scaffolding based on the Skill Anatomy v2.2 standard for the current project.
 - **`notebooklm-sync`**: Knowledge management. A built-in protocol mapping out the distillation of insights from Google NotebookLM down into the project's atomic `graph.json` state.
+
+### Dynamic Skills (Awesome Skills):
+Version v4.0 automatically downloads and updates a library of ready-to-use dynamic skills during `INSTALL.sh` execution. These skills are stored in the local `.agents/skills/` directory (which is ignored by Git in `.gitignore` to prevent repository bloat).
+* **How to use them:** Inside the Antigravity assistant conversation panel, you can explicitly invoke any installed dynamic skill by typing `@skill-name` (e.g. `@git-pr-review`, `@audio-transcriber`).
+* **Scope Configuration:** The variety of downloaded skills can be customized in `INSTALL.sh` by adjusting `antigravity-awesome-skills` parameters (e.g. by setting `--risk safe,none` or `--tags`).
 
 ---
 Document generated by the Antigravity Instance on the day of final verification. Protocol complete.
