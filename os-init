@@ -1,12 +1,100 @@
 #!/bin/bash
-# Trigger: os-init
-# Engine: Caveman Ultra+
+# ==============================================================================
+# os-init <nazwa-projektu>
+# AGENTS-OS v4.0 SWARM — Project Initializer
+# Tworzy projekt, GitHub repo, commit+push, otwiera IDE.
+# ==============================================================================
+
+set -e
 
 SKILL_SCRIPT="$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py"
 
-if [ -f "$SKILL_SCRIPT" ]; then
-    python3 "$SKILL_SCRIPT" "$@"
-else
-    echo "ERR: Skill swarm-bootstrapper.py nie znaleziony w $SKILL_SCRIPT"
+# Fallback: użyj lokalnej kopii jeśli nie zainstalowano globalnie
+if [ ! -f "$SKILL_SCRIPT" ]; then
+    SKILL_SCRIPT="$(dirname "$(realpath "$0")")/../global_skills/swarm-bootstrapper/scripts/bootstrap.py"
+fi
+
+if [ ! -f "$SKILL_SCRIPT" ]; then
+    echo "❌ ERR: bootstrap.py nie znaleziony. Uruchom najpierw INSTALL.sh."
     exit 1
 fi
+
+# --------------------------------------------------------------------------- #
+# 1. Uruchom bootstrapper i przechwyć output
+# --------------------------------------------------------------------------- #
+echo "🚀 os-init: Uruchamianie bootstrappera..."
+OUTPUT=$(python3 "$SKILL_SCRIPT" "$@" 2>&1)
+
+# Wyświetl output (bez ostatniej linii z ścieżką)
+echo "$OUTPUT" | grep -v "^__PROJECT_DIR__:" || true
+
+# --------------------------------------------------------------------------- #
+# 2. Wyciągnij ścieżkę projektu
+# --------------------------------------------------------------------------- #
+PROJECT_DIR=$(echo "$OUTPUT" | grep "^__PROJECT_DIR__:" | sed 's/^__PROJECT_DIR__://')
+
+if [ -z "$PROJECT_DIR" ]; then
+    echo "⚠️  Nie udało się wykryć ścieżki projektu. Sprawdź bootstrap.py."
+    exit 1
+fi
+
+echo ""
+echo "📁 Projekt gotowy w: $PROJECT_DIR"
+
+# --------------------------------------------------------------------------- #
+# 3. Otwórz Antigravity IDE w folderze projektu
+# --------------------------------------------------------------------------- #
+
+# Ścieżka Windows do IDE (przez WSL interop)
+WIN_IDE="/mnt/c/Users/admin_tk/AppData/Local/Programs/Antigravity IDE/Antigravity IDE.exe"
+WIN_IDE_ALT="/mnt/c/Users/admin_tk/AppData/Local/Programs/antigravity-ide/Antigravity IDE.exe"
+
+# Konwersja ścieżki WSL → Windows (\\wsl.localhost\Ubuntu\...)
+WIN_PROJECT_PATH=$(wslpath -w "$PROJECT_DIR" 2>/dev/null || echo "")
+
+open_ide() {
+    local ide_path="$1"
+    if [ -f "$ide_path" ]; then
+        echo "🖥️  Otwieranie Antigravity IDE w: $PROJECT_DIR"
+        if [ -n "$WIN_PROJECT_PATH" ]; then
+            "$ide_path" "$WIN_PROJECT_PATH" &
+        else
+            "$ide_path" "$PROJECT_DIR" &
+        fi
+        echo "✅ IDE uruchomione."
+        return 0
+    fi
+    return 1
+}
+
+if open_ide "$WIN_IDE"; then
+    :
+elif open_ide "$WIN_IDE_ALT"; then
+    :
+else
+    # Fallback: spróbuj przez komendę antigravity-ide lub code
+    if command -v antigravity-ide &>/dev/null; then
+        echo "🖥️  Otwieranie IDE przez komendę 'antigravity-ide'..."
+        antigravity-ide "$PROJECT_DIR" &
+    elif command -v agy &>/dev/null; then
+        echo "🖥️  Otwieranie przez agy..."
+        agy "$PROJECT_DIR" &
+    else
+        echo "ℹ️  Nie znaleziono IDE. Otwórz ręcznie: $PROJECT_DIR"
+    fi
+fi
+
+# --------------------------------------------------------------------------- #
+# 4. Zmień katalog roboczy w bieżącym shellu
+# --------------------------------------------------------------------------- #
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  ✅ PROJEKT GOTOWY: $PROJECT_DIR"
+echo "  🐙 GitHub: https://github.com/tkogut/${1:-$PROJECT_DIR}"
+echo ""
+echo "  Aby przejść do projektu w terminalu:"
+echo "  cd \"$PROJECT_DIR\""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Eksportuj ścieżkę żeby shell-wrapper mógł zrobić cd
+export OS_INIT_PROJECT_DIR="$PROJECT_DIR"
