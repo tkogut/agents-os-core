@@ -1,11 +1,11 @@
 ---
 name: swarm-bootstrapper
-description: Automatyczna instancjacja Złotego Standardu AGENTS-OS v4.1 w nowych projektach.
+description: Automatyczna instancjacja Złotego Standardu AGENTS-OS v4.2 w nowych projektach.
 trigger_words: ["@agents.md instantiate", "os-init", "bootstrap", "swarm init"]
 version: 1.0
 ---
 
-# Swarm Bootstrapper (v4.1-AG)
+# Swarm Bootstrapper (v4.2-AG)
 
 **Goal:** Klonowanie Template Vault (ROOT + LOKAL) do obecnego obszaru roboczego bez niszczenia istniejących repozytoriów.
 **Engine:** Caveman Ultra+

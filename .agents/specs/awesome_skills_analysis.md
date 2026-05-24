@@ -1,4 +1,4 @@
-# Analiza i integracja `antigravity-awesome-skills` w systemie AGENTS-OS v4.1
+# Analiza i integracja `antigravity-awesome-skills` w systemie AGENTS-OS v4.2
 
 Repozytorium [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) to biblioteka instalacyjna zawierająca ponad 1 400 zoptymalizowanych skilli systemowych (wzorce w plikach `SKILL.md`) kompatybilnych z systemami Claude Code, Gemini CLI, Codex, Cursor i Antigravity.
 
@@ -17,7 +17,7 @@ Oto szczegółowy raport z analizy narzędzia oraz plan jego rozszerzonego wykor
 
 ---
 
-## 2. Stan obecny w naszym setupie (AGENTS-OS v4.1)
+## 2. Stan obecny w naszym setupie (AGENTS-OS v4.2)
 W plikach instalacyjnych naszego systemu mamy już podstawową integrację:
 * W pliku [INSTALL.sh](file:///home/tkogut/projects/agents-os-core/INSTALL.sh#L65):
   ```bash

@@ -3,7 +3,7 @@ name: github-orchestrator
 description: >
   [Trigger Words: "github init", "sync github", "github push", "github test",
   "deploy workflow", "auto commit", "zapisz i pushnij", "create pr", "open pull request"]
-  [Domain: DevOps, Cloud CI/CD, GitOps, AntiGravity v4.1]
+  [Domain: DevOps, Cloud CI/CD, GitOps, AntiGravity v4.2]
   [Outcomes: automated remote repo creation, structured caveman commits, workflow monitoring]
 ---
 
@@ -58,4 +58,4 @@ D. **Zasada "Standardized PR" (Trigger: "create pr" / "open pull request")**
 🗣️ **Usage Rule**
 Pamiętaj! Nigdy nie wypisuj w chatcie pełnych logów git, zatrzymuj się tylko na esencji (sukces/porażka). Jeśli workflow padnie, odpal `caveman-review` na logach, by od razu zaproponować plik z poprawką.
 
-Standard AntiGravity v4.1 Swarm | Cloud Sync Automation.
+Standard AntiGravity v4.2 Swarm | Cloud Sync Automation.
