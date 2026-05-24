@@ -4,6 +4,19 @@ Wszystkie zmiany w tej wersji są bezpośrednią odpowiedzią na audyt przenasza
 
 ---
 
+## [4.1.1] - 2026-05-24
+
+### 🚀 Poprawki i Automatyzacja (Portability & Automation)
+
+* **Instalacja wtyczki Caveman przez URL**:
+  * Zmieniono cel instalacji wtyczki `caveman` w [INSTALL.sh](file:///home/tkogut/projects/agents-os-core/INSTALL.sh) na bezpośredni link GitHub (`https://github.com/juliusbrussee/caveman`). Rozwiązuje to błąd instalacji lokalnej.
+* **Automatyczne czyszczenie starych szablonów**:
+  * Dodano moduł czyszczący w [INSTALL.sh](file:///home/tkogut/projects/agents-os-core/INSTALL.sh), usuwający stare wersje szablonów (np. `v4.0-swarm`) przed kopiowaniem nowych.
+* **Automatyczny test E2E**:
+  * Utworzono skrypt testowy [test_bootstrap.sh](file:///home/tkogut/projects/agents-os-core/execution/test_bootstrap.sh) weryfikujący tworzenie projektów, strukturę Złotego Standardu, repozytorium git i push na GitHub.
+
+---
+
 ## [4.1.0] - 2026-05-24
 
 ### 🚀 Nowości i Ulepszenia Przenaszalności (Portability)

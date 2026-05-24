@@ -6,4 +6,10 @@
 - [x] Implement Self-Rule in `.agents/rules/core-rule.md` forcing Git Worktrees and asynchronous execution
 - [x] Verify core configuration structure and validate Graph RAG node integrity
 - [x] Migrate Constitution and knowledge base to native structure in `.agents/specs/` and update `graph.json`
-- [x] Patch all working files to replace old v3.2 references with native AGENTS-OS v4.0
+- [x] Patch all working files to replace old v3.2 references with native AGENTS-OS v4.1
+
+- [x] Portability & Automation updates (v4.1.1)
+  - [x] Update Caveman plugin installation in `INSTALL.sh` to use github URL
+  - [x] Implement old template clean-up in `INSTALL.sh`
+  - [x] Create automated E2E script `execution/test_bootstrap.sh`
+

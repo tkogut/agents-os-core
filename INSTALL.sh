@@ -93,6 +93,13 @@ echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."
 AGY_DIR="$HOME/.antigravity"
 VAULT_DIR="$AGY_DIR/templates/v4.1-swarm"
 
+# Czyszczenie starych wersji szablonów w celu zachowania czystości systemu
+echo "🧹 Czyszczenie starych szablonów..."
+if [ -d "$AGY_DIR/templates/v4.0-swarm" ]; then
+    rm -rf "$AGY_DIR/templates/v4.0-swarm"
+    echo "   ✓ Usunięto przestarzały szablon v4.0-swarm"
+fi
+
 echo "✨ Deploy: The Template Vault (Złoty Standard)..."
 mkdir -p "$VAULT_DIR"
 cp -ra ./vault/. "$VAULT_DIR/"
@@ -167,7 +174,7 @@ if [ -t 0 ]; then
         agy --version &>/dev/null || echo "⚠️ Nie udało się sprawdzić statusu logowania agy."
         
         echo "🛡️ Instalacja wtyczki Caveman w agy..."
-        agy plugin install caveman || echo "⚠️ Nie udało się zainstalować wtyczki Caveman (zaloguj się i zainstaluj ręcznie: agy plugin install caveman)."
+        agy plugin install https://github.com/juliusbrussee/caveman || echo "⚠️ Nie udało się zainstalować wtyczki Caveman (zaloguj się i zainstaluj ręcznie: agy plugin install https://github.com/juliusbrussee/caveman)."
     fi
 else
     echo "🖥️ Środowisko nieinteraktywne. Pomijam autoryzację CLI (wykonaj ręcznie po instalacji)."
