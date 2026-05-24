@@ -77,21 +77,33 @@ cp -ra ./global_skills/rebuild-skill/. "$AGY_DIR/skills/rebuild-skill/"
 echo "⚙️ Integracja Awesome Skills..."
 npx -y antigravity-awesome-skills --path .agents/skills --risk safe,none
 
-echo "⚙️ Rejestracja globalnego skrótu CLI (os-init)..."
+echo "⚙️ Rejestracja skryptu os-init-run (wykonywalny backend)..."
 if [ -f "./os-init" ]; then
-    if sudo -n cp ./os-init /usr/local/bin/os-init 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-init
-        echo "✓ Skrót zarejestrowany w /usr/local/bin/os-init"
+    if sudo -n cp ./os-init /usr/local/bin/os-init-run 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-init-run
+        echo "✓ Backend zarejestrowany w /usr/local/bin/os-init-run"
     else
-        echo "⚠️ Brak uprawnień sudo. Rejestracja w ~/.local/bin/os-init..."
+        echo "⚠️ Brak uprawnień sudo. Rejestracja w ~/.local/bin/os-init-run..."
         mkdir -p "$HOME/.local/bin"
-        cp ./os-init "$HOME/.local/bin/os-init"
-        chmod +x "$HOME/.local/bin/os-init"
-        echo "✓ Skrót zarejestrowany w $HOME/.local/bin/os-init"
+        cp ./os-init "$HOME/.local/bin/os-init-run"
+        chmod +x "$HOME/.local/bin/os-init-run"
+        echo "✓ Backend zarejestrowany w $HOME/.local/bin/os-init-run"
     fi
 else
     echo "⚠️ Nie odnaleziono pliku os-init w repozytorium!"
 fi
+
+echo "⚙️ Rejestracja shell function os-init w ~/.bashrc.d/antigravity..."
+SHELL_RC="$HOME/.bashrc.d/antigravity"
+if ! grep -q 'os-init()' "$SHELL_RC" 2>/dev/null; then
+    echo "⚠️ Shell function os-init nie znaleziona. Dodaj ją ręcznie lub uruchom skrypt ponownie."
+else
+    echo "✓ Shell function os-init() jest zarejestrowana w $SHELL_RC"
+fi
+
+echo ""
+echo "ℹ️  Aby aktywować os-init w bieżącym terminalu:"
+echo "   source ~/.bashrc.d/antigravity"
 
 # 5. Autoryzacja i logowanie do usług CLI (tylko w trybie interaktywnym)
 if [ -t 0 ]; then
@@ -123,5 +135,15 @@ fi
 
 echo "===================================================================="
 echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: SYSTEM AGENTS-OS GOTOWY."
-echo "Uruchom komendę: 'os-init nazwa-mojego-projektu' aby wystartować."
+echo ""
+echo "Następne kroki:"
+echo "  1. Załaduj shell config:  source ~/.bashrc.d/antigravity"
+echo "  2. Utwórz projekt:         os-init nazwa-projektu"
+echo ""
+echo "  Komenda os-init automatycznie:"
+echo "    ✓ Tworzy strukturę folderów (Złoty Standard)"
+echo "    ✓ Tworzy repo na GitHubie (tkogut/nazwa-projektu)"
+echo "    ✓ Robi initial commit i push"
+echo "    ✓ Otwiera Antigravity IDE w folderze projektu"
+echo "    ✓ Przechodzi do folderu projektu w terminalu (cd)"
 echo "===================================================================="
