@@ -4,7 +4,7 @@ import sys
 import git
 from github import Github, GithubException
 
-VAULT_DIR = os.path.expanduser("~/.gemini/antigravity/templates/v4.0-swarm")
+VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v4.0-swarm")
 TARGET_DIR = os.getcwd()
 
 # Argument handling
@@ -68,7 +68,9 @@ for item in os.listdir(VAULT_DIR):
 print("🧩 Aktywne rozszerzenia (Antigravity CLI):")
 try:
     ext_dirs = [
+        os.path.expanduser("~/.antigravity/extensions"),
         os.path.expanduser("~/.gemini/extensions"),
+        os.path.expanduser("~/snap/antigravity/current/.antigravity/extensions"),
         os.path.expanduser("~/snap/gemini-cli/current/.gemini/extensions")
     ]
     found_exts = []

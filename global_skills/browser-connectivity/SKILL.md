@@ -21,7 +21,7 @@ Agent używa \`browserType.connectOverCDP\` zamiast \`browser.launch()\`.
 3. **Ping**: \`curl -I http://127.0.0.1:9222/json/version\`.
 
 ⚠️ **Error Recovery**
-- Jeśli mostek leży: Wykonaj \`python3 ~/.gemini/antigravity/skills/browser-connectivity/scripts/start_tunnel.py\`.
+- Jeśli mostek leży: Wykonaj \`python3 ~/.antigravity/skills/browser-connectivity/scripts/start_tunnel.py\`.
 - Jeśli port 9223 zablokowany: Poproś użytkownika o \`netsh interface portproxy reset\` na Windows.
 
 Standard AntiGravity v4.0 Swarm | Browser Bridge Active.

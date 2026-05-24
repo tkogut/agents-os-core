@@ -17,7 +17,7 @@ def check_port(ip, port):
         return s.connect_ex((ip, port)) == 0
 
 def start_bridge():
-    bridge_path = os.path.expanduser("~/.gemini/antigravity/skills/browser-connectivity/scripts/wsl_bridge_universal.py")
+    bridge_path = os.path.expanduser("~/.antigravity/skills/browser-connectivity/scripts/wsl_bridge_universal.py")
     cmd = f"nohup python3 {bridge_path} > /tmp/wsl_bridge.log 2>&1 &"
     print(f"[WSL] Starting bridge: {cmd}")
     subprocess.Popen(cmd, shell=True)
