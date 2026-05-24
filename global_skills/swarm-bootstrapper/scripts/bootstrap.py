@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 AGENTS-OS v4.0 SWARM - Project Bootstrapper
-Tworzy projekt, repo GitHub, commit initial + push.
-Wypisuje ścieżkę projektu na stdout jako ostatnią linię (używana przez os-init do cd).
+Kolejność: folder → vault → .gitignore → git init → commit → gh repo create → push
+Wypisuje __PROJECT_DIR__:<ścieżka> jako ostatnią linię (używana przez os-init do cd).
 """
 import os
 import shutil
@@ -64,17 +64,50 @@ if not os.path.exists(gitignore_path):
     with open(gitignore_path, "w") as f:
         f.write("# AGENTS-OS v4.0\ntmp/\n*.log\n__pycache__/\n.DS_Store\nnode_modules/\n.env\n")
 
+# Tworzymy README.md jeśli brak (potrzebny do commita)
+readme_path = os.path.join(TARGET_DIR, "README.md")
+if not os.path.exists(readme_path):
+    with open(readme_path, "w") as f:
+        f.write(f"# {project_name}\n\nAGENTS-OS v4.0 Swarm Edition\n")
+
 # --------------------------------------------------------------------------- #
-# 4. Git init
+# 4. Git init (ZAWSZE przed gh repo create)
 # --------------------------------------------------------------------------- #
 git_path = os.path.join(TARGET_DIR, ".git")
 if not os.path.exists(git_path):
     print("📦 Inicjalizacja lokalnego repo git...")
-    subprocess.run(["git", "init"], cwd=TARGET_DIR, check=True)
-    subprocess.run(["git", "checkout", "-b", "main"], cwd=TARGET_DIR, check=True)
+    subprocess.run(["git", "init"], cwd=TARGET_DIR, check=True, capture_output=True)
+    # Ustaw branch na main
+    subprocess.run(["git", "checkout", "-b", "main"], cwd=TARGET_DIR, check=True, capture_output=True)
+else:
+    # Sprawdź czy jesteśmy na main lub master
+    branch = subprocess.run(
+        ["git", "branch", "--show-current"],
+        cwd=TARGET_DIR, capture_output=True, text=True
+    ).stdout.strip()
+    if not branch:
+        subprocess.run(["git", "checkout", "-b", "main"], cwd=TARGET_DIR, capture_output=True)
 
 # --------------------------------------------------------------------------- #
-# 5. Tworzenie repo na GitHubie (gh CLI)
+# 5. Initial commit (PRZED gh repo create — gh --push wymaga commitów)
+# --------------------------------------------------------------------------- #
+status = subprocess.run(
+    ["git", "status", "--porcelain"],
+    cwd=TARGET_DIR, capture_output=True, text=True
+)
+if status.stdout.strip():
+    print("📝 Initial commit...")
+    subprocess.run(["git", "add", "-A"], cwd=TARGET_DIR, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "commit", "-m", "init: agents-os v4.0 swarm bootstrap"],
+        cwd=TARGET_DIR, check=True, capture_output=True
+    )
+    print("   ✅ Commit gotowy.")
+else:
+    print("   ℹ️  Brak zmian do commita (repo już zainicjalizowane).")
+
+# --------------------------------------------------------------------------- #
+# 6. GitHub repo — utwórz jeśli nie istnieje, ustaw remote
 # --------------------------------------------------------------------------- #
 print("🐙 Sprawdzanie repo na GitHubie...")
 gh_check = subprocess.run(
@@ -83,97 +116,68 @@ gh_check = subprocess.run(
 )
 
 if gh_check.returncode != 0:
+    # Repo nie istnieje — utwórz BEZ --push (commitujemy sami w kroku 5 i 7)
     print(f"🐙 Tworzenie publicznego repo: tkogut/{project_name}...")
     result = subprocess.run(
         ["gh", "repo", "create", project_name,
          "--public",
          "--description", f"AGENTS-OS v4.0 — {project_name}",
          "--source", TARGET_DIR,
-         "--remote", "origin",
-         "--push"],
+         "--remote", "origin"],
         cwd=TARGET_DIR, capture_output=True, text=True
     )
     if result.returncode == 0:
-        print(f"✅ Repo utworzone: https://github.com/tkogut/{project_name}")
-        repo_created_by_gh = True
+        print(f"   ✅ Repo utworzone: https://github.com/tkogut/{project_name}")
     else:
-        print(f"⚠️  gh repo create failed: {result.stderr.strip()}")
-        repo_created_by_gh = False
+        print(f"   ⚠️  gh repo create failed: {result.stderr.strip()}")
+        # Fallback: ustaw remote ręcznie
+        remote_url = f"https://github.com/tkogut/{project_name}.git"
+        subprocess.run(
+            ["git", "remote", "add", "origin", remote_url],
+            cwd=TARGET_DIR, capture_output=True
+        )
+        print(f"   🔗 Remote origin ustawiony ręcznie: {remote_url}")
 else:
-    print(f"✅ Repo już istnieje: tkogut/{project_name}")
-    repo_created_by_gh = False
-
-# --------------------------------------------------------------------------- #
-# 6. Sprawdź remote + initial commit + push (jeśli gh nie zrobiło tego sam)
-# --------------------------------------------------------------------------- #
-if not repo_created_by_gh:
-    # Sprawdź czy remote origin już jest ustawiony
+    print(f"   ✅ Repo już istnieje: tkogut/{project_name}")
+    # Upewnij się że remote origin jest ustawiony
     remote_check = subprocess.run(
         ["git", "remote", "get-url", "origin"],
         cwd=TARGET_DIR, capture_output=True, text=True
     )
     if remote_check.returncode != 0:
         remote_url = f"https://github.com/tkogut/{project_name}.git"
-        print(f"🔗 Ustawianie remote origin: {remote_url}")
-        subprocess.run(
-            ["git", "remote", "add", "origin", remote_url],
-            cwd=TARGET_DIR, check=True
-        )
-
-    # Commit jeśli są zmiany
-    status = subprocess.run(
-        ["git", "status", "--porcelain"],
-        cwd=TARGET_DIR, capture_output=True, text=True
-    )
-    if status.stdout.strip():
-        print("📝 Initial commit...")
-        subprocess.run(["git", "add", "-A"], cwd=TARGET_DIR, check=True)
-        subprocess.run(
-            ["git", "commit", "-m", "init: agents-os v4.0 swarm bootstrap"],
-            cwd=TARGET_DIR, check=True
-        )
-
-    # Push
-    print("🚀 Push na GitHub (main)...")
-    push_result = subprocess.run(
-        ["git", "push", "-u", "origin", "main"],
-        cwd=TARGET_DIR, capture_output=True, text=True
-    )
-    if push_result.returncode == 0:
-        print("✅ Push zakończony sukcesem.")
-    else:
-        # Spróbuj z master
-        push_result2 = subprocess.run(
-            ["git", "push", "-u", "origin", "HEAD"],
-            cwd=TARGET_DIR, capture_output=True, text=True
-        )
-        if push_result2.returncode == 0:
-            print("✅ Push zakończony sukcesem.")
-        else:
-            print(f"⚠️  Push failed: {push_result.stderr.strip()}")
+        subprocess.run(["git", "remote", "add", "origin", remote_url], cwd=TARGET_DIR, capture_output=True)
 
 # --------------------------------------------------------------------------- #
-# 7. Rozszerzenia (info)
+# 7. Push
 # --------------------------------------------------------------------------- #
-print("\n🧩 Aktywne rozszerzenia (Antigravity CLI):")
-ext_dirs = [
-    os.path.expanduser("~/.antigravity/extensions"),
-    os.path.expanduser("~/.gemini/extensions"),
-]
-found_exts = []
-for edir in ext_dirs:
-    if os.path.exists(edir):
-        for ext in os.listdir(edir):
-            if os.path.isdir(os.path.join(edir, ext)):
-                found_exts.append(ext)
-if found_exts:
-    for ext in list(set(found_exts)):
-        print(f"   ✓ {ext}")
+print("🚀 Push na GitHub...")
+# Wykryj aktualną gałąź
+current_branch = subprocess.run(
+    ["git", "branch", "--show-current"],
+    cwd=TARGET_DIR, capture_output=True, text=True
+).stdout.strip() or "main"
+
+push_result = subprocess.run(
+    ["git", "push", "-u", "origin", current_branch],
+    cwd=TARGET_DIR, capture_output=True, text=True
+)
+if push_result.returncode == 0:
+    print(f"   ✅ Push zakończony ({current_branch} → origin).")
 else:
-    print("   Brak zainstalowanych rozszerzeń.")
+    # Jeśli branch nie istnieje na remote, wymuś
+    push_result2 = subprocess.run(
+        ["git", "push", "--set-upstream", "origin", f"HEAD:{current_branch}"],
+        cwd=TARGET_DIR, capture_output=True, text=True
+    )
+    if push_result2.returncode == 0:
+        print(f"   ✅ Push zakończony ({current_branch}).")
+    else:
+        print(f"   ⚠️  Push failed: {push_result.stderr.strip()}")
+        print(f"      Możesz pushować ręcznie: git push -u origin {current_branch}")
 
 print(f"\n✨ AGENTS-OS v4.0 Swarm — projekt GOTOWY.")
 print(f"   GitHub: https://github.com/tkogut/{project_name}")
 
-# WAŻNE: ostatnia linia to ścieżka do projektu — używana przez os-init
+# WAŻNE: ostatnia linia = sygnał dla os-init (shell function) do cd
 print(f"__PROJECT_DIR__:{TARGET_DIR}")
