@@ -59,18 +59,21 @@ else
     IDE_BIN="/mnt/c/Users/admin_tk/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide"
 fi
 
-echo "🖥️  Otwieranie Antigravity IDE (WSL:Ubuntu) w: $PROJECT_DIR"
-
-if [ -f "$IDE_BIN" ]; then
-    "$IDE_BIN" --remote wsl+Ubuntu "$PROJECT_DIR" &
-    echo "   ✅ IDE uruchomione w środowisku WSL:Ubuntu."
-elif command -v antigravity-ide &>/dev/null; then
-    # Fallback: alias z .bashrc.d
-    antigravity-ide --remote wsl+Ubuntu "$PROJECT_DIR" &
-    echo "   ✅ IDE uruchomione (via alias antigravity-ide)."
+if [ "${OS_INIT_TEST:-false}" = "true" ]; then
+    echo "🧪 [TEST] Pomijam otwieranie Antigravity IDE w trybie testowym."
 else
-    echo "   ℹ️  Nie znaleziono IDE. Otwórz ręcznie:"
-    echo "   \"$IDE_BIN\" --remote wsl+Ubuntu \"$PROJECT_DIR\""
+    echo "🖥️  Otwieranie Antigravity IDE (WSL:Ubuntu) w: $PROJECT_DIR"
+    if [ -f "$IDE_BIN" ]; then
+        "$IDE_BIN" --remote wsl+Ubuntu "$PROJECT_DIR" &
+        echo "   ✅ IDE uruchomione w środowisku WSL:Ubuntu."
+    elif command -v antigravity-ide &>/dev/null; then
+        # Fallback: alias z .bashrc.d
+        antigravity-ide --remote wsl+Ubuntu "$PROJECT_DIR" &
+        echo "   ✅ IDE uruchomione (via alias antigravity-ide)."
+    else
+        echo "   ℹ️  Nie znaleziono IDE. Otwórz ręcznie:"
+        echo "   \"$IDE_BIN\" --remote wsl+Ubuntu \"$PROJECT_DIR\""
+    fi
 fi
 
 # Wykryj użytkownika GitHub do wyświetlenia

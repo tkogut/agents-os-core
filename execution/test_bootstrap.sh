@@ -38,6 +38,7 @@ fi
 
 # 2. Uruchom os-init-run (backend)
 echo "🚀 [TEST] Uruchamianie os-init dla projektu '$TEST_PROJECT'..."
+export OS_INIT_TEST=true
 if command -v os-init-run &>/dev/null; then
     os-init-run "$TEST_PROJECT"
 elif [ -f "./os-init" ]; then
