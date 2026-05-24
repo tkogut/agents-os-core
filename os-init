@@ -42,46 +42,26 @@ echo ""
 echo "📁 Projekt gotowy w: $PROJECT_DIR"
 
 # --------------------------------------------------------------------------- #
-# 3. Otwórz Antigravity IDE w folderze projektu
+# 3. Otwórz Antigravity IDE w środowisku WSL:Ubuntu
 # --------------------------------------------------------------------------- #
+# Używamy bin/antigravity-ide z --remote wsl+Ubuntu i ścieżką Linux.
+# To samo co funkcja antigravity() w ~/.bashrc.d/antigravity.
+# NIE używamy .exe ani wslpath — --remote obsługuje mapowanie ścieżki.
 
-# Ścieżka Windows do IDE (przez WSL interop)
-WIN_IDE="/mnt/c/Users/admin_tk/AppData/Local/Programs/Antigravity IDE/Antigravity IDE.exe"
-WIN_IDE_ALT="/mnt/c/Users/admin_tk/AppData/Local/Programs/antigravity-ide/Antigravity IDE.exe"
+IDE_BIN="/mnt/c/Users/admin_tk/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide"
 
-# Konwersja ścieżki WSL → Windows (\\wsl.localhost\Ubuntu\...)
-WIN_PROJECT_PATH=$(wslpath -w "$PROJECT_DIR" 2>/dev/null || echo "")
+echo "🖥️  Otwieranie Antigravity IDE (WSL:Ubuntu) w: $PROJECT_DIR"
 
-open_ide() {
-    local ide_path="$1"
-    if [ -f "$ide_path" ]; then
-        echo "🖥️  Otwieranie Antigravity IDE w: $PROJECT_DIR"
-        if [ -n "$WIN_PROJECT_PATH" ]; then
-            "$ide_path" "$WIN_PROJECT_PATH" &
-        else
-            "$ide_path" "$PROJECT_DIR" &
-        fi
-        echo "✅ IDE uruchomione."
-        return 0
-    fi
-    return 1
-}
-
-if open_ide "$WIN_IDE"; then
-    :
-elif open_ide "$WIN_IDE_ALT"; then
-    :
+if [ -f "$IDE_BIN" ]; then
+    "$IDE_BIN" --remote wsl+Ubuntu "$PROJECT_DIR" &
+    echo "   ✅ IDE uruchomione w środowisku WSL:Ubuntu."
+elif command -v antigravity-ide &>/dev/null; then
+    # Fallback: alias z .bashrc.d
+    antigravity-ide --remote wsl+Ubuntu "$PROJECT_DIR" &
+    echo "   ✅ IDE uruchomione (via alias antigravity-ide)."
 else
-    # Fallback: spróbuj przez komendę antigravity-ide lub code
-    if command -v antigravity-ide &>/dev/null; then
-        echo "🖥️  Otwieranie IDE przez komendę 'antigravity-ide'..."
-        antigravity-ide "$PROJECT_DIR" &
-    elif command -v agy &>/dev/null; then
-        echo "🖥️  Otwieranie przez agy..."
-        agy "$PROJECT_DIR" &
-    else
-        echo "ℹ️  Nie znaleziono IDE. Otwórz ręcznie: $PROJECT_DIR"
-    fi
+    echo "   ℹ️  Nie znaleziono IDE. Otwórz ręcznie:"
+    echo "   \"$IDE_BIN\" --remote wsl+Ubuntu \"$PROJECT_DIR\""
 fi
 
 # --------------------------------------------------------------------------- #
