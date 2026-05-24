@@ -1,4 +1,4 @@
-# AGENTS-OS v4.0 Swarm Edition — Instrukcja obsługi
+# AGENTS-OS v4.1 Swarm Edition — Instrukcja obsługi
 
 > **Dla kogo jest ten dokument?**
 > Dla każdego — nawet jeśli nie programujesz na co dzień.
@@ -126,7 +126,7 @@ os-init moja-aplikacja
 2. 🛡️  Kopiuje do niego Złoty Standard (szablony plików i folderów)
 3. 📝  Tworzy .gitignore i README.md
 4. 🔀  Inicjalizuje lokalne repozytorium Git
-5. 📝  Robi pierwszy commit ("init: agents-os v4.0 swarm bootstrap")
+5. 📝  Robi pierwszy commit ("init: agents-os v4.1 swarm bootstrap")
 6. 🐙  Tworzy publiczne repozytorium na GitHubie: github.com/<twój-użytkownik-git>/moja-aplikacja
 7. 🚀  Wysyła (push) kod na GitHub
 8. 🖥️  Otwiera Antigravity IDE w środowisku WSL:Ubuntu w folderze projektu
@@ -347,7 +347,7 @@ System przypisuje asystentowi 3 tryby pracy:
 <br><hr><br>
 
 <a name="english"></a>
-# [EN] AGENTS-OS v4.0 Swarm Edition — User Guide
+# [EN] AGENTS-OS v4.1 Swarm Edition — User Guide
 
 > **Who is this for?**
 > Everyone — even if you don't code every day.

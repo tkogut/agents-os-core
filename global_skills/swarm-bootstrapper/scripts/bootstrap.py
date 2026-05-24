@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AGENTS-OS v4.0 SWARM - Project Bootstrapper
+AGENTS-OS v4.1 SWARM - Project Bootstrapper
 Kolejność: folder → vault → .gitignore → git init → commit → gh repo create → push
 Wypisuje __PROJECT_DIR__:<ścieżka> jako ostatnią linię (używana przez os-init do cd).
 """
@@ -9,7 +9,7 @@ import shutil
 import sys
 import subprocess
 
-VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v4.0-swarm")
+VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v4.1-swarm")
 
 # --------------------------------------------------------------------------- #
 # Argument handling
@@ -34,7 +34,7 @@ if not os.path.exists(TARGET_DIR):
     print(f"📦 Tworzenie projektu: {TARGET_DIR}")
     os.makedirs(TARGET_DIR)
 
-print(f"🚀 INICJACJA AGENTS-OS v4.0 SWARM W: {TARGET_DIR}")
+print(f"🚀 INICJACJA AGENTS-OS v4.1 SWARM W: {TARGET_DIR}")
 
 # --------------------------------------------------------------------------- #
 # 2. Kopiowanie Vault (Złoty Standard)
@@ -62,13 +62,13 @@ gitignore_path = os.path.join(TARGET_DIR, ".gitignore")
 if not os.path.exists(gitignore_path):
     print("📝 Tworzenie .gitignore...")
     with open(gitignore_path, "w") as f:
-        f.write("# AGENTS-OS v4.0\ntmp/\n*.log\n__pycache__/\n.DS_Store\nnode_modules/\n.env\n")
+        f.write("# AGENTS-OS v4.1\ntmp/\n*.log\n__pycache__/\n.DS_Store\nnode_modules/\n.env\n")
 
 # Tworzymy README.md jeśli brak (potrzebny do commita)
 readme_path = os.path.join(TARGET_DIR, "README.md")
 if not os.path.exists(readme_path):
     with open(readme_path, "w") as f:
-        f.write(f"# {project_name}\n\nAGENTS-OS v4.0 Swarm Edition\n")
+        f.write(f"# {project_name}\n\nAGENTS-OS v4.1 Swarm Edition\n")
 
 # --------------------------------------------------------------------------- #
 # 4. Git init (ZAWSZE przed gh repo create)
@@ -99,7 +99,7 @@ if status.stdout.strip():
     print("📝 Initial commit...")
     subprocess.run(["git", "add", "-A"], cwd=TARGET_DIR, check=True, capture_output=True)
     subprocess.run(
-        ["git", "commit", "-m", "init: agents-os v4.0 swarm bootstrap"],
+        ["git", "commit", "-m", "init: agents-os v4.1 swarm bootstrap"],
         cwd=TARGET_DIR, check=True, capture_output=True
     )
     print("   ✅ Commit gotowy.")
@@ -145,7 +145,7 @@ if gh_check.returncode != 0:
     result = subprocess.run(
         ["gh", "repo", "create", project_name,
          "--public",
-         "--description", f"AGENTS-OS v4.0 — {project_name}",
+         "--description", f"AGENTS-OS v4.1 — {project_name}",
          "--source", TARGET_DIR,
          "--remote", "origin"],
         cwd=TARGET_DIR, capture_output=True, text=True
@@ -200,7 +200,7 @@ else:
         print(f"   ⚠️  Push failed: {push_result.stderr.strip()}")
         print(f"      Możesz pushować ręcznie: git push -u origin {current_branch}")
 
-print(f"\n✨ AGENTS-OS v4.0 Swarm — projekt GOTOWY.")
+print(f"\n✨ AGENTS-OS v4.1 Swarm — projekt GOTOWY.")
 print(f"   GitHub: https://github.com/{gh_user}/{project_name}")
 
 # WAŻNE: ostatnia linia = sygnał dla os-init (shell function) do cd
