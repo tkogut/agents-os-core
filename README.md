@@ -31,8 +31,9 @@ Stworzyliśmy absolutnie samowystarczalny system. Nie musisz już ręcznie kopio
 Pobierz repozytorium i uruchom skrypt instalacyjny (musisz być wewnątrz folderu projektu):
 
 ```bash
-git clone https://github.com/tkogut/agents-os-core.git
-cd agents-os-core
+mkdir -p ~/projects
+git clone https://github.com/tkogut/agents-os-core.git ~/projects/agents-os-core
+cd ~/projects/agents-os-core
 ./INSTALL.sh  # lub: bash INSTALL.sh
 ```
 
@@ -159,8 +160,9 @@ We have created an absolutely self-sufficient system. You no longer need to manu
 Clone the repository and run the installation script (you must be inside the project folder):
 
 ```bash
-git clone https://github.com/tkogut/agents-os-core.git
-cd agents-os-core
+mkdir -p ~/projects
+git clone https://github.com/tkogut/agents-os-core.git ~/projects/agents-os-core
+cd ~/projects/agents-os-core
 ./INSTALL.sh  # or: bash INSTALL.sh
 ```
 
