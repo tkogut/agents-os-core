@@ -1,254 +1,491 @@
-# AGENTS-OS v4.0 Swarm Edition (Ultra+) - Master Manual
+# AGENTS-OS v4.0 Swarm Edition — Instrukcja obsługi
 
-**Data Zbudowania Systemu**: Kwiecień 2026
-**Architekt**: Antigravity Orchestrator & User tkogut
-**Poziom Kompresji**: Caveman Ultra+
+> **Dla kogo jest ten dokument?**
+> Dla każdego — nawet jeśli nie programujesz na co dzień.
+> Wyjaśniamy krok po kroku co robić i dlaczego.
 
 ---
 
-## 1. Czym jest AGENTS-OS v4.0 Swarm?
-AGENTS-OS to rygorystyczny framework konfiguracyjny (Dotfiles) zaprojektowany specjalnie dla ekosystemu **Google Cloud Antigravity** oraz nakładki na terminal **Gemini CLI**. Zmusza modele AI udostępnione przez Google (Gemini, Claude) do pracy w trybie "Swarm" (Rozproszenie Ról) z wykorzystaniem agresywnej optymalizacji użycia tokenów "Caveman Ultra+".
+## Spis treści
 
-Zapewnia to:
-- Maksymalną efektywność kodu.
-- Brak halucynacji związanych z przełączaniem kontekstów.
-- Szybsze operacje na plikach i doskonałą integralność w terminalu (WSL).
+1. [Czym jest AGENTS-OS?](#1-czym-jest-agents-os)
+2. [Co potrzebujesz zanim zaczniesz](#2-wymagania)
+3. [Instalacja — jednorazowa konfiguracja](#3-instalacja)
+4. [Tworzenie nowego projektu — komenda `os-init`](#4-os-init)
+5. [Struktura nowego projektu](#5-struktura-projektu)
+6. [Codzienna praca — jak otwierać projekty](#6-codzienna-praca)
+7. [Najczęstsze problemy i rozwiązania](#7-najczestsze-problemy)
+8. [Jak działa system od środka](#8-jak-dziala-od-srodka)
+9. [English version](#english)
 
-## 2. Inicjalizacja Nowego Projektu (`os-init`)
+---
 
-Stworzyliśmy absolutnie samowystarczalny system. Nie musisz już ręcznie kopiować plików z poprzednich projektów.
+## 1. Czym jest AGENTS-OS?
 
-### Instalacja systemu na nowym komputerze:
+**AGENTS-OS** to zestaw narzędzi i konfiguracji, który sprawia że asystent AI (Antigravity) działa jak doświadczony programista — zamiast pisać długie elaboraty, dostaje konkretne zadanie i je wykonuje.
 
-#### Wymagania wstępne:
-1. **Python 3** oraz `pip3` zainstalowane w systemie.
-2. Dodanie `~/.local/bin` do zmiennej `PATH` (w przypadku instalacji bez uprawnień root):
-   ```bash
-   export PATH="$HOME/.local/bin:$PATH"
-   ```
+System składa się z trzech elementów:
 
-#### Instalacja:
-Pobierz repozytorium i uruchom skrypt instalacyjny (musisz być wewnątrz folderu projektu):
+| Element | Co to jest | Do czego służy |
+|---|---|---|
+| **INSTALL.sh** | Skrypt instalacyjny | Jednorazowe ustawienie wszystkiego na komputerze |
+| **os-init** | Komenda startowa | Tworzenie nowego projektu jedną komendą |
+| **Vault (Złoty Standard)** | Szablon folderów | Gotowa struktura, która kopiuje się do każdego projektu |
+
+---
+
+## 2. Wymagania
+
+Zanim zaczniesz, upewnij się że masz zainstalowane:
+
+| Narzędzie | Jak sprawdzić | Gdzie pobrać |
+|---|---|---|
+| **WSL2 + Ubuntu** (Windows) | `wsl --version` w PowerShell | [docs.microsoft.com](https://docs.microsoft.com/pl-pl/windows/wsl/install) |
+| **Antigravity IDE** | Czy masz ikonę w Menu Start | Zainstaluj przez oficjalny instalator |
+| **Antigravity (okno czatu)** | Czy działa aplikacja asystenta | Jak wyżej |
+| **Python 3** | `python3 --version` w terminalu WSL | Preinstalowany w Ubuntu |
+| **Git** | `git --version` | `sudo apt install git` |
+| **GitHub CLI** | `gh --version` | Instaluje się automatycznie przez INSTALL.sh |
+
+> **Skąd wziąć terminal WSL?**
+> W Windows naciśnij `Win + R`, wpisz `wsl` i Enter. Otworzy się czarny terminal Ubuntu.
+
+---
+
+## 3. Instalacja
+
+> ⚠️ **Wykonujesz to tylko raz** — przy pierwszym ustawieniu systemu na komputerze.
+
+### Krok 1 — Otwórz terminal WSL (Ubuntu)
+
+W Windows: `Win + R` → wpisz `wsl` → Enter
+
+### Krok 2 — Pobierz repozytorium
 
 ```bash
 mkdir -p ~/projects
 git clone https://github.com/tkogut/agents-os-core.git ~/projects/agents-os-core
 cd ~/projects/agents-os-core
-./INSTALL.sh  # lub: bash INSTALL.sh
 ```
 
-Po instalacji zaloguj się do narzędzi CLI:
+### Krok 3 — Uruchom instalator
+
+```bash
+bash INSTALL.sh
+```
+
+Instalator automatycznie:
+- Instaluje GitHub CLI (`gh`)
+- Instaluje potrzebne biblioteki Python
+- Kopiuje szablony projektów do `~/.antigravity/templates/`
+- Rejestruje komendę `os-init` w systemie
+- Dodaje konfigurację do `~/.bashrc.d/antigravity`
+
+### Krok 4 — Zaloguj się do GitHub
+
 ```bash
 gh auth login
-agy auth login
 ```
 
-### Jak utworzyć nowy projekt (The Bootstrapper):
-Wpisz w terminalu OS:
+Wybierz: `GitHub.com` → `HTTPS` → `Login with a web browser` → wklej kod na stronie GitHub.
+
+### Krok 5 — Załaduj konfigurację shella
+
 ```bash
-os-init nazwa-mojego-projektu
+source ~/.bashrc.d/antigravity
 ```
 
-**Co zrobi sztuczna inteligencja?**
-1. System sam utworzy folder `/home/tkogut/projects/nazwa-mojego-projektu`.
-2. Skopiuje do niego "Złoty Standard" tzw. The Template Vault z rezerwuaru `~/.antigravity/templates/v4.0-swarm/`.
-3. Zainicjalizuje puste repozytorium GiT.
-4. Zgłosi się w trybie "ACTIVE" z odpowiednim "State Token".
-
-*(Jeśli wpiszesz samo `os-init`, zainicjuje to architekturę w folderze, w którym obecnie jesteś).*
+> **Co to robi?**
+> Ładuje skróty i funkcje (w tym `os-init`) do Twojego terminala.
+> **Nowe terminale** ładują to automatycznie. Przy pierwszym razie musisz to zrobić ręcznie.
 
 ---
 
-## 3. The Template Vault (Złoty Standard)
-Kiedy tworzysz nowy projekt, kopiowana jest do niego nienaruszalna hierarchia (Topologia).
-Zawiera ona pusty, czysty stan systemu oparty o sprawdzone mechanizmy.
+## 4. `os-init` — Tworzenie nowego projektu
 
-**Widok folderu startowego nowej aplikacji:**
-```plaintext
-/nazwa-mojego-projektu/
-├── AGENTS-OS.md               <-- Prawo Nadrzędne. Zawiera zasady działania Agenta.
-├── agents.md                  <-- Rejestr Ról (Triad) i zadania do przekazania Modelom.
-├── task.md                    <-- State Token (Tutaj zapisujesz co AI ma zrobić).
-├── design-tokens.md           <-- Pusty brudnopis dla wytycznych UI.
-├── execution/                 <-- Pliki uruchomieniowe The Buildera.
-├── tmp/                       <-- Logi (zgodnie z protokołem Command Logging Protocol).
-├── .github/                   <-- Konfiguracja CI/CD.
-└── .agents/                    <-- Pamięć Podświadoma Agenta
-    ├── rules/
-    │   ├── GOVERNANCE.md      <-- Prawo Lokalne (Czy to Python? Czy Vue? Odoo?)
-    │   └── GEMINI.md          <-- Context Guard dla Snapa.
-    ├── plans/                 <-- Szablony długoterminowych planów wdrożen.
-    ├── specs/                 <-- Wiedza Zewnętrzna i Graph RAG (grapg.json).
-    ├── workflows/             <-- Zautomatyzowane instrukcje dla narzędzi.
-    └── skills/                <-- Umiejętności (Caveman, NotebookLM Sync, itp.).
+> 💡 **Jedna komenda robi wszystko.**
+
+### Jak używać
+
+W terminalu WSL wpisz:
+
+```bash
+os-init nazwa-twojego-projektu
+```
+
+**Przykład:**
+
+```bash
+os-init moja-aplikacja
+```
+
+### Co się dzieje automatycznie
+
+```
+1. 📦  Tworzy folder: ~/projects/moja-aplikacja
+2. 🛡️  Kopiuje do niego Złoty Standard (szablony plików i folderów)
+3. 📝  Tworzy .gitignore i README.md
+4. 🔀  Inicjalizuje lokalne repozytorium Git
+5. 📝  Robi pierwszy commit ("init: agents-os v4.0 swarm bootstrap")
+6. 🐙  Tworzy publiczne repozytorium na GitHubie: github.com/tkogut/moja-aplikacja
+7. 🚀  Wysyła (push) kod na GitHub
+8. 🖥️  Otwiera Antigravity IDE w środowisku WSL:Ubuntu w folderze projektu
+9. 🔀  Przechodzi do folderu projektu w Twoim terminalu (cd)
+```
+
+### Po zakończeniu
+
+Twój terminal automatycznie przejdzie do nowego folderu:
+
+```bash
+📁 Jesteś w: /home/tkogut/projects/moja-aplikacja
+```
+
+A na GitHub pojawi się nowe repozytorium:
+```
+https://github.com/tkogut/moja-aplikacja
 ```
 
 ---
 
-## 4. Modele w Systemie (The Swarm Triad)
-Agent obsługuje 3 role operacyjne. W zależności od zadania, zmienia tryb pracy:
+## 5. Struktura projektu
 
-1. **Coordinator (Zarządzanie)**
-   - Typ: Gemini 3.5 Flash
-   - Narzędzia: `browser`, `task_boundary`.
-   - Zasada dostępu: Pracuje na `plans/`, `tasks.md`. NIE PISZE KODU GŁÓWNEGO W `/src`. Jest kierownikiem budowy.
-2. **Builder (Inżynieria Zmian)**
-   - Typ: Claude 4.6 Sonnet / Opus (Model Thinking)
-   - Narzędzia: `view_file`, `execution`, terminal.
-   - Zasada dostępu: Pisze "atomiowy pancerz" kodu wewnątrz `src/` oraz `execution/`. Optymalizuje na żywo.
-3. **Auditor (Zabezpieczenie & QA)**
-   - Typ: Gemini 3 Flash
-   - Operacje: Szybka weryfikacja. Z-index, linting, raporty z błędów serwera. Pracuje w ułamkach sekund przez protokół logowania (`/tmp/*.log`). Zgłasza błędy w trybie `caveman-review` (jedna linijka).
+Każdy projekt tworzony przez `os-init` ma identyczną, gotową strukturę:
 
-## 5. Standard Caveman Ultra+ i Snap Sandbox Guard
+```
+moja-aplikacja/
+│
+├── README.md                ← Opis projektu (tu możesz pisać co to za projekt)
+├── .gitignore               ← Lista plików ignorowanych przez Git
+├── agents.yaml              ← Konfiguracja ról asystenta AI
+├── design-tokens.md         ← Wytyczne wizualne (kolory, fonty, itp.)
+├── task.md                  ← 📋 TU PISZESZ CO AI MA ZROBIĆ
+│
+├── execution/               ← Skrypty uruchomieniowe
+├── tmp/                     ← Logi tymczasowe (ignorowane przez Git)
+│
+├── .github/                 ← Konfiguracja automatyzacji GitHub Actions
+│   └── workflows/
+│
+└── .agents/                 ← Pamięć i konfiguracja asystenta AI
+    ├── plans/               ← Długoterminowe plany projektu
+    ├── skills/              ← Umiejętności asystenta (pobierane automatycznie)
+    ├── specs/               ← Dokumentacja techniczna i wiedza RAG
+    └── workflows/           ← Zautomatyzowane instrukcje
+```
 
-- **Caveman Ultra+**: Wszystkie instrukcje są zredukowane. Agent ma zakaz pisania bzdur ("Cieszę się, że mogłem pomóc", "Jasne, chętnie to zrobię"). Komunikacja z agentem wygląda jak komunikacja z wojskowym snajperem radiowym. Krótko, wektor, na temat.
-- **Snap Sandbox Guard**: Twoje CLI Google Antigravity zostało zainstalowane przez `snap`, a to oznacza uwięzienie terminala. Stworzony przez nas skrypt `global_antigravity_update.sh` (oraz z automatu w nowym projekcie `GEMINI.md`) radzi sobie z tym przez miękkie dowiązania ("Symlinks"). Jeśli struktura się stłucze, wystarczy wezwać `Aduyt Snapa` albo uruchomić w IDE komendę `os-init`. 
+### Najważniejszy plik: `task.md`
 
-## 6. Globalne Umiejętności (Global Skills)
-System jest wyposażony domyślnie w "Agentic Skills" dostarczane jako globalne rozszerzenia możliwości Agenta:
-- **`swarm-bootstrapper` (os-init)**: Automatyzacja tworzenia środowisk deweloperskich. Agent czyta architekturę systemu, konfiguruje i loguje projekt w pamięci podręcznej.
-- **`github-orchestrator`**: Operator Zdalnego Składowania. Możesz napisać: *"github init"* by utworzył chmurę, lub *"zapisz i pushnij"* by od razu skompresował Twoje intencje w commit i je wdrożył. Odpala i czyta także `github actions` bez wychodzenia na stronę WWW.
-- **`browser-connectivity`**: Zarządzanie mostkiem CDP dla WSL2. Wymusza połączenie z Twoją aktywną instancją przeglądarki na Windows, eliminując błędy braku interfejsu graficznego.
-- **`caveman`**: Redukcja szumu języka naturalnego. Oszczędność tokenów wejściowych o ~75%.
+To tutaj piszesz asystentowi co ma zrobić. Przykład:
 
-## 7. Umiejętności Lokalne Projektu (Local Project Skills)
-Oprócz skilli globalnych, każdy projekt inicjowany jest ze specjalnymi umiejętnościami osadzonymi wewnątrz lokalnego katalogu `.agents/skills/`:
-- **`skill-creator`**: Meta-programowanie. Komenda *"new-skill"* wyzwala procedurę tworzenia nowych, ustandaryzowanych (Anatomy v2.2) folderów skilli wprost dla bieżącego projektu. Agent instruuje samego siebie.
-- **`notebooklm-sync`**: Automatyzacja zarządzania wiedzą RAG. Domyślny instruktarz do destylacji i importowania danych z Google NotebookLM do `graph.json`.
-
-### Dynamiczne Umiejętności (Dynamic Skills - Awesome Skills):
-Wersja v4.0 automatycznie pobiera i aktualizuje bazę gotowych, dynamicznych skilli podczas uruchomienia `INSTALL.sh`. Skille te są umieszczane w katalogu `.agents/skills/` (który jest ignorowany przez Gita w `.gitignore`, aby uniknąć zaśmiecenia repozytorium).
-* **Jak z nich korzystać:** W panelu konwersacji asystenta Antigravity możesz wywołać dowolny z tych skilli bezpośrednio, wpisując `@nazwa-skilla` (np. `@git-pr-review`, `@audio-transcriber`).
-* **Filtrowanie zakresu:** Zakres pobieranych skilli można dostosować w pliku `INSTALL.sh` poprzez modyfikację argumentów narzędzia `antigravity-awesome-skills` (np. dodając filtry `--risk safe,none` lub `--tags`).
+```markdown
+## Zadanie
+Stwórz stronę główną aplikacji w HTML i CSS.
+Użyj kolorów: niebieski (#2563EB), biały (#FFFFFF).
+Dodaj nagłówek, sekcję hero i stopkę.
+```
 
 ---
-Dokument wygenerowany przez Instancję Antigravity w dniu ostatecznej weryfikacji. Zakończono protokół.
+
+## 6. Codzienna praca
+
+### Otwieranie istniejącego projektu w IDE
+
+Masz dwie opcje:
+
+**Opcja A — z terminala WSL:**
+```bash
+source ~/.bashrc.d/antigravity   # tylko jeśli nowy terminal
+cd ~/projects/nazwa-projektu
+antigravity .
+```
+
+**Opcja B — z Menu Start Windows:**
+1. Uruchom **Antigravity IDE**
+2. `File` → `Open Folder`
+3. W pasku adresu Eksploratora wpisz: `\\wsl.localhost\Ubuntu\home\tkogut\projects\`
+4. Wybierz folder projektu
+
+> ⚠️ **Uwaga:** Jeśli Eksplorator Windows się zawiesza przy otwieraniu folderu WSL, wykonaj reset:
+> ```powershell
+> # W PowerShell (Windows):
+> wsl --shutdown
+> ```
+> Następnie uruchom ponownie terminal WSL.
+
+### Wysyłanie zmian na GitHub
+
+```bash
+git add -A
+git commit -m "opis: co zrobiłem"
+git push
+```
+
+Lub powiedz asystentowi: *„zapisz i wyślij na GitHub"* — zrobi to za Ciebie.
+
+---
+
+## 7. Najczęstsze problemy
+
+### ❌ `Permission denied` przy `~/.bashrc.d/antigravity`
+
+**Problem:** Próbujesz uruchomić plik zamiast go załadować.
+
+**Rozwiązanie:**
+```bash
+# ❌ ŹLE — uruchamia jako osobny proces
+~/.bashrc.d/antigravity
+
+# ✅ DOBRZE — ładuje do bieżącego terminala
+source ~/.bashrc.d/antigravity
+```
+
+---
+
+### ❌ `os-init: command not found`
+
+**Problem:** Konfiguracja shella nie jest załadowana.
+
+**Rozwiązanie:**
+```bash
+source ~/.bashrc.d/antigravity
+```
+
+Jeśli nadal nie działa, sprawdź instalację:
+```bash
+ls ~/.local/bin/os-init-run   # powinien istnieć
+```
+
+Jeśli pliku nie ma — uruchom ponownie `bash INSTALL.sh`.
+
+---
+
+### ❌ IDE otwiera się bez WSL:Ubuntu (projekt lokalny Windows)
+
+**Problem:** IDE otwiera pliki w trybie Windows, nie WSL — brak dostępu do narzędzi Linux.
+
+**Rozwiązanie:** Otwieraj IDE zawsze przez terminal WSL:
+```bash
+antigravity .
+```
+
+Lub używaj `os-init` — otwiera IDE automatycznie z flagą `--remote wsl+Ubuntu`.
+
+---
+
+### ❌ `gh repo create failed: --push enabled but no commits found`
+
+**Problem:** Stara wersja skryptu — naprawiona w wersji `05a271f`.
+
+**Rozwiązanie:** Pobierz najnowszą wersję i zainstaluj ponownie:
+```bash
+cd ~/projects/agents-os-core
+git pull origin master
+bash INSTALL.sh
+```
+
+---
+
+### ❌ Eksplorator Windows zawiesza się przy `\\wsl.localhost`
+
+**Problem:** Błąd integracji WSL2 z systemem plików Windows (znany bug WSL).
+
+**Rozwiązanie:**
+```powershell
+# W PowerShell Windows:
+wsl --shutdown
+```
+Następnie uruchom ponownie terminal WSL. Reset trwa ~5 sekund.
+
+---
+
+### ❌ `antigravity` otwiera okno czatu zamiast edytora kodu
+
+**Problem:** Konflikt między aplikacją Antigravity (czat) a Antigravity IDE (edytor).
+
+**Rozwiązanie:** Używaj konkretnych komend:
+```bash
+antigravity .          # otwiera IDE (edytor kodu) w bieżącym folderze
+agy                    # uruchamia CLI asystenta (czat w terminalu)
+```
+
+---
+
+## 8. Jak działa system od środka
+
+> Ta sekcja jest dla ciekawskich — nie musisz tego czytać żeby używać systemu.
+
+### Dlaczego `os-init` jest funkcją shella, a nie skryptem?
+
+W systemie Linux, skrypt uruchomiony jako osobny proces **nie może zmienić katalogu** (`cd`) w terminalu rodzica. To fundamentalne ograniczenie systemu.
+
+Dlatego `os-init` jest **funkcją shella** zdefiniowaną w `~/.bashrc.d/antigravity`:
+1. Wywołuje `os-init-run` (właściwy skrypt)
+2. Skrypt wypisuje na końcu `__PROJECT_DIR__:/ścieżka/do/projektu`
+3. Funkcja przechwytuje tę linię i wykonuje `cd` — **w bieżącym terminalu**
+
+### Kolejność operacji w `bootstrap.py`
+
+```
+git init  →  vault copy  →  .gitignore  →  README.md  →  git commit  →  gh repo create  →  git push
+```
+
+> Kolejność **musi** być taka — `gh repo create` wymaga żeby commit istniał zanim się go wywoła.
+
+### The Swarm Triad — 3 role asystenta
+
+System przypisuje asystentowi 3 tryby pracy:
+
+| Rola | Kiedy aktywna | Co robi |
+|---|---|---|
+| **Coordinator** | Planowanie | Czyta `task.md`, tworzy plan, NIE pisze kodu |
+| **Builder** | Implementacja | Pisze kod, edytuje pliki, uruchamia komendy |
+| **Auditor** | Weryfikacja | Sprawdza błędy, logi, jakość kodu |
+
+---
 
 <br><hr><br>
 
-# [EN] AGENTS-OS v4.0 Swarm Edition (Ultra+) - Master Manual
+<a name="english"></a>
+# [EN] AGENTS-OS v4.0 Swarm Edition — User Guide
 
-**System Build Date**: April 2026
-**Architect**: Antigravity Orchestrator & User tkogut
-**Compression Level**: Caveman Ultra+
+> **Who is this for?**
+> Everyone — even if you don't code every day.
+> Step-by-step instructions explaining what to do and why.
 
 ---
 
-## 1. What is AGENTS-OS v4.0 Swarm?
-AGENTS-OS is a rigorous configuration framework (Dotfiles) designed specifically for the **Google Cloud Antigravity Ecosystem** and the **Gemini CLI**. It forces Google-provided AI models (Gemini, Claude) to operate in "Swarm" mode (Role Distribution) utilizing aggressive token usage optimization known as "Caveman Ultra+".
+## Table of Contents
 
-This ensures:
-- Maximum code efficiency.
-- Zero hallucinations related to context switching.
-- Faster file operations and pristine terminal integrity (WSL).
+1. [What is AGENTS-OS?](#what-is-agents-os)
+2. [Requirements](#requirements)
+3. [Installation — one-time setup](#installation)
+4. [Creating a new project — `os-init`](#os-init)
+5. [Project structure](#project-structure)
+6. [Daily workflow](#daily-workflow)
+7. [Common issues & fixes](#common-issues)
 
-## 2. Initializing a New Project (`os-init`)
+---
 
-We have created an absolutely self-sufficient system. You no longer need to manually copy files from previous projects.
+## What is AGENTS-OS?
 
-### System installation on a new machine:
+**AGENTS-OS** is a toolkit and configuration framework that makes the Antigravity AI assistant work like an experienced developer — instead of lengthy explanations, it receives a concrete task and executes it.
 
-#### Prerequisites:
-1. **Python 3** and `pip3` installed on the system.
-2. Add `~/.local/bin` to your `PATH` variable (if installing without root privileges):
-   ```bash
-   export PATH="$HOME/.local/bin:$PATH"
-   ```
+| Component | What it is | Purpose |
+|---|---|---|
+| **INSTALL.sh** | Installation script | One-time setup on your machine |
+| **os-init** | Startup command | Create a new project with one command |
+| **Vault (Golden Standard)** | Folder template | Ready-made structure copied into every project |
 
-#### Installation:
-Clone the repository and run the installation script (you must be inside the project folder):
+---
+
+## Requirements
+
+| Tool | How to check | Where to get |
+|---|---|---|
+| **WSL2 + Ubuntu** (Windows) | `wsl --version` in PowerShell | [docs.microsoft.com](https://docs.microsoft.com/en-us/windows/wsl/install) |
+| **Antigravity IDE** | Icon in Start Menu | Official installer |
+| **Antigravity (chat window)** | Does the assistant app work | Same as above |
+| **Python 3** | `python3 --version` in WSL | Pre-installed in Ubuntu |
+| **Git** | `git --version` | `sudo apt install git` |
+| **GitHub CLI** | `gh --version` | Auto-installed by INSTALL.sh |
+
+---
+
+## Installation
+
+> ⚠️ **Run this only once** — when setting up the system for the first time.
 
 ```bash
+# 1. Open WSL terminal (Windows: Win+R → type "wsl" → Enter)
+
+# 2. Clone the repository
 mkdir -p ~/projects
 git clone https://github.com/tkogut/agents-os-core.git ~/projects/agents-os-core
 cd ~/projects/agents-os-core
-./INSTALL.sh  # or: bash INSTALL.sh
-```
 
-After installation, authorize the CLI clients:
-```bash
+# 3. Run the installer
+bash INSTALL.sh
+
+# 4. Log in to GitHub
 gh auth login
-agy auth login
+
+# 5. Load shell configuration
+source ~/.bashrc.d/antigravity
 ```
 
-### How to create a new project (The Bootstrapper):
-Type in the OS terminal:
+---
+
+## `os-init` — Creating a new project
+
 ```bash
-os-init my-new-project-name
+os-init my-project-name
 ```
 
-**What will the AI do?**
-1. The system will auto-create the directory `/home/tkogut/projects/my-new-project-name`.
-2. It will copy the "Golden Standard", aka The Template Vault from `~/.antigravity/templates/v4.0-swarm/` into it.
-3. Initializes an empty GiT repository.
-4. Reports back in "ACTIVE" state with the corresponding "State Token".
+**What happens automatically:**
 
-*(Typing just `os-init` will initialize the architecture in your current working directory).*
-
----
-
-## 3. The Template Vault (Golden Standard)
-When you create a new project, an inviolable hierarchy (Topology) is copied into it. It contains a pristine, clean system state based on proven mechanisms.
-
-**View of the starting folder for a new application:**
-```plaintext
-/my-new-project-name/
-├── AGENTS-OS.md               <-- Supreme Law. Contains Agent operation rules.
-├── agents.md                  <-- Roles Registry (Triad) and tasks to offload to Models.
-├── task.md                    <-- State Token (You write here what AI should do).
-├── design-tokens.md           <-- Empty scratchpad for UI guidelines.
-├── execution/                 <-- Runtime files for The Builder.
-├── tmp/                       <-- Logs (according to the Command Logging Protocol).
-├── .github/                   <-- CI/CD configuration.
-└── .agents/                    <-- Agent's Subconscious Memory
-    ├── rules/
-    │   ├── GOVERNANCE.md      <-- Local Law (Is it Python? Vue? Odoo?)
-    │   └── GEMINI.md          <-- Context Guard for Snap.
-    ├── plans/                 <-- Templates for long-term deployment plans.
-    ├── specs/                 <-- External Knowledge & Graph RAG (graph.json).
-    ├── workflows/             <-- Automated instructions for tools.
-    └── skills/                <-- Skills (Caveman, NotebookLM Sync, etc.).
+```
+1. 📦  Creates folder: ~/projects/my-project-name
+2. 🛡️  Copies Golden Standard (file/folder templates)
+3. 📝  Creates .gitignore and README.md
+4. 🔀  Initializes local Git repository
+5. 📝  Makes first commit
+6. 🐙  Creates public GitHub repo: github.com/tkogut/my-project-name
+7. 🚀  Pushes code to GitHub
+8. 🖥️  Opens Antigravity IDE in WSL:Ubuntu environment
+9. 🔀  Changes terminal directory to the new project (cd)
 ```
 
 ---
 
-## 4. Models in the System (The Swarm Triad)
-The Agent supports 3 operational roles. Depending on the task, it switches work modes:
+## Project structure
 
-1. **Coordinator (Management)**
-   - Type: Gemini 3.5 Flash
-   - Tools: `browser`, `task_boundary`.
-   - Access Rule: Works on `plans/`, `tasks.md`. DOES NOT WRITE MAIN CODE IN `/src`. Serves as the construction manager.
-2. **Builder (Change Engineering)**
-   - Type: Claude 4.6 Sonnet / Opus (Thinking Model)
-   - Tools: `view_file`, `execution`, terminal.
-   - Access Rule: Writes the "atomic armor" of code inside `src/` and `execution/`. Optimizes live.
-3. **Auditor (Security & QA)**
-   - Type: Gemini 3 Flash
-   - Operations: Rapid verification. Z-index, linting, server error reports. Works in fractions of a second using the logging protocol (`/tmp/*.log`). Reports bugs in `caveman-review` mode (one liner).
-
-## 5. Caveman Ultra+ Standard and Snap Sandbox Guard
-
-- **Caveman Ultra+**: All instructions are heavily reduced. The Agent is forbidden from writing fluff ("I'm glad I could help", "Sure, I'd be happy to do that"). Communication with the agent looks like communicating with a military radio sniper. Short, vectorized, to the point.
-- **Snap Sandbox Guard**: Your Google Antigravity CLI was installed via `snap`, which means terminal imprisonment. Our `global_antigravity_update.sh` script (and automatically the `GEMINI.md` in new projects) bypasses this via soft links ("Symlinks"). If the structure breaks, just call `Snap Audit` or run the `os-init` command in your IDE. 
-
-## 6. Global Skills Overview
-The system comes pre-equipped with "Agentic Skills" layered as global extensions of your Agent's capabilities:
-- **`swarm-bootstrapper` (os-init)**: Developer environment setup automation. The Agent reads system architecture, configures paths, and primes the project into sub-memory.
-- **`github-orchestrator`**: Remote Storage Operator. You can command: *"github init"* to auto-create the repository in the cloud, or *"auto commit"* to compress intents into conventional commits and push them. It can run and read `github actions` silently in the terminal.
-- **`browser-connectivity`**: WSL2 CDP Bridge Management. Forces integration with your active Windows-hosted browser session, eliminating headless environment errors.
-- **`caveman`**: Heavy NLP reduction. Shrinks input token overhead by ~75%.
-
-## 7. Local Project Skills
-In addition to global skills, each project is initialized with specialized skills embedded directly within the local `.agents/skills/` directory:
-- **`skill-creator`**: Meta-programming. The *"new-skill"* trigger allows the Agent to train itself, generating robust skill scaffolding based on the Skill Anatomy v2.2 standard for the current project.
-- **`notebooklm-sync`**: Knowledge management. A built-in protocol mapping out the distillation of insights from Google NotebookLM down into the project's atomic `graph.json` state.
-
-### Dynamic Skills (Awesome Skills):
-Version v4.0 automatically downloads and updates a library of ready-to-use dynamic skills during `INSTALL.sh` execution. These skills are stored in the local `.agents/skills/` directory (which is ignored by Git in `.gitignore` to prevent repository bloat).
-* **How to use them:** Inside the Antigravity assistant conversation panel, you can explicitly invoke any installed dynamic skill by typing `@skill-name` (e.g. `@git-pr-review`, `@audio-transcriber`).
-* **Scope Configuration:** The variety of downloaded skills can be customized in `INSTALL.sh` by adjusting `antigravity-awesome-skills` parameters (e.g. by setting `--risk safe,none` or `--tags`).
+```
+my-project-name/
+│
+├── README.md                ← Project description
+├── .gitignore               ← Files ignored by Git
+├── agents.yaml              ← AI assistant role config
+├── task.md                  ← 📋 WRITE AI TASKS HERE
+│
+├── execution/               ← Runtime scripts
+├── tmp/                     ← Temporary logs (Git-ignored)
+├── .github/                 ← GitHub Actions automation
+│
+└── .agents/                 ← AI assistant memory & config
+    ├── plans/
+    ├── skills/
+    ├── specs/
+    └── workflows/
+```
 
 ---
-Document generated by the Antigravity Instance on the day of final verification. Protocol complete.
+
+## Daily workflow
+
+```bash
+# Open existing project in IDE (from WSL terminal)
+cd ~/projects/my-project
+antigravity .
+
+# Push changes to GitHub
+git add -A
+git commit -m "describe: what you did"
+git push
+```
+
+---
+
+## Common issues
+
+| Error | Cause | Fix |
+|---|---|---|
+| `Permission denied` on `~/.bashrc.d/antigravity` | Running instead of sourcing | Use `source ~/.bashrc.d/antigravity` |
+| `os-init: command not found` | Shell config not loaded | Run `source ~/.bashrc.d/antigravity` |
+| IDE opens without WSL:Ubuntu | Opening via .exe directly | Use `antigravity .` from WSL terminal |
+| Explorer freezes at `\\wsl.localhost` | Known WSL2 network bug | Run `wsl --shutdown` in PowerShell, then restart WSL |
+| `gh repo create failed: no commits` | Old script version | Run `git pull && bash INSTALL.sh` |
+
+---
+
+*Document maintained by Antigravity Agent & tkogut. Last updated: May 2026.*
