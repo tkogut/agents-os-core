@@ -146,14 +146,17 @@ if [ -f "./os-init" ]; then
 fi
 
 if [ -f "./os-add-skill" ]; then
-    if sudo -n cp ./os-add-skill /usr/local/bin/os-add-skill-run 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-add-skill-run
-        echo "✓ os-add-skill-run zarejestrowany w /usr/local/bin/os-add-skill-run"
+    # Sprzątanie: usuń stary plik os-add-skill-run z v4.1.x jeśli istnieje
+    sudo -n rm -f /usr/local/bin/os-add-skill-run 2>/dev/null || rm -f "$HOME/.local/bin/os-add-skill-run" 2>/dev/null || true
+
+    if sudo -n cp ./os-add-skill /usr/local/bin/os-add-skill 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-add-skill
+        echo "✓ os-add-skill zainstalowany w /usr/local/bin/os-add-skill"
     else
         mkdir -p "$HOME/.local/bin"
-        cp ./os-add-skill "$HOME/.local/bin/os-add-skill-run"
-        chmod +x "$HOME/.local/bin/os-add-skill-run"
-        echo "✓ os-add-skill-run zarejestrowany w $HOME/.local/bin/os-add-skill-run"
+        cp ./os-add-skill "$HOME/.local/bin/os-add-skill"
+        chmod +x "$HOME/.local/bin/os-add-skill"
+        echo "✓ os-add-skill zainstalowany w $HOME/.local/bin/os-add-skill"
     fi
 fi
 
@@ -221,24 +224,6 @@ os-init() {
     fi
 }
 
-# ==============================================================================
-# os-add-skill <nazwa-skilla>
-# Shell function wrapper — wywołuje instalator skilla z venv lub ścieżki.
-# ==============================================================================
-os-add-skill() {
-    local script
-    if command -v os-add-skill-run &>/dev/null; then
-        script="os-add-skill-run"
-    elif [ -f "$HOME/.local/bin/os-add-skill-run" ]; then
-        script="$HOME/.local/bin/os-add-skill-run"
-    elif [ -f "/usr/local/bin/os-add-skill-run" ]; then
-        script="/usr/local/bin/os-add-skill-run"
-    else
-        echo "❌ os-add-skill: skrypt nie znaleziony. Uruchom INSTALL.sh."
-        return 1
-    fi
-    "$script" "$@"
-}
 EOF
 chmod +x "$HOME/.bashrc.d/antigravity"
 echo "✓ Plik ~/.bashrc.d/antigravity został zapisany."
