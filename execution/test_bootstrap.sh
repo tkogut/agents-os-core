@@ -103,8 +103,8 @@ echo "   ✅ Adres remote origin jest poprawny: $remote_url"
 
 # 5. Weryfikacja dynamicznego dociągania skilli (os-add-skill)
 echo "🔍 [TEST] Weryfikacja dynamicznego dociągania skilli (os-add-skill)..."
-if command -v os-add-skill-run &>/dev/null; then
-    os-add-skill-run "postgresql-optimization"
+if command -v os-add-skill &>/dev/null; then
+    os-add-skill "postgresql-optimization"
 elif [ -f "$REPO_ROOT/os-add-skill" ]; then
     python3 "$REPO_ROOT/os-add-skill" "postgresql-optimization"
 else
