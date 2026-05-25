@@ -18,7 +18,7 @@ if ! command -v snap &> /dev/null; then
   fi
 fi
 
-if command -v agy &> /dev/null; then
+if command -v agy &> /dev/null || [ -f "/usr/local/bin/agy" ] || [ -f "$HOME/.local/bin/agy" ]; then
     echo "Antigravity CLI (agy) jest już zainstalowane. Pomijam pobieranie."
 else
     echo "Pobieranie i instalacja Antigravity CLI (Go Binary)..."
