@@ -314,7 +314,7 @@ else
 fi
 
 echo "===================================================================="
-echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: SYSTEM AGENTS-OS GOTOWY."
+echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: SYSTEM AGENTS-OS v4.2 GOTOWY."
 echo ""
 echo "Następne kroki:"
 echo "  1. Załaduj shell config:  source ~/.bashrc.d/antigravity"
