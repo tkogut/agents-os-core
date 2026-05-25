@@ -4,6 +4,12 @@ Wszystkie zmiany w tej wersji są bezpośrednią odpowiedzią na audyt przenasza
 
 ---
 
+## [4.2.1] - 2026-05-25
+
+### 🚀 Hardening i Zabezpieczenia (Hardening & Security)
+* **Ścieżki relatywne w teście E2E**: Zaimplementowano pobieranie ścieżek relatywnych względem lokalizacji pliku skryptu `test_bootstrap.sh`, co umożliwia uruchomienie testów z dowolnego katalogu w systemie.
+* **Zabezpieczenie przed Path Traversal w `os-add-skill`**: Dodano walidację nazwy skilla (blokada znaków `..`, `/`, `\`) chroniącą przed zapisem plików poza docelowym folderem projektu.
+
 ## [4.2.0] - 2026-05-24
 
 ### 🚀 Poprawki i Automatyzacja (Portability & Automation)
