@@ -7,8 +7,10 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+PROJECTS_ROOT="$(dirname "$REPO_ROOT")"
 TEST_PROJECT="agents-os-test-bootstrap-$(date +%s)"
-PROJECTS_ROOT="$HOME/projects"
 TEST_DIR="$PROJECTS_ROOT/$TEST_PROJECT"
 
 echo "🧪 [TEST] Rozpoczynam test integracyjny E2E dla os-init/bootstrap.py..."
@@ -41,8 +43,8 @@ echo "🚀 [TEST] Uruchamianie os-init dla projektu '$TEST_PROJECT'..."
 export OS_INIT_TEST=true
 if command -v os-init-run &>/dev/null; then
     os-init-run "$TEST_PROJECT"
-elif [ -f "./os-init" ]; then
-    bash "./os-init" "$TEST_PROJECT"
+elif [ -f "$REPO_ROOT/os-init" ]; then
+    bash "$REPO_ROOT/os-init" "$TEST_PROJECT"
 else
     echo "❌ [TEST] Nie znaleziono skryptu os-init!"
     exit 1
@@ -103,8 +105,8 @@ echo "   ✅ Adres remote origin jest poprawny: $remote_url"
 echo "🔍 [TEST] Weryfikacja dynamicznego dociągania skilli (os-add-skill)..."
 if command -v os-add-skill-run &>/dev/null; then
     os-add-skill-run "postgresql-optimization"
-elif [ -f "$PROJECTS_ROOT/agents-os-core/os-add-skill" ]; then
-    python3 "$PROJECTS_ROOT/agents-os-core/os-add-skill" "postgresql-optimization"
+elif [ -f "$REPO_ROOT/os-add-skill" ]; then
+    python3 "$REPO_ROOT/os-add-skill" "postgresql-optimization"
 else
     echo "❌ [TEST] Nie znaleziono skryptu os-add-skill!"
     exit 1
