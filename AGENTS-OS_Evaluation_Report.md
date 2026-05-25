@@ -1,8 +1,8 @@
-# 🛸 Raport Oceny i Audytu Kodu: AGENTS-OS v4.2.0 (Zero-Click Production)
+# 🛸 Raport Oceny i Audytu Kodu: AGENTS-OS v4.2.1 (Zero-Click Production)
 
 **Status projektu:** PRODUCTION READY / EXCELLENT (Środowisko dojrzałe, zoptymalizowane pod kątem przenaszalności i kosztów API)  
-**Wersja:** 4.2.0 (Antigravity 2.0 Native)  
-**Data audytu:** 2026-05-24  
+**Wersja:** 4.2.1 (Antigravity 2.0 Native)  
+**Data audytu:** 2026-05-24 (Aktualizacja: 2026-05-25)  
 **Audytor:** Asystent AI Antigravity (GEM Expert)  
 
 ---
@@ -52,5 +52,30 @@ Podczas audytu wdrożonej wersji **v4.2.0** zidentyfikowano **dwa drobne usprawn
 
 ---
 
-## 3. Werdykt Końcowy
-Wersja **v4.2.0** to wzorcowy przykład ewolucji kodu na podstawie audytu. System jest **w pełni stabilny, zoptymalizowany pod kątem tokenów i gotowy do wdrożeń produkcyjnych**. Wdrożenie powyższych dwóch drobnych poprawek ostatecznie domyka odporność systemu na błędy uruchomieniowe i bezpieczeństwo ścieżek.
+## 3. Audyt Nowych Zmian (Wersja v4.2.0+, Zmiany z dnia 2026-05-25)
+
+Wprowadzone w najnowszych commitach zmiany znacząco rozszerzają automatyzację instalacji i poprawiają stabilność działania systemu na nowych/czystych maszynach deweloperskich.
+
+### 🌟 3.1. Dynamiczne pobieranie adresu URL CLI w `INSTALL.sh`
+*   **Co zrobiono:** Zastąpiono statyczny adres URL pobierania binarki `agy` dynamicznym zapytaniem do oficjalnego manifestu wydań GCP Cloud Run (`linux_amd64.json`) z poprawnie zaimplementowanym mechanizmem fallback.
+*   **Ocena:** Bardzo dobre rozwiązanie. Zapobiega instalacji przestarzałych wersji CLI w przypadku aktualizacji binarnej po stronie Google.
+
+### 🌟 3.2. Pomijanie pobierania zainstalowanego CLI
+*   **Co zrobiono:** Rozszerzono warunek sprawdzania obecności `agy` o bezpośrednie wyszukiwanie plików w `/usr/local/bin/agy` oraz `$HOME/.local/bin/agy` (nie polegając wyłącznie na `command -v agy`, co mogło zawodzić przed ponownym załadowaniem powłoki).
+*   **Ocena:** Znakomity patch optymalizacyjny, eliminujący niepotrzebne pobieranie dużych paczek binarnych.
+
+### 🌟 3.3. Automatyczna tożsamość Git (`bootstrap.py`)
+*   **Co zrobiono:** Dodano weryfikację konfiguracji `user.name` oraz `user.email` w lokalnym repozytorium projektu przed wykonaniem pierwszego commita. W przypadku ich braku, skrypt konfiguruje tożsamość lokalną opartą na wykrytej nazwie użytkownika GitHub oraz adresie `users.noreply.github.com`.
+*   **Ocena:** Klasa światowa. Na świeżych maszynach wirtualnych lub kontenerach WSL brak tożsamości Git był jedną z najczęstszych przyczyn wyciszonego crashu skryptu inicjalizacyjnego.
+
+### 🌟 3.4. Automatyczna instalacja wtyczki Remote - WSL
+*   **Co zrobiono:** Dodano automatyczną próbę zainstalowania wtyczki `ms-vscode-remote.remote-wsl` z poziomu WSL na hoście Windows przy użyciu wykrytej ścieżki do pliku wykonywalnego IDE.
+*   **Ocena:** Znakomita funkcja poprawiająca User Experience. Konfiguracja remote-WSL bywa problematyczna dla początkujących deweloperów, a to polecenie rozwiązuje problem bezpośrednio podczas instalacji środowiska.
+
+---
+
+## 4. Werdykt Końcowy
+
+Po uwzględnieniu najnowszych zmian, projekt prezentuje **wyjątkowo wysoki poziom odporności na błędy (resilience)**. Nowe mechanizmy tożsamości Git oraz integracja z Remote-WSL w edytorze Windows czynią system w pełni przygotowanym do wdrożenia deweloperskiego na dowolnej maszynie. 
+
+Oba zalecenia z sekcji 2 (Script-Relative Paths w teście E2E oraz walidacja Path Traversal w `os-add-skill`) zostały pomyślnie wdrożone i zweryfikowane w wersji **v4.2.1**, co ostatecznie zamyka audyt i w pełni zabezpiecza system.

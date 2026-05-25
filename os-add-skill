@@ -74,6 +74,10 @@ def main():
         sys.exit(1)
 
     skill_name = sys.argv[1]
+    if "/" in skill_name or "\\" in skill_name or ".." in skill_name:
+        print("❌ BŁĄD: Nazwa skilla zawiera niedozwolone znaki (/, \\, ..).")
+        sys.exit(1)
+
     project_root = find_project_root()
     if not project_root:
         print("❌ BŁĄD: Nie jesteś w katalogu projektu AGENTS-OS (brak folderu .agents/).")
