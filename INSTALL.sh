@@ -18,12 +18,19 @@ if ! command -v snap &> /dev/null; then
   fi
 fi
 
-if command -v agy &> /dev/null; then
+if command -v agy &> /dev/null || [ -f "/usr/local/bin/agy" ] || [ -f "$HOME/.local/bin/agy" ]; then
     echo "Antigravity CLI (agy) jest już zainstalowane. Pomijam pobieranie."
 else
     echo "Pobieranie i instalacja Antigravity CLI (Go Binary)..."
-    curl -fL -o antigravity.tar.gz "https://antigravity.google/download/linux-x64.tar.gz"
+    # Dynamiczne pobranie adresu URL z oficjalnego manifestu wydań dla linux_amd64
+    CLI_URL=$(curl -fsSL "https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json" | grep -o '"url": *"[^"]*"' | sed 's/"url": *//;s/"//g')
+    if [ -z "$CLI_URL" ]; then
+        # Fallback w przypadku problemów z manifestem
+        CLI_URL="https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.2-6109799369277440/linux-x64/cli_linux_x64.tar.gz"
+    fi
+    curl -fL -o antigravity.tar.gz "$CLI_URL"
     tar -xzf antigravity.tar.gz
+    mv antigravity agy
     if sudo -n mv agy /usr/local/bin/ 2>/dev/null; then
         echo "✓ agy zainstalowany w /usr/local/bin"
     else
@@ -244,11 +251,41 @@ if ! grep -q "source ~/.bashrc.d/antigravity" "$HOME/.bashrc" 2>/dev/null; then
     echo "✓ Dodano import do ~/.bashrc"
 fi
 
+# 5. Instalacja rozszerzenia WSL dla Antigravity IDE
+echo "🔌 Konfiguracja integracji WSL dla Antigravity IDE..."
+IDE_BIN=""
+for user_dir in /mnt/c/Users/*; do
+    if [ -f "${user_dir}/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide" ]; then
+        IDE_BIN="${user_dir}/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide"
+        break
+    fi
+done
+
+if [ -z "$IDE_BIN" ]; then
+    WIN_USER=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+    if [ -n "$WIN_USER" ] && [ -f "/mnt/c/Users/${WIN_USER}/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide" ]; then
+        IDE_BIN="/mnt/c/Users/${WIN_USER}/AppData/Local/Programs/Antigravity IDE/bin/antigravity-ide"
+    fi
+fi
+
+if [ -n "$IDE_BIN" ]; then
+    echo "   📦 Instalacja rozszerzenia Remote - WSL..."
+    if "$IDE_BIN" --install-extension ms-vscode-remote.remote-wsl &>/dev/null; then
+        echo "   ✓ Rozszerzenie Remote - WSL zainstalowane pomyślnie."
+    else
+        echo "   ⚠️  Nie udało się automatycznie zainstalować rozszerzenia Remote - WSL."
+        echo "      Zainstaluj je ręcznie w IDE lub uruchom:"
+        echo "      \"$IDE_BIN\" --install-extension ms-vscode-remote.remote-wsl"
+    fi
+else
+    echo "   ⚠️  Nie odnaleziono instalacji Antigravity IDE w systemie Windows."
+fi
+
 echo ""
 echo "ℹ️  Aby aktywować os-init i os-add-skill w bieżącym terminalu:"
 echo "   source ~/.bashrc.d/antigravity"
 
-# 5. Autoryzacja i logowanie do usług CLI (tylko w trybie interaktywnym)
+# 6. Autoryzacja i logowanie do usług CLI (tylko w trybie interaktywnym)
 if [ -t 0 ]; then
     echo "🔑 Wykryto terminal interaktywny. Konfiguracja autoryzacji CLI..."
     
@@ -277,7 +314,7 @@ else
 fi
 
 echo "===================================================================="
-echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: SYSTEM AGENTS-OS GOTOWY."
+echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: SYSTEM AGENTS-OS v4.2 GOTOWY."
 echo ""
 echo "Następne kroki:"
 echo "  1. Załaduj shell config:  source ~/.bashrc.d/antigravity"

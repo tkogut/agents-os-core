@@ -80,45 +80,8 @@ if not os.path.exists(readme_path):
         f.write(f"# {project_name}\n\nAGENTS-OS v4.2 Swarm Edition\n")
 
 # --------------------------------------------------------------------------- #
-# 4. Git init (ZAWSZE przed gh repo create)
+# 4. Ustal dynamicznie użytkownika GitHub i sprawdź tożsamość git
 # --------------------------------------------------------------------------- #
-git_path = os.path.join(TARGET_DIR, ".git")
-if not os.path.exists(git_path):
-    print("📦 Inicjalizacja lokalnego repo git...")
-    subprocess.run(["git", "init"], cwd=TARGET_DIR, check=True, capture_output=True)
-    # Ustaw branch na main
-    subprocess.run(["git", "branch", "-M", "main"], cwd=TARGET_DIR, check=True, capture_output=True)
-else:
-    # Sprawdź czy jesteśmy na main lub master
-    branch = subprocess.run(
-        ["git", "branch", "--show-current"],
-        cwd=TARGET_DIR, capture_output=True, text=True
-    ).stdout.strip()
-    if not branch:
-        subprocess.run(["git", "branch", "-M", "main"], cwd=TARGET_DIR, capture_output=True)
-
-# --------------------------------------------------------------------------- #
-# 5. Initial commit (PRZED gh repo create — gh --push wymaga commitów)
-# --------------------------------------------------------------------------- #
-status = subprocess.run(
-    ["git", "status", "--porcelain"],
-    cwd=TARGET_DIR, capture_output=True, text=True
-)
-if status.stdout.strip():
-    print("📝 Initial commit...")
-    subprocess.run(["git", "add", "-A"], cwd=TARGET_DIR, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "init: agents-os v4.2 swarm bootstrap"],
-        cwd=TARGET_DIR, check=True, capture_output=True
-    )
-    print("   ✅ Commit gotowy.")
-else:
-    print("   ℹ️  Brak zmian do commita (repo już zainicjalizowane).")
-
-# --------------------------------------------------------------------------- #
-# 6. GitHub repo — utwórz jeśli nie istnieje, ustaw remote
-# --------------------------------------------------------------------------- #
-# Ustal dynamicznie użytkownika GitHub
 gh_user = "twoj-github-username"
 try:
     gh_user_proc = subprocess.run(
@@ -142,6 +105,53 @@ except Exception:
         if git_user_name_proc.returncode == 0 and git_user_name_proc.stdout.strip():
             gh_user = git_user_name_proc.stdout.strip().replace(" ", "")
 
+# --------------------------------------------------------------------------- #
+# 5. Git init (ZAWSZE przed gh repo create)
+# --------------------------------------------------------------------------- #
+git_path = os.path.join(TARGET_DIR, ".git")
+if not os.path.exists(git_path):
+    print("📦 Inicjalizacja lokalnego repo git...")
+    subprocess.run(["git", "init"], cwd=TARGET_DIR, check=True, capture_output=True)
+    # Ustaw branch na main
+    subprocess.run(["git", "branch", "-M", "main"], cwd=TARGET_DIR, check=True, capture_output=True)
+else:
+    # Sprawdź czy jesteśmy na main lub master
+    branch = subprocess.run(
+        ["git", "branch", "--show-current"],
+        cwd=TARGET_DIR, capture_output=True, text=True
+    ).stdout.strip()
+    if not branch:
+        subprocess.run(["git", "branch", "-M", "main"], cwd=TARGET_DIR, capture_output=True)
+
+# Upewnij się, że tożsamość git jest skonfigurowana przed commitowaniem
+user_name_check = subprocess.run(["git", "config", "user.name"], cwd=TARGET_DIR, capture_output=True, text=True)
+user_email_check = subprocess.run(["git", "config", "user.email"], cwd=TARGET_DIR, capture_output=True, text=True)
+if not user_name_check.stdout.strip() or not user_email_check.stdout.strip():
+    print(f"   ⚙️  Brak tożsamości Git. Ustawiam lokalnie: {gh_user}")
+    subprocess.run(["git", "config", "user.name", gh_user], cwd=TARGET_DIR, check=True)
+    subprocess.run(["git", "config", "user.email", f"{gh_user}@users.noreply.github.com"], cwd=TARGET_DIR, check=True)
+
+# --------------------------------------------------------------------------- #
+# 6. Initial commit (PRZED gh repo create — gh --push wymaga commitów)
+# --------------------------------------------------------------------------- #
+status = subprocess.run(
+    ["git", "status", "--porcelain"],
+    cwd=TARGET_DIR, capture_output=True, text=True
+)
+if status.stdout.strip():
+    print("📝 Initial commit...")
+    subprocess.run(["git", "add", "-A"], cwd=TARGET_DIR, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "commit", "-m", "init: agents-os v4.2 swarm bootstrap"],
+        cwd=TARGET_DIR, check=True, capture_output=True
+    )
+    print("   ✅ Commit gotowy.")
+else:
+    print("   ℹ️  Brak zmian do commita (repo już zainicjalizowane).")
+
+# --------------------------------------------------------------------------- #
+# 7. GitHub repo — utwórz jeśli nie istnieje, ustaw remote
+# --------------------------------------------------------------------------- #
 print(f"🐙 Sprawdzanie repo na GitHubie dla użytkownika {gh_user}...")
 gh_check = subprocess.run(
     ["gh", "repo", "view", f"{gh_user}/{project_name}"],
