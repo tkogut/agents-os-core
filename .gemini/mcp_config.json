@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "antigravity-docs": {
+      "command": "node",
+      "args": [
+        "/home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/mcp_server.js"
+      ],
+      "description": "Antigravity IDE documentation knowledge base — search_docs, read_doc, list_document_names"
+    }
+  }
+}
