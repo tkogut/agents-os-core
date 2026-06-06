@@ -1,0 +1,166 @@
+[
+    {
+        "title": "Home",
+        "url": "https://antigravity.google/docs/home"
+    },
+    {
+        "title": "Getting Started",
+        "url": "https://antigravity.google/docs/get-started"
+    },
+    {
+        "title": "Agent",
+        "url": "https://antigravity.google/docs/agent"
+    },
+    {
+        "title": "Models",
+        "url": "https://antigravity.google/docs/models"
+    },
+    {
+        "title": "Agent Modes / Settings",
+        "url": "https://antigravity.google/docs/agent-modes-settings"
+    },
+    {
+        "title": "Rules / Workflows",
+        "url": "https://antigravity.google/docs/rules-workflows"
+    },
+    {
+        "title": "Skills",
+        "url": "https://antigravity.google/docs/skills"
+    },
+    {
+        "title": "Task Groups",
+        "url": "https://antigravity.google/docs/task-groups"
+    },
+    {
+        "title": "Browser Subagent",
+        "url": "https://antigravity.google/docs/browser-subagent"
+    },
+    {
+        "title": "Strict Mode",
+        "url": "https://antigravity.google/docs/strict-mode"
+    },
+    {
+        "title": "Sandboxing",
+        "url": "https://antigravity.google/docs/sandbox-mode"
+    },
+    {
+        "title": "MCP",
+        "url": "https://antigravity.google/docs/mcp"
+    },
+    {
+        "title": "Artifacts",
+        "url": "https://antigravity.google/docs/artifacts"
+    },
+    {
+        "title": "Task List",
+        "url": "https://antigravity.google/docs/task-list"
+    },
+    {
+        "title": "Implementation Plan",
+        "url": "https://antigravity.google/docs/implementation-plan"
+    },
+    {
+        "title": "Walkthrough",
+        "url": "https://antigravity.google/docs/walkthrough"
+    },
+    {
+        "title": "Screenshots",
+        "url": "https://antigravity.google/docs/screenshots"
+    },
+    {
+        "title": "Browser Recordings",
+        "url": "https://antigravity.google/docs/browser-recordings"
+    },
+    {
+        "title": "Knowledge",
+        "url": "https://antigravity.google/docs/knowledge"
+    },
+    {
+        "title": "Editor",
+        "url": "https://antigravity.google/docs/editor"
+    },
+    {
+        "title": "Tab",
+        "url": "https://antigravity.google/docs/tab"
+    },
+    {
+        "title": "Command",
+        "url": "https://antigravity.google/docs/command"
+    },
+    {
+        "title": "Agent Side Panel",
+        "url": "https://antigravity.google/docs/agent-side-panel"
+    },
+    {
+        "title": "Review Changes + Source Control",
+        "url": "https://antigravity.google/docs/review-changes-editor"
+    },
+    {
+        "title": "Agent Manager",
+        "url": "https://antigravity.google/docs/agent-manager"
+    },
+    {
+        "title": "Workspaces",
+        "url": "https://antigravity.google/docs/workspaces"
+    },
+    {
+        "title": "Playground",
+        "url": "https://antigravity.google/docs/playground"
+    },
+    {
+        "title": "Inbox",
+        "url": "https://antigravity.google/docs/inbox"
+    },
+    {
+        "title": "Conversation View",
+        "url": "https://antigravity.google/docs/conversation-view"
+    },
+    {
+        "title": "Browser Subagent View",
+        "url": "https://antigravity.google/docs/browser-subagent-view"
+    },
+    {
+        "title": "Panes",
+        "url": "https://antigravity.google/docs/panes"
+    },
+    {
+        "title": "Review Changes + Source Control",
+        "url": "https://antigravity.google/docs/review-changes-manager"
+    },
+    {
+        "title": "Changes Sidebar",
+        "url": "https://antigravity.google/docs/changes-sidebar"
+    },
+    {
+        "title": "Terminal",
+        "url": "https://antigravity.google/docs/terminal"
+    },
+    {
+        "title": "Files",
+        "url": "https://antigravity.google/docs/files"
+    },
+    {
+        "title": "Browser",
+        "url": "https://antigravity.google/docs/browser"
+    },
+    {
+        "title": "Allowlist / Denylist",
+        "url": "https://antigravity.google/docs/allowlist-denylist"
+    },
+    {
+        "title": "Separate Chrome Profile",
+        "url": "https://antigravity.google/docs/separate-chrome-profile"
+    },
+    {
+        "title": "Plans",
+        "url": "https://antigravity.google/docs/plans"
+    },
+    {
+        "title": "Settings",
+        "url": "https://antigravity.google/docs/settings"
+    },
+    {
+        "title": "FAQ",
+        "url": "https://antigravity.google/docs/faq"
+    }
+]
