@@ -4,7 +4,7 @@ description: Instrukcja i automatyzacja pracy z serwerem VPS, Docker Compose, re
 trigger_words: ["vps deploy", "vps setup", "docker-compose rebuild", "deploy production", "setup env vps", "git branch switch vps", "redeploy", "zrób redeploy", "przebuduj kontener"]
 ---
 
-# VPS Operations & Docker Deploy (v4.3)
+# VPS Operations & Docker Deploy (v4.4)
 
 ## Purpose
 Standard pracy, wdrażania i diagnostyki na serwerach VPS z Docker Compose + Traefik.
@@ -86,7 +86,69 @@ curl -s https://{service}.{TRAEFIK_HOST}/api/debug/ps | grep signal_engine
 
 ---
 
-## 3. Rebuild & Deploy
+## 3. Adaptive Process Watcher (OBOWIĄZKOWY PROTOKÓŁ)
+
+Gdy agent monitoruje długotrwały proces (signal_engine, data_loader, itp.):
+
+### Krok 1 — Zapytaj użytkownika o interwał
+
+**ZAWSZE** przed uruchomieniem watchera zapytaj:
+> „Co ile mam sprawdzać czy proces się zakończył? (domyślnie: 1 minuta)"
+
+Czekaj **max 30 sekund** na odpowiedź. Jeśli brak — ustaw 1 minutę.
+
+Przykładowe odpowiedzi użytkownika:
+- `"co 3 minuty"` → `interval = 3 min`
+- `"co 5 min"` → `interval = 5 min`
+- `"sprawdzaj często"` → `interval = 30 sekund`
+- brak odpowiedzi → `interval = 1 min` (default)
+
+### Krok 2 — Dynamiczna adaptacja interwału
+
+Po każdej iteracji agent **aktualizuje interwał** na podstawie czasu życia procesu:
+
+```
+elapsed_time → next_interval
+
+0  – 5 min   → max(user_default, 1 min)    # wczesna faza — częste sprawdzanie
+5  – 15 min  → max(user_default, 3 min)    # środkowa faza — umiarkowane
+15 – 30 min  → max(user_default, 5 min)    # długa faza — rzadsze sprawdzanie
+30+  min     → max(user_default, 10 min)   # bardzo długa — oszczędność zasobów
+```
+
+**Reguła**: nowy interwał = `max(user_default, adaptive_interval)`.
+Nigdy nie sprawdzaj **rzadziej** niż pozwolił użytkownik, ale możesz **częściej**.
+
+### Krok 3 — Raportowanie
+
+Przy każdej iteracji informuj użytkownika:
+```
+🟠 Iteracja 3 | Czas: 9 min | Następne sprawdzenie za: 3 min | PID 2400 żyje
+```
+
+Po zakończeniu procesu:
+```
+✅ PID 2400 zakończony po ~12 min | Przystępuję do implementacji...
+```
+
+### Implementacja w schedule tool
+
+```python
+# Iteracja 1 (elapsed=0):      interval = 1 min  (default)
+# Iteracja 3 (elapsed=6 min):  interval = 3 min  (adaptacja)
+# Iteracja 8 (elapsed=20 min): interval = 5 min  (adaptacja)
+# Iteracja 15 (elapsed=40min): interval = 10 min (adaptacja)
+```
+
+Użyj `schedule` tool z dynamicznie obliczonym `DurationSeconds`:
+- 1 min → `DurationSeconds=60`
+- 3 min → `DurationSeconds=180`
+- 5 min → `DurationSeconds=300`
+- 10 min → `DurationSeconds=600`
+
+---
+
+## 4. Rebuild & Deploy
 
 ### Standardowa procedura (przez SSH)
 
