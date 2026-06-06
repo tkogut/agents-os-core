@@ -344,6 +344,30 @@ System przypisuje asystentowi 3 tryby pracy:
 
 ---
 
+## 9. Integracja MCP & GitOps
+
+**MCP (Model Context Protocol) zintegrowany z GitOps** umożliwia dynamiczne aktualizowanie i dystrybucję bazy wiedzy o Antigravity IDE bezpośrednio z repozytorium GitHub.
+
+### Jak to działa?
+
+1. **Serwer MCP (`antigravity-docs`)**:
+   Zlokalizowany w `.agents/mcp-servers/antigravity-docs/`. Jest to serwer oparty o Node.js/stdio, który dostarcza zasoby (`docs://index`) oraz narzędzia (`search_docs`, `read_doc`, `list_document_names`) dla asystenta AI.
+   
+2. **Scraper & Extractor**:
+   Skrypty Pythonowe (`scraper.py` i `extractor.py`) używające biblioteki Playwright pobierają najnowsze wersje dokumentacji ze strony `https://antigravity.google/docs/get-started` bezpośrednio do formatu Markdown w katalogu `knowledge_base/`.
+
+3. **Cykliczny pipeline GitHub Actions (`mcp-docs-updater.yml`)**:
+   Skonfigurowany przepływ pracy w `.github/workflows/mcp-docs-updater.yml` automatycznie:
+   * Odpala się raz w miesiącu lub na żądanie (`workflow_dispatch`).
+   * Instaluje Pythona, zależności oraz przeglądarkę Chromium (Playwright).
+   * Wykonuje scraper i extractor.
+   * Porównuje różnice (`git diff`) i w przypadku zmian automatycznie commituje i pushuje nową wiedzę do repozytorium `master/main` jako `chore(mcp): auto-refresh Antigravity docs`.
+
+4. **Lokalna konfiguracja IDE (`.gemini/mcp_config.json`)**:
+   Lokalne środowisko automatycznie wczytuje serwer MCP podczas otwierania projektu, dając asystentowi natychmacowy dostęp do lokalnej, zaktualizowanej bazy wiedzy.
+
+---
+
 <br><hr><br>
 
 <a name="english"></a>
@@ -488,4 +512,27 @@ git push
 
 ---
 
-*Document maintained by Antigravity Agent & tkogut. Last updated: May 2026.*
+## MCP & GitOps Integration
+
+**MCP (Model Context Protocol) integrated with GitOps** allows dynamic updating and distribution of the Antigravity IDE documentation directly via GitHub.
+
+### How it works:
+
+1. **MCP Server (`antigravity-docs`)**:
+   Located in `.agents/mcp-servers/antigravity-docs/`. It runs on Node.js/stdio, providing the AI agent with documentation resources (`docs://index`) and search/read tools.
+
+2. **Scraper & Extractor**:
+   Python scripts (`scraper.py` and `extractor.py`) use Playwright to crawl the official Antigravity Docs site (`https://antigravity.google/docs/get-started`) and generate clean Markdown files under `knowledge_base/`.
+
+3. **Cyklic GitHub Actions Pipeline (`mcp-docs-updater.yml`)**:
+   Located in `.github/workflows/mcp-docs-updater.yml`. It runs automatically:
+   * Monthly (cron) or via manual trigger (`workflow_dispatch`).
+   * Installs Python 3.11, Playwright (Chromium), and runs the scraper and extractor.
+   * Compares differences and automatically commits/pushes updates to `master/main` with `chore(mcp): auto-refresh Antigravity docs`.
+
+4. **Local IDE Integration (`.gemini/mcp_config.json`)**:
+   The editor dynamically registers the local MCP server when opening the workspace, giving the AI agent instant, zero-setup access to the latest documentation.
+
+---
+
+*Document maintained by Antigravity Agent & tkogut. Last updated: June 2026.*
