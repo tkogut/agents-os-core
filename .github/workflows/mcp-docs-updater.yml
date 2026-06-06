@@ -1,0 +1,85 @@
+name: MCP Docs Updater
+
+on:
+  schedule:
+    # Run at 03:00 UTC on the 1st of every month
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual knowledge base refresh'
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-knowledge-base:
+    name: Scrape & Commit Antigravity Docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-playwright-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-playwright-
+
+      - name: Install Python dependencies
+        working-directory: .agents/mcp-servers/antigravity-docs
+        run: |
+          pip install --upgrade pip
+          pip install playwright
+
+      - name: Install Playwright Chromium browser
+        working-directory: .agents/mcp-servers/antigravity-docs
+        run: |
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Run scraper — collect documentation links
+        working-directory: .agents/mcp-servers/antigravity-docs
+        run: python scraper.py
+
+      - name: Run extractor — download documentation pages
+        working-directory: .agents/mcp-servers/antigravity-docs
+        run: python extractor.py
+
+      - name: Check for changes in knowledge base
+        id: diff
+        working-directory: .agents/mcp-servers/antigravity-docs
+        run: |
+          git diff --quiet knowledge_base/ links.json || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Configure git identity
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit updated knowledge base
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git add .agents/mcp-servers/antigravity-docs/knowledge_base/ \
+                   .agents/mcp-servers/antigravity-docs/links.json
+          git commit -m "chore(mcp): auto-refresh Antigravity docs $(date -u '+%Y-%m-%d')"
+          git push origin HEAD
+
+      - name: No changes detected
+        if: steps.diff.outputs.changed != 'true'
+        run: echo "Knowledge base is up-to-date. No commit needed."
