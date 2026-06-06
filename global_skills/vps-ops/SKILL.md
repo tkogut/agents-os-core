@@ -240,45 +240,158 @@ ssh root@{TRAEFIK_HOST} "cat /root/{project}/.tmp/api_errors.log | tail -30"
 
 ---
 
-## 7. Wzorce wydajności — lekcje z portfolio-sentinel
+## 7. Wzorce wydajności — Production Patterns
 
-### Problem: długotrwałe procesy (signal_engine)
+### P1: Długotrwałe zadania — Cache TTL + Hard Timeout
 
-**Antywzorzec** — scraping 240+ tickerów bez cache:
+Każde zadanie scrapujące/pobierające dane dla N>50 elementów MUSI mieć:
+
 ```python
-# ZLE: wywołuje HTTP dla każdego tickera przy każdym uruchomieniu
-analyze_sentiment()  # może trwać 60+ minut
-```
+# ANTYWZORZEC: wywołanie HTTP dla każdego elementu przy każdym uruchomieniu
+fetch_all_items()  # 100 elementów × 1-3s = 100-300s blokady
 
-**Wzorzec** — cache TTL + hard timeout:
-```python
-CACHE_TTL = 6 * 3600  # 6 godzin
-cache_age = time.time() - os.path.getmtime(cache_path)
+# WZORZEC: cache TTL + hard timeout + więcej workerów
+CACHE_TTL = 6 * 3600  # 6 godzin — nie odświeżaj częściej
+cache_age = time.time() - os.path.getmtime(cache_path) if os.path.exists(cache_path) else float('inf')
 if cache_age < CACHE_TTL:
-    # użyj cache
+    load_from_cache()  # szybko
 else:
-    # odśwież z timeout
+    HARD_TIMEOUT = 180  # 3 minuty max
     with ThreadPoolExecutor(max_workers=15) as executor:
-        # ... max 180 sekund
+        for future in as_completed(futures, timeout=HARD_TIMEOUT):
+            try:
+                result = future.result(timeout=12)
+            except Exception:
+                pass  # skip failed items
 ```
 
-### Problem: batch download danych (yfinance)
+### P2: Batch download zamiast pętli requestów
 
 ```python
-# DOBRZE: jeden batch zamiast pętli
-data = yf.download(symbols, period="2y", interval="1d", progress=False)
-# Przetwarza lokalnie dla każdego tickera — bez dodatkowych requestów
-for ticker in symbols:
-    prices = data['Close'][ticker].dropna()
+# ANTYWZORZEC: N requestów = N × opóźnienie sieci
+for symbol in symbols:
+    data = fetch_single(symbol)  # wolne, ryzyko rate-limit
+
+# WZORZEC: jeden batch request
+data = fetch_batch(symbols)  # jeden request, przetwarzaj lokalnie
+for symbol in symbols:
+    result = process_local(data[symbol])
+```
+
+### P3: Jitter i backoff przy zewnętrznych API
+
+```python
+# Zbyt duży jitter blokuje cały pipeline
+time.sleep(random.uniform(1.0, 3.0))  # ZLE przy 100+ elementach
+
+# Minimalny jitter wystarczy przy wielu workerach
+time.sleep(random.uniform(0.05, 0.5))  # DOBRZE
+
+# Przy niepowodzeniach: exponential backoff
+for attempt in range(3):
+    try:
+        result = call_api()
+        break
+    except Exception:
+        time.sleep(0.5 * (2 ** attempt))  # 0.5s, 1s, 2s
 ```
 
 ---
 
-## 8. Usage Rules for Agent
+## 8. API Design dla Agentów AI (Best Practices)
+
+Jeśli budujesz aplikację zarządzaną przez agenta AI, zaprojektuj API tak:
+
+### Obowiązkowe endpointy
+
+```
+GET /api/status          → {"status": "GREEN|ORANGE|RED", "version": "master@abc123"}
+GET /api/debug/ps        → lista procesów (czyta /proc — działa w slim containers)
+GET /api/debug/logs      → ostatnie N linii logów
+GET /api/version         → {"sha": "abc123", "deployed_at": "2026-06-06T..."}
+```
+
+### Long-running jobs pattern
+
+```python
+# Agent wywołuje: POST /api/jobs/sync
+# Natychmiastowa odpowiedź:
+{"job_id": "sync-001", "status": "STARTED"}
+
+# Agent polluje: GET /api/jobs/sync-001/status
+{"job_id": "sync-001", "status": "RUNNING", "progress": "45/240 tickers"}
+{"job_id": "sync-001", "status": "DONE", "elapsed_s": 312}
+```
+
+### Strukturalne błędy (nie HTML 500)
+
+```python
+# Agent nie umie parsować HTML stack trace
+# ZLE: return 500 Internal Server Error (HTML)
+# DOBRZE:
+return {"error": "timeout", "details": "yfinance download exceeded 30s", "ticker": "AAPL"}, 500
+```
+
+---
+
+## 9. Docker Volumes — co przeżywa rebuild
+
+Agent MUSI wiedzieć co resetuje się po `docker compose up --build`:
+
+| Zasób | Przeżywa rebuild? | Dlaczego |
+|-------|------------------|----------|
+| Kod aplikacji | ❌ Zastąpiony | Nowy image z git pull |
+| `.env` (volume mount) | ✅ TAK | Montowany z hosta |
+| `database.db` (volume mount) | ✅ TAK | Montowany z hosta |
+| `.tmp/` cache (volume mount) | ✅ TAK | Montowany z hosta |
+| Zmienne środowiskowe | ✅ TAK | Z `docker-compose.yml` |
+| Dane w kontenerze (nie volume) | ❌ Utracone | Ephemeral layer |
+
+**Reguła**: wszystko co ma przeżyć rebuild musi być w `volumes:` w `docker-compose.yml`.
+
+---
+
+## 10. CI/CD bez SSH (GitHub Actions)
+
+Najlepszy pattern dla agenta — push kodu → automatyczny deploy:
+
+```yaml
+# .github/workflows/deploy.yml
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /root/{project}
+            git pull origin master
+            docker compose up -d --build
+            docker system prune -f
+```
+
+Agent push → CI/CD deploy → Agent weryfikuje przez `/api/version` czy nowy SHA wdrożony.
+**Zero SSH po stronie agenta.**
+
+---
+
+## 11. Usage Rules for Agent
 
 1. **Zawsze czytaj TRAEFIK_HOST z .env** — nie zgaduj IP/domeny.
-2. **API-first** — przed SSH sprawdź `/api/status/sync` i `/api/debug/ps`.
-3. **Po deployu** — weryfikuj przez API (nowy SHA w `version`), nie przez SSH.
+2. **API-first** — przed SSH sprawdź `/api/status` i `/api/debug/ps`.
+3. **Po deployu** — weryfikuj przez `/api/version` (nowy SHA), nie przez SSH.
 4. **Slim kontenery** — `ps`, `top`, `htop` nie działają. Używaj `/proc` lub API.
 5. **Deploy = git pull + docker compose up -d --build + docker system prune -f**.
-6. **Watcher pattern** — monitoruj długie procesy co 3 min przez API, nie przez SSH polling.
+6. **Adaptive Watcher** — zapytaj o interwał, domyślnie 1 min, adaptuj dynamicznie.
+7. **Cache przed requestem** — sprawdź wiek cache przed wywołaniem kosztownego API.
+8. **Volumes check** — przed rebuild sprawdź co jest zamontowane jako volume.
+9. **Strukturalne logi** — aplikacja musi logować do pliku w volume, nie tylko stdout.
+10. **Nie trzymaj stanu w kontekście** — każdą sesję zacznij od `curl /api/version`.
