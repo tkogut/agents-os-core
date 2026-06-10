@@ -9,7 +9,7 @@ set -o nounset
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-PROJECTS_ROOT="$(dirname "$REPO_ROOT")"
+PROJECTS_ROOT="$HOME/projects"
 TEST_PROJECT="agents-os-test-bootstrap-$(date +%s)"
 TEST_DIR="$PROJECTS_ROOT/$TEST_PROJECT"
 

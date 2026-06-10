@@ -8,12 +8,17 @@ Używa natywnych bibliotek GitPython i PyGithub zamiast surowych wywołań subpr
 import os
 import sys
 import shutil
-import subprocess
+
 import git
 import github
 from github import Github, GithubException
 
 VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v4.2-swarm")
+if not os.path.exists(VAULT_DIR):
+    # Domyślnie fallback do lokalnego folderu jeśli brak globalnej instalacji
+    local_vault = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "vault")
+    if os.path.exists(local_vault):
+        VAULT_DIR = local_vault
 
 # --------------------------------------------------------------------------- #
 # Argument handling
@@ -88,11 +93,17 @@ if not os.path.exists(readme_path):
 # --------------------------------------------------------------------------- #
 token = os.environ.get("GITHUB_TOKEN")
 if not token:
-    try:
-        proc = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True)
-        token = proc.stdout.strip()
-    except Exception:
-        pass
+    # Używamy natywnego odczytu z pliku hosts.yml aby uniknąć wywołania subprocess
+    gh_hosts_path = os.path.expanduser("~/.config/gh/hosts.yml")
+    if os.path.exists(gh_hosts_path):
+        try:
+            with open(gh_hosts_path, "r") as f:
+                content = f.read()
+                # Proste wyciągnięcie tokena (zakładając strukturę hosts.yml)
+                if "oauth_token: " in content:
+                    token = content.split("oauth_token: ")[1].split("\n")[0].strip()
+        except Exception:
+            pass
 
 gh_user = None
 if token:
