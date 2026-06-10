@@ -2,6 +2,7 @@
 import os
 import sys
 import json
+import re
 import urllib.request
 import urllib.error
 
@@ -58,7 +59,12 @@ def fetch_dir(skill_name, api_url, dest_dir):
         else:
             rel_path = name
         
-        target_path = os.path.join(dest_dir, rel_path)
+        target_path = os.path.abspath(os.path.join(dest_dir, rel_path))
+        
+        # Ochrona przed Path Traversal
+        if not target_path.startswith(os.path.abspath(dest_dir)):
+            print(f"   ⚠️ Zablokowano próbę zapisu poza katalog docelowy: {target_path}")
+            continue
 
         if item_type == "file" and download_url:
             download_item(download_url, target_path)
@@ -74,8 +80,10 @@ def main():
         sys.exit(1)
 
     skill_name = sys.argv[1]
-    if "/" in skill_name or "\\" in skill_name or ".." in skill_name:
-        print("❌ BŁĄD: Nazwa skilla zawiera niedozwolone znaki (/, \\, ..).")
+    
+    # Rygorystyczna walidacja nazwy skilla (tylko znaki alfanumeryczne, myślniki, podkreślenia)
+    if not re.match(r"^[a-zA-Z0-9\-_]+$", skill_name):
+        print("❌ BŁĄD: Nazwa skilla może zawierać tylko litery, cyfry, myślniki i podkreślenia.")
         sys.exit(1)
 
     project_root = find_project_root()
@@ -83,7 +91,7 @@ def main():
         print("❌ BŁĄD: Nie jesteś w katalogu projektu AGENTS-OS (brak folderu .agents/).")
         sys.exit(1)
 
-    dest_dir = os.path.join(project_root, ".agents", "skills", skill_name)
+    dest_dir = os.path.abspath(os.path.join(project_root, ".agents", "skills", skill_name))
     print(f"🪐 Pobieranie skilla '{skill_name}' z oficjalnego katalogu...")
     
     success = fetch_dir(skill_name, API_URL.format(skill_name=skill_name), dest_dir)
