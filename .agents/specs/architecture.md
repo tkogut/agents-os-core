@@ -75,13 +75,18 @@ Skrypt w Pythonie pobierający w locie zdefiniowane pakiety umiejętności z rep
 
 ## 5. Integracja GitOps & Model Context Protocol (MCP)
 
-Wersja 5.0 wdraża system dynamicznego dostarczania wiedzy:
-1.  **Węzeł Dokumentacji (MCP Server):** W folderze `.agents/mcp-servers/antigravity-docs/` uruchomiony jest serwer Node.js implementujący protokół MCP. Dostarcza on do agenta narzędzia wyszukiwania i odczytu oficjalnej dokumentacji Antigravity.
-2.  **Lokalna Rejestracja:** Plik `.gemini/mcp_config.json` deklaruje ścieżkę do serwera MCP, izolując go per-projekt (brak rejestracji globalnej chroni przed wyciekiem kontekstu).
-3.  **Automatyczny Pipeline (`mcp-docs-updater.yml`):**
-    *   Skonfigurowany przepływ GitHub Actions uruchamia się cyklicznie raz w miesiącu (cron).
-    *   Uruchamia scraper oparty na Playwright i wyciąga najnowszą strukturę dokumentów w formacie Markdown do folderu `knowledge_base/`.
-    *   Wykonuje test zmian (`git diff`) i automatycznie commituje nową wiedzę, jeśli nastąpiły rzeczywiste zmiany (GitOps Pull Model).
+Wersja 5.0 wdraża system dynamicznego dostarczania wiedzy i autonomicznego aktualizowania bazy dokumentacji:
+
+1.  **Węzeł Dokumentacji (MCP Server):** W folderze `.agents/mcp-servers/antigravity-docs/` uruchomiony jest serwer Node.js ([mcp_server.js](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/mcp_server.js)) implementujący protokół MCP. Dostarcza on do agenta narzędzia wyszukiwania i odczytu oficjalnej dokumentacji Antigravity.
+2.  **Lokalna Rejestracja:** Plik [.gemini/mcp_config.json](file:///home/tkogut/projects/agents-os-core/.gemini/mcp_config.json) deklaruje ścieżkę do serwera MCP, izolując go per-projekt (brak rejestracji globalnej chroni przed wyciekiem kontekstu).
+3.  **Autonomiczna Aktualizacja Dokumentacji (GitOps CI/CD):**
+    System automatycznie synchronizuje zmiany w oficjalnej dokumentacji bez zaangażowania dewelopera. Całość opiera się na cyklicznym przepływie pracy GitHub Actions zdefiniowanym w [.github/workflows/mcp-docs-updater.yml](file:///home/tkogut/projects/agents-os-core/.github/workflows/mcp-docs-updater.yml).
+
+### Przebieg Przepływu Autonomicznej Aktualizacji (Workflow Sequence):
+*   **Krok 1: Inicjalizacja & Scraper (`scraper.py`):** Co miesiąc (lub przy ręcznym uruchomieniu) bot uruchamia bezgłową przeglądarkę Playwright ([scraper.py](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/scraper.py)) na stronie `https://antigravity.google/docs/get-started`. Parsuje strukturę paska bocznego i zapisuje listę linków do pliku [links.json](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/links.json).
+*   **Krok 2: Ekstrakcja Treści (`extractor.py`):** Skrypt [extractor.py](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/extractor.py) iteruje po linkach z indeksu, pobiera wyrenderowaną przez JS treść z kontenera `.docs-main-content` i zapisuje czysty tekst do plików Markdown w folderze [knowledge_base/](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/knowledge_base/).
+*   **Krok 3: Dirty-Check & Auto-Commit:** System sprawdza różnice w plikach (`git diff`). W przypadku wykrycia modyfikacji, bot automatycznie tworzy commit `chore(mcp): auto-refresh Antigravity docs YYYY-MM-DD` i wypycha zmiany do repozytorium zdalnego.
+*   **Krok 4: Lokalna Aktualizacja i Użycie:** Deweloper pobiera zmiany za pomocą `git pull`. Ponieważ lokalny serwer MCP serwuje pliki bezpośrednio z podkatalogu `knowledge_base/`, agenci roju w kolejnej sesji pracy natychmiast zyskują dostęp do najnowszej wiedzy bez potrzeby restartu czy reinstalacji środowiska.
 
 ---
 
