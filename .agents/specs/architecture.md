@@ -1,6 +1,6 @@
-# Specyfikacja Architektoniczna AGENTS-OS v4.2 Swarm Edition
+# Specyfikacja Architektoniczna AGENTS-OS v5.0 Swarm Edition
 
-Niniejszy dokument przedstawia kompletną architekturę, strukturę oraz zasady działania systemu operacyjnego dla agentów — **AGENTS-OS v4.2 (Swarm Edition)**, wdrożonego w repozytorium `tkogut/agents-os-core`.
+Niniejszy dokument przedstawia kompletną architekturę, strukturę oraz zasady działania systemu operacyjnego dla agentów — **AGENTS-OS v5.0 (Swarm Edition)**, wdrożonego w repozytorium `tkogut/agents-os-core`.
 
 ---
 
@@ -75,7 +75,7 @@ Skrypt w Pythonie pobierający w locie zdefiniowane pakiety umiejętności z rep
 
 ## 5. Integracja GitOps & Model Context Protocol (MCP)
 
-Wersja 4.2 wdraża system dynamicznego dostarczania wiedzy:
+Wersja 5.0 wdraża system dynamicznego dostarczania wiedzy:
 1.  **Węzeł Dokumentacji (MCP Server):** W folderze `.agents/mcp-servers/antigravity-docs/` uruchomiony jest serwer Node.js implementujący protokół MCP. Dostarcza on do agenta narzędzia wyszukiwania i odczytu oficjalnej dokumentacji Antigravity.
 2.  **Lokalna Rejestracja:** Plik `.gemini/mcp_config.json` deklaruje ścieżkę do serwera MCP, izolując go per-projekt (brak rejestracji globalnej chroni przed wyciekiem kontekstu).
 3.  **Automatyczny Pipeline (`mcp-docs-updater.yml`):**
@@ -97,4 +97,4 @@ Z powodu niestabilności wbudowanych mechanizmów IDE, system wymusza rygorystyc
     ```
 
 ---
-*Dokumentacja wygenerowana zgodnie ze standardem docs-architect. Wersja 4.2-AG.*
+*Dokumentacja wygenerowana zgodnie ze standardem docs-architect. Wersja 5.0-AG.*

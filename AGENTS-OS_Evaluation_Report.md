@@ -1,7 +1,7 @@
-# 🛸 Raport Oceny i Audytu Kodu: AGENTS-OS v4.2.1 (Zero-Click Production)
+# 🛸 Raport Oceny i Audytu Kodu: AGENTS-OS v5.0.0 (Zero-Click Production)
 
 **Status projektu:** PRODUCTION READY / EXCELLENT (Środowisko dojrzałe, zoptymalizowane pod kątem przenaszalności i kosztów API)  
-**Wersja:** 4.2.1 (Antigravity 2.0 Native)  
+**Wersja:** 5.0.0 (Antigravity 2.0 Native)  
 **Data audytu:** 2026-05-24 (Aktualizacja: 2026-05-25)  
 **Audytor:** Asystent AI Antigravity (GEM Expert)  
 
@@ -9,14 +9,14 @@
 
 ## 1. Podsumowanie Wykonawcze (Executive Summary)
 
-Wersja **v4.2.0** to w pełni dojrzała i gotowa do dystrybucji wersja platformy **AGENTS-OS**. Wszystkie krytyczne niedociągnięcia z wersji v4.1.1 zostały bezbłędnie wyeliminowane:
+Wersja **v5.0.0** to w pełni dojrzała i gotowa do dystrybucji wersja platformy **AGENTS-OS**. Wszystkie krytyczne niedociągnięcia z wersji v4.1.1 zostały bezbłędnie wyeliminowane:
 *   **Dynamiczne dociąganie skilli**: Dodano skrypt `os-add-skill` w czystym Pythonie (zależny tylko od bibliotek standardowych), co pozwala na dynamiczne doinstalowywanie specjalistycznych modułów do konkretnych projektów. Drastycznie zmniejsza to koszt tokenów (zapobiega Context Bloat).
 *   **Pobieranie katalogu skilli**: Wprowadzono automatyczne pobieranie katalogu RAG (`awesome-skills-catalog.md`) podczas instalacji.
 *   **Automatyczna rejestracja powłoki**: Instalator `INSTALL.sh` tworzy teraz automatycznie `~/.bashrc.d/antigravity` oraz dopisuje import do `~/.bashrc`, dzięki czemu system konfiguruje się samoczynnie od pierwszego kliknięcia.
 *   **Przenaszalność edytora IDE**: Zaimplementowano dynamiczny loop sprawdzający profile Windows w WSL w poszukiwaniu Antigravity IDE, co czyni start edytora niezależnym od interop.
 *   **Testy E2E**: Testy E2E w `test_bootstrap.sh` poprawnie weryfikują również procedurę pobierania skilli przez `os-add-skill`.
 
-Podczas audytu wdrożonej wersji **v4.2.0** zidentyfikowano **dwa drobne usprawnienia o charakterze "hardeningu" (zabezpieczenie kodu i testów)**, które warto nanieść przed ostatecznym zamknięciem wersji.
+Podczas audytu wdrożonej wersji **v5.0.0** zidentyfikowano **dwa drobne usprawnienia o charakterze "hardeningu" (zabezpieczenie kodu i testów)**, które warto nanieść przed ostatecznym zamknięciem wersji.
 
 ---
 
@@ -52,7 +52,7 @@ Podczas audytu wdrożonej wersji **v4.2.0** zidentyfikowano **dwa drobne usprawn
 
 ---
 
-## 3. Audyt Nowych Zmian (Wersja v4.2.0+, Zmiany z dnia 2026-05-25)
+## 3. Audyt Nowych Zmian (Wersja v5.0.0+, Zmiany z dnia 2026-05-25)
 
 Wprowadzone w najnowszych commitach zmiany znacząco rozszerzają automatyzację instalacji i poprawiają stabilność działania systemu na nowych/czystych maszynach deweloperskich.
 
@@ -78,4 +78,4 @@ Wprowadzone w najnowszych commitach zmiany znacząco rozszerzają automatyzację
 
 Po uwzględnieniu najnowszych zmian, projekt prezentuje **wyjątkowo wysoki poziom odporności na błędy (resilience)**. Nowe mechanizmy tożsamości Git oraz integracja z Remote-WSL w edytorze Windows czynią system w pełni przygotowanym do wdrożenia deweloperskiego na dowolnej maszynie. 
 
-Oba zalecenia z sekcji 2 (Script-Relative Paths w teście E2E oraz walidacja Path Traversal w `os-add-skill`) zostały pomyślnie wdrożone i zweryfikowane w wersji **v4.2.1**, co ostatecznie zamyka audyt i w pełni zabezpiecza system.
+Oba zalecenia z sekcji 2 (Script-Relative Paths w teście E2E oraz walidacja Path Traversal w `os-add-skill`) zostały pomyślnie wdrożone i zweryfikowane w wersji **v5.0.0**, co ostatecznie zamyka audyt i w pełni zabezpiecza system.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AGENTS-OS v4.2 SWARM - Project Bootstrapper
+AGENTS-OS v5.0 SWARM - Project Bootstrapper
 Kolejność: folder → vault → .gitignore → git init → commit → gh repo create → push
 Wypisuje __PROJECT_DIR__:<ścieżka> jako ostatnią linię (używana przez os-init do cd).
 Używa natywnych bibliotek GitPython i PyGithub zamiast surowych wywołań subprocess.
@@ -13,7 +13,7 @@ import git
 import github
 from github import Github, GithubException
 
-VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v4.2-swarm")
+VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v5.0-swarm")
 if not os.path.exists(VAULT_DIR):
     # Domyślnie fallback do lokalnego folderu jeśli brak globalnej instalacji
     local_vault = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "vault")
@@ -52,7 +52,7 @@ if not os.path.exists(TARGET_DIR):
     print(f"📦 Tworzenie projektu: {TARGET_DIR}")
     os.makedirs(TARGET_DIR)
 
-print(f"🚀 INICJACJA AGENTS-OS v4.2 SWARM W: {TARGET_DIR}")
+print(f"🚀 INICJACJA AGENTS-OS v5.0 SWARM W: {TARGET_DIR}")
 
 # --------------------------------------------------------------------------- #
 # 2. Kopiowanie Vault (Złoty Standard)
@@ -80,13 +80,13 @@ gitignore_path = os.path.join(TARGET_DIR, ".gitignore")
 if not os.path.exists(gitignore_path):
     print("📝 Tworzenie .gitignore...")
     with open(gitignore_path, "w") as f:
-        f.write("# AGENTS-OS v4.2\ntmp/\n*.log\n__pycache__/\n.DS_Store\nnode_modules/\n.env\n")
+        f.write("# AGENTS-OS v5.0\ntmp/\n*.log\n__pycache__/\n.DS_Store\nnode_modules/\n.env\n")
 
 # Tworzymy README.md jeśli brak (potrzebny do commita)
 readme_path = os.path.join(TARGET_DIR, "README.md")
 if not os.path.exists(readme_path):
     with open(readme_path, "w") as f:
-        f.write(f"# {project_name}\n\nAGENTS-OS v4.2 Swarm Edition\n")
+        f.write(f"# {project_name}\n\nAGENTS-OS v5.0 Swarm Edition\n")
 
 # --------------------------------------------------------------------------- #
 # 4. Pozyskanie tokena GitHub i określenie użytkownika
@@ -168,7 +168,7 @@ if repo.is_dirty(untracked_files=True):
     print("📝 Initial commit...")
     try:
         repo.git.add(A=True)
-        repo.index.commit("init: agents-os v4.2 swarm bootstrap")
+        repo.index.commit("init: agents-os v5.0 swarm bootstrap")
         print("   ✅ Commit gotowy.")
     except Exception as e:
         print(f"❌ Commit failed: {e}")
@@ -203,7 +203,7 @@ if not repo_exists and token:
         gh_repo = user.create_repo(
             name=project_name,
             private=False,
-            description=f"AGENTS-OS v4.2 — {project_name}"
+            description=f"AGENTS-OS v5.0 — {project_name}"
         )
         print(f"   ✅ Repo utworzone: {gh_repo.html_url}")
     except Exception as e:
@@ -232,7 +232,7 @@ except Exception as e:
     print(f"   ⚠️  Push failed: {e}")
     print(f"      Możesz pushować ręcznie: git push -u origin {repo.active_branch.name}")
 
-print(f"\n✨ AGENTS-OS v4.2 Swarm — projekt GOTOWY.")
+print(f"\n✨ AGENTS-OS v5.0 Swarm — projekt GOTOWY.")
 print(f"   GitHub: https://github.com/{gh_user}/{project_name}")
 
 # WAŻNE: ostatnia linia = sygnał dla os-init (shell function) do cd

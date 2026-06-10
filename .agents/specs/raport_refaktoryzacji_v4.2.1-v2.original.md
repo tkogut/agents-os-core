@@ -1,16 +1,16 @@
-# Raport Refaktoryzacji AGENTS-OS do wersji v4.2.1 Swarm Edition
+# Raport Refaktoryzacji AGENTS-OS do wersji v5.0.0 Swarm Edition
 
 ## 1. Cel i zakres refaktoryzacji
-Niniejszy raport przedstawia strategię i konkretne kroki niezbędne do zmigrowania środowiska AGENTS-OS z przestarzałej wersji korzystającej z `gemini-cli` i dystrybucji `snap` na natywny ekosystem **Antigravity CLI** wprowadzony w wersji v4.2.1. Decyzja ta podyktowana jest m.in. wygasaniem wsparcia dla starych tokenów deweloperskich (18 czerwca 2026 r.).
+Niniejszy raport przedstawia strategię i konkretne kroki niezbędne do zmigrowania środowiska AGENTS-OS z przestarzałej wersji korzystającej z `gemini-cli` i dystrybucji `snap` na natywny ekosystem **Antigravity CLI** wprowadzony w wersji v5.0.0. Decyzja ta podyktowana jest m.in. wygasaniem wsparcia dla starych tokenów deweloperskich (18 czerwca 2026 r.).
 
 ## 2. Identyfikacja Długu Technologicznego (Legacy Code)
 Analiza repozytorium wykazała, że obecny instalator (`INSTALL.sh`) oraz powiązane skrypty posiadały kilka krytycznych wad:
 * **Zależność od Snap:** Mocne sprzężenie ze środowiskiem snap uniemożliwiało instalację systemu na macOS oraz w czystych kontenerach (np. Docker, Devcontainers) i powodowało problemy z systemem dowiązań symbolicznych (konieczność omijania przez tzw. "Snap Sandbox Guard").
 * **Przestarzałe narzędzia CLI:** Wykorzystywanie `gemini-cli`, które wg oficjalnego changelogu i dokumentów Google zostało zastąpione przez wbudowane środowisko w Antigravity.
-* **Manualne zarządzanie skilami:** Kopiowanie skilli z pominięciem natywnych mechanizmów, co narusza zasady *Konstytucji AGENTS-OS v4.0*.
+* **Manualne zarządzanie skilami:** Kopiowanie skilli z pominięciem natywnych mechanizmów, co narusza zasady *Konstytucji AGENTS-OS v5.0*.
 
 ## 3. Zrefaktoryzowany Skrypt Inicjalizujący (`INSTALL.sh`)
-Skrypt instalacyjny wymaga głębokiej refaktoryzacji, aby dostosować go do wymogów architektonicznych v4.2.1. Należy wyeliminować dług technologiczny i oprzeć się na uniwersalnych menedżerach pakietów (apt/brew) oraz natywnym Antigravity CLI. 
+Skrypt instalacyjny wymaga głębokiej refaktoryzacji, aby dostosować go do wymogów architektonicznych v5.0.0. Należy wyeliminować dług technologiczny i oprzeć się na uniwersalnych menedżerach pakietów (apt/brew) oraz natywnym Antigravity CLI. 
 
 *Uwaga: Zgodnie z architekturą roju, bezpośrednia implementacja i kod skryptu `INSTALL.sh` zostaną wygenerowane i wdrożone autonomicznie przez agenta Antigravity CLI w ramach wewnętrznej pętli wykonawczej.*
 

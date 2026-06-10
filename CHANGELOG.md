@@ -1,8 +1,14 @@
-# 🛸 Historia Zmian / Changelog — AGENTS-OS v4.2 (Universal Swarm)
+# 🛸 Historia Zmian / Changelog — AGENTS-OS v5.0 (Universal Swarm)
 
 Wszystkie zmiany w tej wersji są bezpośrednią odpowiedzią na audyt przenaszalności systemu zawarty w [AGENTS-OS_Evaluation_Report.md](file:///home/tkogut/projects/agents-os-core/AGENTS-OS_Evaluation_Report.md).
 
 ---
+
+## [5.0.0] - 2026-06-10
+
+### 🚀 Aktualizacja Systemowa do v5.0 (System-wide Version Increment)
+* **Konstytucja i Dokumentacja**: Zaktualizowano Konstytucję AGENTS-OS oraz wszystkie powiązane specyfikacje i raporty do wersji v5.0, zapewniając pełną spójność topologii systemowej w repozytorium.
+* **Synchronizacja Vault**: Zsynchronizowano szablony w katalogu Vault (`vault/`), w tym Konstytucję, reguły GOVERNANCE i specyfikację diagramu zależności `graph.json`.
 
 ## [4.2.1] - 2026-05-25
 

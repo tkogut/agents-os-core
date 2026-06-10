@@ -1,5 +1,5 @@
-🛸 KONSTYTUCJA AGENTS-OS v4.2 Swarm Edition — Instrukcja obsługi
-Wersja: 4.2-AG | Status: STABLE | Architekt: Antigravity Orchestrator & GEM (Gemini Evolution Manager)
+🛸 KONSTYTUCJA AGENTS-OS v5.0 Swarm Edition — Instrukcja obsługi
+Wersja: 5.0-AG | Status: STABLE | Architekt: Antigravity Orchestrator & GEM (Gemini Evolution Manager)
 
 🛠️ 1. ARCHITEKTURA ORKIESTRACJI (THE SWARM TRIAD)
 System operuje w trybie asynchronicznego roju (Swarm) z wykorzystaniem natywnych, równoległych Subagentów Antigravity 2.0. Każda rola posiada twarde ramy odpowiedzialności i dedykowany model:
@@ -43,7 +43,7 @@ Struktura katalogu głównego projektu pod rygorem błędu krytycznego musi zach
 └── src/                    # Czysty, zweryfikowany kod źródłowy
 
 🧠 3. GITOPS & BAZA WIEDZY (MCP PROTOCOL)
-Wersja 4.2 wprowadza samowystarczalny system zapobiegania halucynacjom modeli LLM (Anti-Hallucination Matrix):
+Wersja 5.0 wprowadza samowystarczalny system zapobiegania halucynacjom modeli LLM (Anti-Hallucination Matrix):
 - Węzeł Dokumentacji (MCP Node): Baza wiedzy o środowisku Antigravity jest mapowana bezpośrednio do IDE przez węzeł Node.js zlokalizowany w .agents/mcp-servers/antigravity-docs/. Model otrzymuje dostęp do narzędzi natywnych: search_docs, read_doc, list_document_names.
 - Izolacja Pamięci: ZAKAZ uruchamiania serwera MCP globalnie. Serwer musi być definiowany wewnątrz pliku .gemini/mcp_config.json z użyciem ścieżek bezwzględnych.
 - Autonomiczna Aktualizacja (CI/CD): System wykorzystuje potok .github/workflows/mcp-docs-updater.yml (Cron Job). Bot GitHub Actions autonomicznie indeksuje oficjalną dokumentację (Python + Playwright), i wypycha zmiany do repozytorium tylko w przypadku wykrycia rzeczywistych modyfikacji (Dirty-Check).

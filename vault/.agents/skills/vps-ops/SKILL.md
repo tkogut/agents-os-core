@@ -4,7 +4,7 @@ description: Instrukcja i automatyzacja pracy z serwerem VPS, Docker Compose, re
 trigger_words: ["vps deploy", "vps setup", "docker-compose rebuild", "deploy production", "setup env vps", "git branch switch vps"]
 ---
 
-# 🪐 VPS Operations & Docker Deploy (v4.2)
+# 🪐 VPS Operations & Docker Deploy (v5.0)
 
 🎯 **Purpose**
 Zapewnienie standardu pracy, wdrażania i rozwiązywania problemów na serwerach VPS z użyciem Docker Compose, Git (zmiana gałęzi) oraz konfiguracji plików środowiskowych (`.env`).
