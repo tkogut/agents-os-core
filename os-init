@@ -11,7 +11,7 @@ SKILL_SCRIPT="$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py"
 
 # Fallback: użyj lokalnej kopii jeśli nie zainstalowano globalnie
 if [ ! -f "$SKILL_SCRIPT" ]; then
-    SKILL_SCRIPT="$(dirname "$(realpath "$0")")/../global_skills/swarm-bootstrapper/scripts/bootstrap.py"
+    SKILL_SCRIPT="$(dirname "$(realpath "$0")")/global_skills/swarm-bootstrapper/scripts/bootstrap.py"
 fi
 
 if [ ! -f "$SKILL_SCRIPT" ]; then
