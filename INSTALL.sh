@@ -9,14 +9,6 @@ set -e
 echo "🚀 Rozpoczynam instalację AGENTS-OS v4.2 Swarm Edition..."
 
 # 1. Zależności systemu
-if ! command -v snap &> /dev/null; then
-  echo "📦 Inicjalizacja snapd..."
-  if sudo -n apt update &>/dev/null; then
-      sudo apt install -y snapd
-  else
-      echo "⚠️ Pomijam instalację snapd (brak bezhasłowego sudo). Upewnij się, że snap jest obecny."
-  fi
-fi
 
 if command -v agy &> /dev/null || [ -f "/usr/local/bin/agy" ] || [ -f "$HOME/.local/bin/agy" ]; then
     echo "Antigravity CLI (agy) jest już zainstalowane. Pomijam pobieranie."

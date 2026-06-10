@@ -3,11 +3,15 @@
 AGENTS-OS v4.2 SWARM - Project Bootstrapper
 Kolejność: folder → vault → .gitignore → git init → commit → gh repo create → push
 Wypisuje __PROJECT_DIR__:<ścieżka> jako ostatnią linię (używana przez os-init do cd).
+Używa natywnych bibliotek GitPython i PyGithub zamiast surowych wywołań subprocess.
 """
 import os
-import shutil
 import sys
+import shutil
 import subprocess
+import git
+import github
+from github import Github, GithubException
 
 VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v4.2-swarm")
 
@@ -80,144 +84,142 @@ if not os.path.exists(readme_path):
         f.write(f"# {project_name}\n\nAGENTS-OS v4.2 Swarm Edition\n")
 
 # --------------------------------------------------------------------------- #
-# 4. Ustal dynamicznie użytkownika GitHub i sprawdź tożsamość git
+# 4. Pozyskanie tokena GitHub i określenie użytkownika
 # --------------------------------------------------------------------------- #
-gh_user = "twoj-github-username"
-try:
-    gh_user_proc = subprocess.run(
-        ["gh", "api", "user", "-q", ".login"],
-        capture_output=True, text=True, check=True
-    )
-    gh_user = gh_user_proc.stdout.strip()
-except Exception:
-    # Fallback do git config github.user lub user.name
-    git_user_proc = subprocess.run(
-        ["git", "config", "github.user"],
-        capture_output=True, text=True
-    )
-    if git_user_proc.returncode == 0 and git_user_proc.stdout.strip():
-        gh_user = git_user_proc.stdout.strip()
-    else:
-        git_user_name_proc = subprocess.run(
-            ["git", "config", "user.name"],
-            capture_output=True, text=True
-        )
-        if git_user_name_proc.returncode == 0 and git_user_name_proc.stdout.strip():
-            gh_user = git_user_name_proc.stdout.strip().replace(" ", "")
+token = os.environ.get("GITHUB_TOKEN")
+if not token:
+    try:
+        proc = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True)
+        token = proc.stdout.strip()
+    except Exception:
+        pass
+
+gh_user = None
+if token:
+    try:
+        g = Github(auth=github.Auth.Token(token))
+        gh_user = g.get_user().login
+    except Exception as e:
+        print(f"⚠️  PyGithub auth failed: {e}. Używam konfiguracji gita.")
+
+if not gh_user:
+    try:
+        config = git.GitConfigParser(os.path.expanduser("~/.gitconfig"), read_only=True)
+        gh_user = config.get_value("github", "user", default="") or config.get_value("user", "name", default="").replace(" ", "")
+    except Exception:
+        pass
+
+if not gh_user:
+    gh_user = "twoj-github-username"
 
 # --------------------------------------------------------------------------- #
-# 5. Git init (ZAWSZE przed gh repo create)
+# 5. Git init (Natywnie przez GitPython)
 # --------------------------------------------------------------------------- #
 git_path = os.path.join(TARGET_DIR, ".git")
-if not os.path.exists(git_path):
-    print("📦 Inicjalizacja lokalnego repo git...")
-    subprocess.run(["git", "init"], cwd=TARGET_DIR, check=True, capture_output=True)
-    # Ustaw branch na main
-    subprocess.run(["git", "branch", "-M", "main"], cwd=TARGET_DIR, check=True, capture_output=True)
-else:
-    # Sprawdź czy jesteśmy na main lub master
-    branch = subprocess.run(
-        ["git", "branch", "--show-current"],
-        cwd=TARGET_DIR, capture_output=True, text=True
-    ).stdout.strip()
-    if not branch:
-        subprocess.run(["git", "branch", "-M", "main"], cwd=TARGET_DIR, capture_output=True)
+try:
+    if not os.path.exists(git_path):
+        print("📦 Inicjalizacja lokalnego repo git...")
+        repo = git.Repo.init(TARGET_DIR)
+        with repo.config_writer() as writer:
+            writer.set_value("init", "defaultBranch", "main")
+    else:
+        repo = git.Repo(TARGET_DIR)
+
+    # Upewnij się, że branch to main
+    try:
+        repo.git.checkout("-b", "main")
+    except Exception:
+        try:
+            repo.git.branch("-M", "main")
+        except Exception:
+            pass
+except Exception as e:
+    print(f"❌ Error during git init: {e}")
+    sys.exit(1)
 
 # Upewnij się, że tożsamość git jest skonfigurowana przed commitowaniem
-user_name_check = subprocess.run(["git", "config", "user.name"], cwd=TARGET_DIR, capture_output=True, text=True)
-user_email_check = subprocess.run(["git", "config", "user.email"], cwd=TARGET_DIR, capture_output=True, text=True)
-if not user_name_check.stdout.strip() or not user_email_check.stdout.strip():
-    print(f"   ⚙️  Brak tożsamości Git. Ustawiam lokalnie: {gh_user}")
-    subprocess.run(["git", "config", "user.name", gh_user], cwd=TARGET_DIR, check=True)
-    subprocess.run(["git", "config", "user.email", f"{gh_user}@users.noreply.github.com"], cwd=TARGET_DIR, check=True)
+try:
+    with repo.config_reader() as reader:
+        has_name = reader.has_option("user", "name")
+        has_email = reader.has_option("user", "email")
+    if not has_name or not has_email:
+        print(f"   ⚙️  Brak tożsamości Git. Ustawiam lokalnie: {gh_user}")
+        with repo.config_writer() as writer:
+            writer.set_value("user", "name", gh_user)
+            writer.set_value("user", "email", f"{gh_user}@users.noreply.github.com")
+except Exception as e:
+    print(f"⚠️  Nie udało się skonfigurować tożsamości git: {e}")
 
 # --------------------------------------------------------------------------- #
-# 6. Initial commit (PRZED gh repo create — gh --push wymaga commitów)
+# 6. Initial commit (Natywnie przez GitPython)
 # --------------------------------------------------------------------------- #
-status = subprocess.run(
-    ["git", "status", "--porcelain"],
-    cwd=TARGET_DIR, capture_output=True, text=True
-)
-if status.stdout.strip():
+if repo.is_dirty(untracked_files=True):
     print("📝 Initial commit...")
-    subprocess.run(["git", "add", "-A"], cwd=TARGET_DIR, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "commit", "-m", "init: agents-os v4.2 swarm bootstrap"],
-        cwd=TARGET_DIR, check=True, capture_output=True
-    )
-    print("   ✅ Commit gotowy.")
+    try:
+        repo.git.add(A=True)
+        repo.index.commit("init: agents-os v4.2 swarm bootstrap")
+        print("   ✅ Commit gotowy.")
+    except Exception as e:
+        print(f"❌ Commit failed: {e}")
+        sys.exit(1)
 else:
     print("   ℹ️  Brak zmian do commita (repo już zainicjalizowane).")
 
 # --------------------------------------------------------------------------- #
-# 7. GitHub repo — utwórz jeśli nie istnieje, ustaw remote
+# 7. GitHub repo — utwórz jeśli nie istnieje (Natywnie przez PyGithub)
 # --------------------------------------------------------------------------- #
 print(f"🐙 Sprawdzanie repo na GitHubie dla użytkownika {gh_user}...")
-gh_check = subprocess.run(
-    ["gh", "repo", "view", f"{gh_user}/{project_name}"],
-    cwd=TARGET_DIR, capture_output=True
-)
+repo_exists = False
+if token:
+    try:
+        g = Github(auth=github.Auth.Token(token))
+        g.get_repo(f"{gh_user}/{project_name}")
+        repo_exists = True
+        print(f"   ✅ Repo już istnieje: {gh_user}/{project_name}")
+    except GithubException as e:
+        if e.status == 404:
+            repo_exists = False
+        else:
+            print(f"⚠️  GitHub API returned status {e.status}: {e.data}")
+    except Exception as e:
+        print(f"⚠️  GitHub API error: {e}")
 
-if gh_check.returncode != 0:
-    # Repo nie istnieje — utwórz BEZ --push (commitujemy sami w kroku 5 i 7)
-    print(f"🐙 Tworzenie publicznego repo: {gh_user}/{project_name}...")
-    result = subprocess.run(
-        ["gh", "repo", "create", project_name,
-         "--public",
-         "--description", f"AGENTS-OS v4.2 — {project_name}",
-         "--source", TARGET_DIR,
-         "--remote", "origin"],
-        cwd=TARGET_DIR, capture_output=True, text=True
-    )
-    if result.returncode == 0:
-        print(f"   ✅ Repo utworzone: https://github.com/{gh_user}/{project_name}")
-    else:
-        print(f"   ⚠️  gh repo create failed: {result.stderr.strip()}")
-        # Fallback: ustaw remote ręcznie
-        remote_url = f"https://github.com/{gh_user}/{project_name}.git"
-        subprocess.run(
-            ["git", "remote", "add", "origin", remote_url],
-            cwd=TARGET_DIR, capture_output=True
+if not repo_exists and token:
+    try:
+        print(f"🐙 Tworzenie publicznego repo: {gh_user}/{project_name}...")
+        g = Github(auth=github.Auth.Token(token))
+        user = g.get_user()
+        gh_repo = user.create_repo(
+            name=project_name,
+            private=False,
+            description=f"AGENTS-OS v4.2 — {project_name}"
         )
-        print(f"   🔗 Remote origin ustawiony ręcznie: {remote_url}")
-else:
-    print(f"   ✅ Repo już istnieje: {gh_user}/{project_name}")
-    # Upewnij się że remote origin jest ustawiony
-    remote_check = subprocess.run(
-        ["git", "remote", "get-url", "origin"],
-        cwd=TARGET_DIR, capture_output=True, text=True
-    )
-    if remote_check.returncode != 0:
-        remote_url = f"https://github.com/{gh_user}/{project_name}.git"
-        subprocess.run(["git", "remote", "add", "origin", remote_url], cwd=TARGET_DIR, capture_output=True)
+        print(f"   ✅ Repo utworzone: {gh_repo.html_url}")
+    except Exception as e:
+        print(f"   ⚠️  Nie udało się utworzyć repozytorium przez API: {e}")
+
+# Ustawienie origin remote
+try:
+    origin = repo.remote("origin")
+    origin.set_url(f"https://github.com/{gh_user}/{project_name}.git")
+except ValueError:
+    origin = repo.create_remote("origin", f"https://github.com/{gh_user}/{project_name}.git")
+    print(f"   🔗 Remote origin ustawiony: https://github.com/{gh_user}/{project_name}.git")
+except Exception as e:
+    print(f"⚠️  Nie udało się skonfigurować remote origin: {e}")
 
 # --------------------------------------------------------------------------- #
-# 7. Push
+# 8. Push (Natywnie przez GitPython)
 # --------------------------------------------------------------------------- #
 print("🚀 Push na GitHub...")
-# Wykryj aktualną gałąź
-current_branch = subprocess.run(
-    ["git", "branch", "--show-current"],
-    cwd=TARGET_DIR, capture_output=True, text=True
-).stdout.strip() or "main"
-
-push_result = subprocess.run(
-    ["git", "push", "-u", "origin", current_branch],
-    cwd=TARGET_DIR, capture_output=True, text=True
-)
-if push_result.returncode == 0:
+try:
+    # Pobierz aktualną nazwę gałęzi
+    current_branch = repo.active_branch.name
+    origin.push(refspec=f"{current_branch}:{current_branch}", set_upstream=True)
     print(f"   ✅ Push zakończony ({current_branch} → origin).")
-else:
-    # Jeśli branch nie istnieje na remote, wymuś
-    push_result2 = subprocess.run(
-        ["git", "push", "--set-upstream", "origin", f"HEAD:{current_branch}"],
-        cwd=TARGET_DIR, capture_output=True, text=True
-    )
-    if push_result2.returncode == 0:
-        print(f"   ✅ Push zakończony ({current_branch}).")
-    else:
-        print(f"   ⚠️  Push failed: {push_result.stderr.strip()}")
-        print(f"      Możesz pushować ręcznie: git push -u origin {current_branch}")
+except Exception as e:
+    print(f"   ⚠️  Push failed: {e}")
+    print(f"      Możesz pushować ręcznie: git push -u origin {repo.active_branch.name}")
 
 print(f"\n✨ AGENTS-OS v4.2 Swarm — projekt GOTOWY.")
 print(f"   GitHub: https://github.com/{gh_user}/{project_name}")
