@@ -1,6 +1,6 @@
-# Decyzja Refaktoryzacyjna: Migracja do AGENTS-OS v4.2.1 Swarm Edition
+# Decyzja Refaktoryzacyjna: Migracja do AGENTS-OS v5.0.0 Swarm Edition
 
-Na podstawie analizy długu technologicznego zawartej w pliku `.agents/specs/raport_refaktoryzacji_v4.2.1-v2.md`, poniżej przedstawiono zestawienie argumentów oraz ocenę ryzyka związanego z migracją do wersji v4.2.1.
+Na podstawie analizy długu technologicznego zawartej w pliku `.agents/specs/raport_refaktoryzacji_v4.2.1-v2.md`, poniżej przedstawiono zestawienie argumentów oraz ocenę ryzyka związanego z migracją do wersji v5.0.0.
 
 ---
 

@@ -1,4 +1,4 @@
-# WIEDZA: AGENTS-OS v4.2 -> Antigravity 2.0 (Refactoring Specs)
+# WIEDZA: AGENTS-OS v5.0 -> Antigravity 2.0 (Refactoring Specs)
 **Tag:** #NotebookLM | **Priorytet:** KRYTYCZNY
 **Środowisko docelowe:** Windows WSL (Brak wsparcia dla macOS/brew)
 

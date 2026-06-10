@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # os-init <nazwa-projektu>
-# AGENTS-OS v4.2 SWARM — Project Initializer
+# AGENTS-OS v5.0 SWARM — Project Initializer
 # Tworzy projekt, GitHub repo, commit+push, otwiera IDE.
 # ==============================================================================
 

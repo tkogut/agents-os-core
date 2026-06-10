@@ -1,4 +1,4 @@
-# Migration and Security Audit Report - AGENTS-OS v4.2.1 Swarm Edition
+# Migration and Security Audit Report - AGENTS-OS v5.0.0 Swarm Edition
 
 ## 1. CODEBASE INSPECTION
 
