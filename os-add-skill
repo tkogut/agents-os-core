@@ -27,7 +27,9 @@ def download_item(url, dest_path):
     except Exception as e:
         print(f"   ❌ Nie udało się pobrać {url}: {e}")
 
-def fetch_dir(skill_name, api_url, dest_dir):
+def fetch_dir(skill_name, api_url, dest_dir, skill_root_dir=None):
+    if skill_root_dir is None:
+        skill_root_dir = dest_dir
     req = urllib.request.Request(api_url, headers=HEADERS)
     try:
         with urllib.request.urlopen(req) as response:
@@ -59,10 +61,10 @@ def fetch_dir(skill_name, api_url, dest_dir):
         else:
             rel_path = name
         
-        target_path = os.path.abspath(os.path.join(dest_dir, rel_path))
+        target_path = os.path.abspath(os.path.join(skill_root_dir, rel_path))
         
         # Ochrona przed Path Traversal
-        if not target_path.startswith(os.path.abspath(dest_dir)):
+        if not target_path.startswith(os.path.abspath(skill_root_dir)):
             print(f"   ⚠️ Zablokowano próbę zapisu poza katalog docelowy: {target_path}")
             continue
 
@@ -70,7 +72,7 @@ def fetch_dir(skill_name, api_url, dest_dir):
             download_item(download_url, target_path)
         elif item_type == "dir":
             # Rekurencyjne pobranie podkatalogu
-            fetch_dir(skill_name, item.get("url"), target_path)
+            fetch_dir(skill_name, item.get("url"), target_path, skill_root_dir)
             
     return True
 
