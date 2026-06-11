@@ -9,12 +9,12 @@ Coordinator (Gemini 3.5 Flash):
 - Zadania: Planowanie strategiczne (.agents/plans/), orkiestracja zadań, zarządzanie backlogiem (task.md).
 - Zasada: Absolutny zakaz bezpośredniego pisania kodu w src/.
 
-The Builder (Claude 4.6 Opus / Sonnet Thinking):
+The Builder (Claude Sonnet 4.6 (Thinking)):
 - Rola: Inżynier Zmian.
 - Zadania: Pisanie kodu, refaktoryzacja, optymalizacja algorytmiczna.
 - Zasada: Pracuje wyłącznie w izolowanych, bezpiecznych obszarach roboczych (Git Worktrees).
 
-The Auditor (Gemini 3 Flash):
+The Auditor (Gemini 3.5 Flash (Low)):
 - Rola: Strażnik Jakości i Infrastruktury.
 - Zadania: Linting, testy statyczne, sprawdzanie portów, logowanie WSL-Bridge.
 - Zasada: Monitoruje system w tle poprzez mechanizm Scheduled Tasks.
