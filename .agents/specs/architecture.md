@@ -20,9 +20,9 @@ System dystrybuuje zadania i logikę pomiędzy trzy wyspecjalizowane role agento
 
 | Rola | Model Domyślny | Odpowiedzialność i Ograniczenia |
 | :--- | :--- | :--- |
-| **Coordinator** | Gemini 3.5 Flash | Zarządca kontekstu i backlogu. Analizuje plik `task.md` i planuje pracę w `.agents/plans/`. **Kategoryczny zakaz modyfikowania kodu źródłowego.** |
-| **Builder** | Claude 4.6 (Thinking) | Wdraża zmiany, refaktoryzuje i optymalizuje kod. Pracuje wyłącznie na wydzielonych gałęziach roboczych (Git Worktrees). |
-| **Auditor** | Gemini 3 Flash | Weryfikuje poprawność kodu, uruchamia testy jednostkowe i statyczne, analizuje logi. Działa w tle (Scheduled Tasks). |
+| **Coordinator** | Gemini 3.5 Flash (High) | Zarządca kontekstu i backlogu. Analizuje plik `task.md` i planuje pracę w `.agents/plans/`. **Kategoryczny zakaz modyfikowania kodu źródłowego.** |
+| **Builder** | Claude Sonnet 4.6 (Thinking) | Wdraża zmiany, refaktoryzuje i optymalizuje kod. Pracuje wyłącznie na wydzielonych gałęziach roboczych (Git Worktrees). |
+| **Auditor** | Gemini 3.5 Flash (Low) | Weryfikuje poprawność kodu, uruchamia testy jednostkowe i statyczne, analizuje logi. Działa w tle (Scheduled Tasks). |
 
 ---
 
