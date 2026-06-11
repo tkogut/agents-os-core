@@ -4,11 +4,173 @@ description: Instrukcja i automatyzacja pracy z serwerem VPS, Docker Compose, re
 trigger_words: ["vps deploy", "vps setup", "docker-compose rebuild", "deploy production", "setup env vps", "git branch switch vps", "redeploy", "zrób redeploy", "przebuduj kontener"]
 ---
 
-# VPS Operations & Docker Deploy (v4.4)
+# VPS Operations & Docker Deploy (v4.5)
 
 ## Purpose
 Standard pracy, wdrażania i diagnostyki na serwerach VPS z Docker Compose + Traefik.
-Wersja 4.3 wprowadza: **API-first monitoring**, wzorce URL Traefik, obsługę slim kontenerów.
+Wersja 4.5 wprowadza: **kompletny protokół uwierzytelnienia SSH dla środowiska WSL + Hostinger VPS**.
+
+---
+
+## 0. PROTOKÓŁ UWIERZYTELNIENIA SSH (CZYTAJ PRZED WSZYSTKIM INNYM)
+
+> **KRYTYCZNE**: Agent CLI działa w izolowanym procesie WSL bez dostępu do `ssh-agent` użytkownika.
+> Bez wykonania tego protokołu KAŻDA komenda SSH będzie wisiała, pytając o hasło.
+> Wykonaj ten protokół RAZ na początku każdej sesji pracy z VPS.
+
+### Środowisko Hostinger VPS (tkogut)
+```
+VPS host:    srv1490214.hstgr.cloud
+VPS user:    root
+Klucz SSH:   ~/.ssh/tkogut_ssh_key  (w WSL)
+Źródło klucza: /mnt/c/Users/tkogut/.ssh/id_ed25519/tkogut_ssh_key (na Windows)
+```
+
+---
+
+### KROK 0.1 — Sprawdź czy klucz istnieje w WSL
+
+**Gdzie wpisać:** Terminal WSL na lokalnym komputerze (nie VPS!)
+
+```bash
+ls -la ~/.ssh/tkogut_ssh_key
+```
+
+**Jeśli plik NIE istnieje** → przejdź do kroku 0.2.  
+**Jeśli plik istnieje** → przejdź do kroku 0.3.
+
+---
+
+### KROK 0.2 — Skopiuj klucz z Windows do WSL (tylko raz)
+
+**Gdzie wpisać:** Terminal WSL na lokalnym komputerze
+
+```bash
+cp /mnt/c/Users/tkogut/.ssh/id_ed25519/tkogut_ssh_key ~/.ssh/tkogut_ssh_key
+chmod 600 ~/.ssh/tkogut_ssh_key
+```
+
+> ⚠️ Krok `chmod 600` jest OBOWIĄZKOWY. Bez niego SSH odrzuci klucz z błędem
+> `WARNING: UNPROTECTED PRIVATE KEY FILE!` i nie nawiąże połączenia.
+
+---
+
+### KROK 0.3 — Uruchom ssh-agent i załaduj klucz
+
+**Gdzie wpisać:** Terminal WSL na lokalnym komputerze (ten sam, w którym pracujesz)
+
+```bash
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/tkogut_ssh_key
+```
+
+**Co zobaczysz na ekranie:**
+```
+Agent pid 12345
+Enter passphrase for /home/tkogut/.ssh/tkogut_ssh_key:
+```
+
+Wpisz passphrase (hasło do klucza SSH) gdy zostaniesz poproszony.
+
+**Po wpisaniu poprawnego hasła zobaczysz:**
+```
+Identity added: /home/tkogut/.ssh/tkogut_ssh_key
+```
+
+> ℹ️ Passphrase to hasło ustawione podczas TWORZENIA klucza SSH (np. w panelu Hostinger
+> lub przez `ssh-keygen`). To NIE jest hasło do serwera VPS ani do GitHuba.
+
+---
+
+### KROK 0.4 — Pobierz wartość SSH_AUTH_SOCK i przekaż agentowi
+
+**Gdzie wpisać:** Ten sam terminal WSL co w kroku 0.3
+
+```bash
+echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+```
+
+**Przykładowy wynik:**
+```
+SSH_AUTH_SOCK=/tmp/ssh-00B5ZXHusAbx/agent.106006
+```
+
+Skopiuj tę wartość i **wklej ją do czatu z agentem**. Agent użyje jej jako prefiksu
+do wszystkich komend SSH w tej sesji.
+
+---
+
+### KROK 0.5 — Agent weryfikuje połączenie (wykonuje Agent CLI)
+
+Agent CLI od tej chwili używa SSH_AUTH_SOCK z poprzedniego kroku. Wzorzec każdej komendy SSH:
+
+```bash
+SSH_AUTH_SOCK=<wartość_z_kroku_0.4> ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@srv1490214.hstgr.cloud "<komenda_na_VPS>"
+```
+
+Test połączenia (wykonuje Agent CLI automatycznie):
+```bash
+SSH_AUTH_SOCK=/tmp/ssh-XXXX/agent.YYYY ssh -o StrictHostKeyChecking=no root@srv1490214.hstgr.cloud "echo OK && docker --version"
+```
+
+**Oczekiwany wynik:**
+```
+OK
+Docker version 24.x.x
+```
+
+---
+
+### KROK 0.6 — Autoryzacja GitHub na VPS (tylko przy pierwszym wdrożeniu)
+
+**Gdzie wpisać:** Na VPS (przez SSH lub bezpośrednio w terminalu VPS)
+
+GitHub CLI jest zainstalowany na VPS (`gh --version` → `gh version 2.94.0`).
+Aby VPS mógł pobierać kod z prywatnych repozytoriów bez podawania hasła:
+
+```bash
+gh auth login
+```
+
+Następnie wybierz:
+- `GitHub.com`
+- `HTTPS`
+- `Yes` (Authenticate Git with credentials)
+- `Login with a web browser`
+
+Otwórz podany link w przeglądarce, wpisz 8-znakowy kod i zatwierdź.
+
+> ✅ Po autoryzacji `gh` komenda `git clone https://github.com/...` na VPS
+> działa bez podawania tokenów ani haseł.
+
+---
+
+### Typowe błędy i rozwiązania
+
+| Błąd | Przyczyna | Rozwiązanie |
+|------|-----------|-------------|
+| `WARNING: UNPROTECTED PRIVATE KEY FILE!` | Złe uprawnienia klucza (0777) | `chmod 600 ~/.ssh/tkogut_ssh_key` |
+| `Enter passphrase for key '...'` | Agent nie załadowany | Wykonaj krok 0.3 |
+| `root@srv...'s password:` | Brak klucza w `authorized_keys` na VPS lub brak SSH_AUTH_SOCK | Sprawdź SSH_AUTH_SOCK, wykonaj krok 0.4 |
+| `Permission denied (publickey)` | Klucz publiczny nie dodany na VPS | Dodaj klucz przez panel Hostinger |
+| `no configuration file provided: not found` | Brak `docker-compose.yml` w katalogu | Sprawdź `git status` i `ls -la` |
+| `fatal: Authentication failed for 'https://github.com/...'` | Brak `gh auth login` na VPS | Wykonaj krok 0.6 |
+| `Password authentication is not supported` | Próba logowania hasłem do GitHub | Użyj tokenu PAT lub `gh auth login` |
+| Komenda wisi bez odpowiedzi | SSH_AUTH_SOCK puste lub wygasłe | Powtórz kroki 0.3 i 0.4 |
+
+---
+
+### Ważne przestrogi
+
+1. **Nie próbuj odczytywać pliku klucza prywatnego** (`id_rsa`, `id_ed25519`). Agent nie potrzebuje
+   zawartości klucza — potrzebuje tylko `SSH_AUTH_SOCK`.
+2. **SSH_AUTH_SOCK wygasa** po zamknięciu terminala. Przy nowej sesji powtórz kroki 0.3 i 0.4.
+3. **Nie montuj `.gitconfig` jako volume read-only** w Dockerze — nadpisuje ustawienie
+   `safe.directory` i powoduje błąd `git diff --cached`.
+4. **Repozytorium na VPS** zawsze klonuj do właściwej lokalizacji: `/docker/agents-os`
+   (nie `/root/agents-os` — brak uprawnień zapisu poza kontekstem sudo).
+5. **Sprawdź `git remote -v`** zanim zaczniesz wdrożenie — upewnij się że lokalne repo
+   i VPS wskazują na to samo zdalne repozytorium.
 
 ---
 
