@@ -1,10 +1,10 @@
 ---
-name: rebuild-skill
-description: Globalny systemowy skill dla rebuild-skill w AGENTS-OS v4.2.
-trigger_words: ["rebuild system", "refresh skills", "sync core", "os-rebuild"]
+name: skill-rebuild
+description: Globalny systemowy skill dla skill-rebuild w AGENTS-OS v5.0.
+trigger_words: ["rebuild system", "refresh skills", "sync core", "os-rebuild", "skill-rebuild"]
 ---
 
-# 🔄 Rebuild Skill (v4.2)
+# 🔄 Skill Rebuild (v5.0)
 
 🎯 **Purpose**
 Wymuszenie synchronizacji lokalnego środowiska Agenta z najnowszą wersją Złotego Standardu (The Vault) i globalnych skilli.
