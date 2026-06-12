@@ -219,6 +219,9 @@ os-init() {
     fi
 }
 
+# Skrót do wklejania obrazów ze schowka Windows (WSL)
+alias clip2img="powershell.exe -Command \"Add-Type -AssemblyName System.Windows.Forms; \$img = [System.Windows.Forms.Clipboard]::GetImage(); if (\$img -ne \$null) { [System.IO.Directory]::CreateDirectory('tmp') | Out-Null; \$img.Save('tmp/clip.png', [System.Drawing.Imaging.ImageFormat]::Png); echo '✓ Zapisano w tmp/clip.png' } else { echo '❌ Brak obrazu w schowku' }\""
+
 EOF
 chmod +x "$HOME/.bashrc.d/antigravity"
 echo "✓ Plik ~/.bashrc.d/antigravity został zapisany."
