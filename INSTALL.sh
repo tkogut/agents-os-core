@@ -117,8 +117,8 @@ cp -ra ./global_skills/github-orchestrator/. "$AGY_DIR/skills/github-orchestrato
 mkdir -p "$AGY_DIR/skills/logic-auditor"
 cp -ra ./global_skills/logic-auditor/. "$AGY_DIR/skills/logic-auditor/"
 
-mkdir -p "$AGY_DIR/skills/rebuild-skill"
-cp -ra ./global_skills/rebuild-skill/. "$AGY_DIR/skills/rebuild-skill/"
+mkdir -p "$AGY_DIR/skills/skill-rebuild"
+cp -ra ./global_skills/skill-rebuild/. "$AGY_DIR/skills/skill-rebuild/"
 
 echo "⚙️ Pobieranie katalogu skilli RAG..."
 mkdir -p "$VAULT_DIR/.agents/specs"
