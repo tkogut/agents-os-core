@@ -152,6 +152,9 @@ if [ -f "./os-add-skill" ]; then
     fi
 fi
 
+echo "⚙️ Automatyczna generacja skrótów komend ukośnika (/) dla skilli..."
+python3 ./scripts/generate_commands.py
+
 echo "⚙️ Generowanie i rejestracja konfiguracji powłoki w ~/.bashrc.d/antigravity..."
 mkdir -p "$HOME/.bashrc.d"
 cat << 'EOF' > "$HOME/.bashrc.d/antigravity"
