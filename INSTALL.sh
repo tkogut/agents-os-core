@@ -126,6 +126,9 @@ curl -fsSL -o "$VAULT_DIR/.agents/specs/awesome-skills-catalog.md" "https://raw.
 
 echo "⚙️ Rejestracja narzędzi systemowych (backend)..."
 if [ -f "./os-init" ]; then
+    # Sprzątanie: usuń stary plik os-init z v4.x jeśli istnieje w PATH
+    sudo -n rm -f /usr/local/bin/os-init 2>/dev/null || rm -f "$HOME/.local/bin/os-init" 2>/dev/null || true
+
     if sudo -n cp ./os-init /usr/local/bin/os-init-run 2>/dev/null; then
         sudo -n chmod +x /usr/local/bin/os-init-run
         echo "✓ os-init-run zarejestrowany w /usr/local/bin/os-init-run"
