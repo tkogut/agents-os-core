@@ -2,65 +2,46 @@
 Source URL: https://antigravity.google/docs/home
 
 Home
-Google Antigravity
+Welcome to Google Antigravitylink
+Choose Your Surfacelink
 
-Google Antigravity is an agentic development platform, evolving the IDE into the agent-first era. Antigravity enables developers to operate at a higher, task-oriented level managing agents across workspaces, while retaining a familiar AI IDE experience at its core. Antigravity extracts agents into their own surface and provides them the tools needed to autonomously operate across the editor, terminal, and browser emphasizing verification and higher-level communication via tasks and artifacts. This capability enables agents to plan and execute more complex, end-to-end software tasks, elevating all aspects of development, from building features, UI iteration, and fixing bugs to research and generating reports.
+Google Antigravity offers multiple product surfaces tailored to your specific development workflow. Select the interface that best fits your needs:
 
-Main Features
-automatic_cluster
-AI-powered IDE
-keyboard_arrow_right
+Antigravity 2.0link
 
-An AI-powered IDE with all of the AI features that developers have come to rely on such as Agent, Tab, and Command.
+Your standalone desktop command center for your agents. Start agents inside Projects, work across multiple workspaces and worktrees, and orchestrate complex tasks using parallel local subagents.
 
-automatic_cluster
-Asynchronous Agents
-keyboard_arrow_right
+Key Features: Asynchronous task management, Scheduled Tasks (Cron sidecars), and voice transcription.
+Get Started: Read the Getting Started Guide
+Antigravity CLIlink
 
-Asynchronous, local agents that can work in parallel on all of your workspaces.
+The lightweight, keyboard-centric Terminal User Interface surface. It brings the same core agentic capabilities as the desktop app directly to your terminal workflow, making it perfect for fast interactions and SSH sessions.
 
-automatic_cluster
-Agent Manager
-keyboard_arrow_right
+Key Features: High-speed prompt shortcuts, custom keybindings, and parallel subagent management.
+Get Started: Explore the CLI Quick Overview
+Antigravity SDKlink
 
-New Agent Manager view for an agent-first experience built around planning mode, the conversation UI, and artifact review.
+A programmatic Python framework for researchers and developers who want complete control over their agent deployments. Custom build an agent, register custom tools, and implement lifecycle hooks, all on top of the Antigravity Harness.
 
-automatic_cluster
-Multi-window
-keyboard_arrow_right
+Key Features: Declarative safety policies, inspect/decide/transform hooks, and programmatic subagent spawning.
+Get Started: Review the SDK Overview
+Antigravity IDElink
 
-A multi-window product with an Editor, Manager, and Browser.
+The fully-featured, AI-powered developer environment. Standardize your daily coding with powerful tightly integrated coding agents, deep context awareness, tools like MCP and skills, and more.
 
-automatic_cluster
-Browser Agent
-keyboard_arrow_right
+Get Started: Read the IDE Getting Started Guide
+Core Agent Capabilitieslink
 
-Agent that can actuate the browser for you and to accomplish dev tasks like dashboard reads, SCM actions, UI testing, etc. in the Browser.
+Every Antigravity surface runs on a shared, highly-optimized agent harness co-trained with Gemini models:
 
-Core Surfaces
-automatic_cluster
-
-Editor
-keyboard_arrow_right
-
-A fully-functional AI-powered IDE that maps to a single workspace.
-
-automatic_cluster
-
-Browser
-keyboard_arrow_right
-
-Browser-use agent capabilities to read & actuate on more surfaces beyond just the IDE.
-
-automatic_cluster
-
-Agent Manager
-keyboard_arrow_right
-
-An orchestration “no code” view to start and view tasks in a minimalist product focused on the conversation and artifacts.
-
-Key Terms
-Agent: The primary AI modality within Antigravity. While the user can work tightly with an Agent within the Editor, they can also have multiple agents working across multiple codebases, orchestrated and monitored through the Agent Manager.
-Tab & Command: The other AI modalities within Antigravity, specifically within the text editor part of the editor surface. Tab is a more powerful “autocomplete” and Command is an inline instructive modality. From past experience, these do not get nearly as much use as the Agent.
-Artifacts: We define an artifact as anything that the agent creates to allow it to get its work done or communicate its accomplishments to the human user. These include rich markdown files, diff views, architecture diagrams, images, browser recordings, etc.
-Getting Started
+Gemini 3.5 Flash: Powering all local agents with SOTA speed, reasoning, and context window capacity.
+Asynchronous Subagents: Allows the main agent to delegate parallel background tasks to concurrent subagents without blocking your flow.
+Visual Artifacts: Track and verify agent output (plans, code diffs, browser recordings) with high-fidelity visual reports, keeping you informed every step of the way.
+Security by Design: Secure local execution via safe defaults, local proxying, and granular tool approval gates.
+Google Integrations: We partner with product teams across Google to provide curated bundles of skills, MCP servers, and extensions that make building on Google platforms frictionless.
+Android: Editor extension, CLI integrations, and Android developer skills.
+Firebase: Curated skills for Firebase Firestore, Cloud Functions, and more.
+Web: Chrome and Web MCP servers for autonomous browser research.
+Science: Specialized DeepMind biology and chemistry skills to accelerate scientific workflows.
+AGY SDK: Skills that optimize your agent’s ability to use the Antigravity SDK to build custom AI agents tailored to your workflow.
+Overview
