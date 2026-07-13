@@ -4,11 +4,11 @@ description: Instrukcja i automatyzacja pracy z serwerem VPS, Docker Compose, re
 trigger_words: ["vps deploy", "vps setup", "docker-compose rebuild", "deploy production", "setup env vps", "git branch switch vps", "redeploy", "zrób redeploy", "przebuduj kontener"]
 ---
 
-# VPS Operations & Docker Deploy (v4.5)
+# VPS Operations & Docker Deploy (v5.0)
 
 ## Purpose
 Standard pracy, wdrażania i diagnostyki na serwerach VPS z Docker Compose + Traefik.
-Wersja 4.5 wprowadza: **kompletny protokół uwierzytelnienia SSH dla środowiska WSL + Hostinger VPS**.
+Wersja 5.0 wprowadza: **wzorzec izolacji wielu instancji tej samej usługi za Traefikiem** (np. wiele instancji n8n dla różnych użytkowników).
 
 ---
 
@@ -557,3 +557,67 @@ Agent push → CI/CD deploy → Agent weryfikuje przez `/api/version` czy nowy S
 8. **Volumes check** — przed rebuild sprawdź co jest zamontowane jako volume.
 9. **Strukturalne logi** — aplikacja musi logować do pliku w volume, nie tylko stdout.
 10. **Nie trzymaj stanu w kontekście** — każdą sesję zacznij od `curl /api/version`.
+11. **Multi-instance isolation** — jedna instancja = jeden kontener + jeden wolumen + jedna subdomena. Nigdy nie współdziel wolumenu między instancjami tej samej usługi.
+
+---
+
+## 12. Traefik Multi-Instance Isolation Pattern
+
+Wzorzec dla uruchomienia wielu izolowanych instancji tej samej usługi (np. n8n dla różnych użytkowników).
+
+> **Zasada**: Każda instancja = osobny katalog `/docker/<name>/`, osobny wolumen, osobna subdomena.
+
+### Wymagania
+- Sieć Docker `traefik-proxy` musi istnieć: `docker network create traefik-proxy`
+- Traefik musi być skonfigurowany z resolverem `letsencrypt` (standardowo na VPS Hostinger)
+
+### Wzorzec `docker-compose.yml`
+
+```yaml
+services:
+  app:
+    image: <image>
+    restart: unless-stopped
+    volumes:
+      - app_data_<name>:/data  # osobny wolumen per instancja
+    networks:
+      - traefik-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.<name>.rule=Host(`<name>.srv1490214.hstgr.cloud`)"
+      - "traefik.http.routers.<name>.entrypoints=websecure"
+      - "traefik.http.routers.<name>.tls.certresolver=letsencrypt"
+      - "traefik.http.services.<name>.loadbalancer.server.port=<port>"
+
+networks:
+  traefik-proxy:
+    external: true  # KLUCZOWE: nie twórz nowej sieci, używaj istniejącej
+
+volumes:
+  app_data_<name>:  # unikalny sufiks per instancja
+```
+
+### Procedura wdrożenia nowej instancji
+
+```bash
+# 1. Utwórz katalog
+mkdir -p /docker/<name>
+
+# 2. Wgraj docker-compose.yml i .env
+# ... (scp lub heredoc)
+
+# 3. Uruchom
+cd /docker/<name> && docker compose up -d
+
+# 4. Weryfikacja
+docker ps | grep <name>  # status: Up
+```
+
+### Rzeczywiste instancje na srv1490214.hstgr.cloud
+
+| Katalog | Kontener | URL | Użytkownik |
+|---------|----------|-----|------------|
+| `/docker/n8n-g7tq` | `n8n-g7tq-n8n-1` | `https://n8n-g7tq.srv1490214.hstgr.cloud` | tkogut |
+| `/docker/n8n-pkogut` | `n8n-pkogut-n8n-1` | `https://n8n-pkogut.srv1490214.hstgr.cloud` | pkogut |
+
+> ℹ️ n8n Free tier: 1 użytkownik per instancja. Nowy użytkownik = nowa izolowana instancja.
