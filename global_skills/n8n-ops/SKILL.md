@@ -4,32 +4,59 @@ description: Operational guide for managing n8n workflows via docker exec/cp on 
 trigger_words: [n8n, workflow, n8n-import, n8n-export, docker exec n8n, n8n workflow json, n8n instancja, n8n VPS, n8n ops, importuj workflow, eksportuj workflow]
 ---
 
-# n8n-ops — Operational Skill v1.0
+# n8n-ops — Operational Skill v1.1
 
 ## 0. Pre-Flight Checklist
 
 Before any n8n operation:
 1. Identify target instance: **g7tq** vs **pkogut**
-2. Load SSH socket from `vps-ops` skill pattern
-3. Confirm container name (see §5)
+2. Load SSH socket from `vps-ops` skill pattern (Note: the `n8n_helper.py` script attempts to automatically detect `SSH_AUTH_SOCK` from `/tmp/` processes).
+3. Confirm container name (see §6)
 
 ---
 
-## 1. Export Workflow from n8n
+## 1. Automated Operations with `n8n_helper.py` (Recommended)
+
+W katalogu `global_skills/n8n-ops/scripts/` (lub w folderze `.agents/skills/n8n-ops/scripts/` lokalnego projektu) znajduje się skrypt pomocniczy automatyzujący całą komunikację z VPS.
+
+### 1.1 List instances and status
+```bash
+python3 scripts/n8n_helper.py list
+```
+
+### 1.2 Import workflow
+```bash
+python3 scripts/n8n_helper.py import --instance g7tq --file path/to/local/workflow.json
+```
+*(Automatycznie dodaje tymczasowe ID, przesyła plik, kopiuje do kontenera, importuje i sprząta).*
+
+### 1.3 Export workflow to local file
+```bash
+python3 scripts/n8n_helper.py export --instance g7tq --id AUssdU21qSE04Wfo --output local_workflow.json
+```
+
+### 1.4 Backup all workflows from instance
+```bash
+python3 scripts/n8n_helper.py backup --instance g7tq --dir ./n8n_backups
+```
+
+---
+
+## 2. Manual Export Workflow from n8n (Fallback)
 
 ```bash
-# Pattern — export workflow by ID
+# Pattern — export workflow by ID manually
 SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
   "docker exec -i <container> n8n export:workflow --id=<workflow_id>"
 ```
 
-> **Use case:** backup, inspect existing workflow JSON before editing.
+> **Use case:** backup, inspect existing workflow JSON before editing manually.
 
 ---
 
-## 2. Import Workflow — Full Procedure
+## 3. Manual Import Workflow — Full Procedure
 
-### 2.1 Create JSON on VPS host (NOT locally)
+### 3.1 Create JSON on VPS host (NOT locally)
 
 ```bash
 SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud "cat << 'EOF' > /tmp/workflow.json
@@ -39,28 +66,28 @@ SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud "cat << 'EOF' > /tmp/work
 EOF"
 ```
 
-### 2.2 Copy to container
+### 3.2 Copy to container
 
 ```bash
 SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
   "docker cp /tmp/workflow.json <container>:/tmp/workflow.json"
 ```
 
-### 2.3 Import
+### 3.3 Import
 
 ```bash
 SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
   "docker exec -i <container> n8n import:workflow --input=/tmp/workflow.json"
 ```
 
-### 2.4 Verify import
+### 3.4 Verify import
 
 ```bash
 SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
   "docker exec -i <container> n8n export:workflow --id=<workflow_id>"
 ```
 
-### 2.5 Cleanup
+### 3.5 Cleanup
 
 ```bash
 SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
@@ -69,7 +96,7 @@ SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
 
 ---
 
-## 3. Workflow JSON Structure — Required Fields
+## 4. Workflow JSON Structure — Required Fields
 
 ```json
 {
@@ -101,19 +128,19 @@ SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
 
 ---
 
-## 4. Known Node Types — Quick Reference
+## 5. Known Node Types — Quick Reference
 
 | Node | type | typeVersion | Notes |
 |------|------|-------------|-------|
 | Manual Trigger | n8n-nodes-base.manualTrigger | 1 | No parameters needed |
-| Schedule Trigger | n8n-nodes-base.scheduleTrigger | 1.3 | See §4.1 |
+| Schedule Trigger | n8n-nodes-base.scheduleTrigger | 1.3 | See §5.1 |
 | Google Drive | n8n-nodes-base.googleDrive | 3 | Requires credentials |
 | Google Sheets | n8n-nodes-base.googleSheets | 4.7 | Requires credentials |
 | Extract From File | n8n-nodes-base.extractFromFile | 1.1 | |
 | Merge | n8n-nodes-base.merge | 3.2 | |
 | Switch | n8n-nodes-base.switch | 3.4 | |
 
-### 4.1 Schedule Trigger parameters example
+### 5.1 Schedule Trigger parameters example
 
 ```json
 {
@@ -129,7 +156,7 @@ SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
 
 ---
 
-## 5. Error Lookup Table
+## 6. Error Lookup Table
 
 | Error | Root Cause | Fix |
 |-------|-----------|-----|
@@ -139,7 +166,7 @@ SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
 
 ---
 
-## 6. Multi-Instance Architecture (Hostinger VPS)
+## 7. Multi-Instance Architecture (Hostinger VPS)
 
 **Host:** srv1490214.hstgr.cloud
 
@@ -148,7 +175,7 @@ SSH_AUTH_SOCK=<socket> ssh root@srv1490214.hstgr.cloud \
 | g7tq | /docker/n8n-g7tq | n8n-g7tq-n8n-1 | n8n-g7tq.srv1490214.hstgr.cloud |
 | pkogut | /docker/n8n-pkogut | n8n-pkogut-n8n-1 | n8n-pkogut.srv1490214.hstgr.cloud |
 
-### 6.1 docker-compose.yml — template for new isolated instance
+### 7.1 docker-compose.yml — template for new isolated instance
 
 ```yaml
 # Zamien <nazwa> na unikalny identyfikator instancji (np. "jkowalski")
@@ -177,32 +204,26 @@ volumes:
 
 ---
 
-## 7. Free Tier Constraint
+## 8. Free Tier Constraint
 
 > **n8n Free = 1 user per instance.**
-> Multiple users → deploy separate isolated instances (see §6).
+> Multiple users → deploy separate isolated instances (see §7).
 
 ---
 
-## 8. Agent Execution Protocol
+## 9. Agent Execution Protocol
 
 When user requests n8n work, follow this sequence **strictly**:
 
 ```
 1. ASK    → which instance? (g7tq / pkogut)
-2. LOAD   → SSH_AUTH_SOCK from vps-ops skill
-3. CREATE → JSON on VPS host (cat << 'EOF' > /tmp/...)
-4. CP     → docker cp /tmp/file.json <container>:/tmp/file.json
-5. IMPORT → docker exec -i <container> n8n import:workflow --input=/tmp/file.json
-6. VERIFY → docker exec -i <container> n8n export:workflow --id=<id>
-7. CLEAN  → rm /tmp/file.json on host AND inside container
+2. EXEC   → Use scripts/n8n_helper.py tool for automated import/export/list
+3. VERIFY → Check status with python3 scripts/n8n_helper.py list
 ```
-
-**Never** pass a local file path directly to `docker exec`. Always `docker cp` first.
 
 ---
 
-## 9. Connections Format Reference
+## 10. Connections Format Reference
 
 ```json
 "connections": {
