@@ -19,6 +19,8 @@ SHARED_SKILLS=(
     "vps-ops"
     "n8n-ops"
     "skill-rebuild"
+    "pr-creator"
+    "code-reviewer"
 )
 
 echo "🔄 Rozpoczynam synchronizację skilli Agents-OS..."
