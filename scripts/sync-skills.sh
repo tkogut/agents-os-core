@@ -23,22 +23,39 @@ SHARED_SKILLS=(
 
 echo "🔄 Rozpoczynam synchronizację skilli Agents-OS..."
 
+# 1. Synchronizacja skilli lokalnych z global_skills/
 for skill in "${SHARED_SKILLS[@]}"; do
     src="$GLOBAL_DIR/$skill"
     dst="$VAULT_SKILLS_DIR/$skill"
 
     if [ -d "$src" ]; then
-        echo "   -> Synchronizuję: $skill"
-        # Usuń starą wersję w vault, jeśli istnieje
+        echo "   [local] -> Synchronizuję: $skill"
         if [ -d "$dst" ]; then
             rm -rf "$dst"
         fi
-        # Skopiuj na świeżo
         cp -ra "$src" "$dst"
-        echo "      ✓ Skopiowano do vault"
     else
         echo "   ⚠️ Ostrzeżenie: Skill '$skill' nie istnieje w global_skills/ ($src)"
     fi
 done
+
+# 2. Synchronizacja skilli z wtyczki caveman
+CAVEMAN_PLUGIN_DIR="$HOME/.gemini/config/plugins/caveman/skills"
+if [ -d "$CAVEMAN_PLUGIN_DIR" ]; then
+    echo "🔄 Synchronizacja skilli z wtyczki Caveman..."
+    for skill_path in "$CAVEMAN_PLUGIN_DIR"/*; do
+        if [ -d "$skill_path" ]; then
+            skill_name=$(basename "$skill_path")
+            dst="$VAULT_SKILLS_DIR/$skill_name"
+            echo "   [caveman] -> Synchronizuję: $skill_name"
+            if [ -d "$dst" ]; then
+                rm -rf "$dst"
+            fi
+            cp -ra "$skill_path" "$dst"
+        fi
+    done
+else
+    echo "⚠️ Ostrzeżenie: Folder wtyczki Caveman ($CAVEMAN_PLUGIN_DIR) nie istnieje. Pomijam."
+fi
 
 echo "✅ Synchronizacja zakończona pomyślnie."
