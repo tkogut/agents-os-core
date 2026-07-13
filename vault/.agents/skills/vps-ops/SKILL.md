@@ -621,3 +621,51 @@ docker ps | grep <name>  # status: Up
 | `/docker/n8n-pkogut` | `n8n-pkogut-n8n-1` | `https://n8n-pkogut.srv1490214.hstgr.cloud` | pkogut |
 
 > ℹ️ n8n Free tier: 1 użytkownik per instancja. Nowy użytkownik = nowa izolowana instancja.
+
+---
+
+## 13. Automated VPS Operations with `vps_helper.py` (Recommended)
+
+W katalogu `global_skills/vps-ops/scripts/` (lub w folderze `.agents/skills/vps-ops/scripts/` lokalnego projektu) znajduje się skrypt pomocniczy automatyzujący całą diagnostykę i wdrażanie aplikacji na VPS.
+
+### 13.1 Sprawdzenie statusu serwera i kontenerów
+```bash
+python3 scripts/vps_helper.py status
+```
+*(Automatycznie wykrywa gniazdo SSH agenta, łączy się z VPS, pobiera listę kontenerów oraz informacje o wolnej pamięci RAM i dysku).*
+
+### 13.2 Aktualizacja i wdrożenie projektu (Deploy)
+```bash
+python3 scripts/vps_helper.py deploy --dir /docker/n8n-g7tq --branch master
+```
+*(Zabezpiecza lokalne modyfikacje na VPS przez git stash, pobiera najnowsze pliki z określonej gałęzi, buduje i restartuje kontenery docker compose w tle).*
+
+### 13.3 Odczyt logów kontenera lub projektu
+* Dla pojedynczego kontenera:
+  ```bash
+  python3 scripts/vps_helper.py logs --container n8n-g7tq-n8n-1 --lines 100
+  ```
+* Dla całego stacku docker compose w folderze:
+  ```bash
+  python3 scripts/vps_helper.py logs --dir /docker/n8n-g7tq --lines 50
+  ```
+* Śledzenie logów na żywo (wymaga interaktywnej konsoli):
+  ```bash
+  python3 scripts/vps_helper.py logs --container n8n-g7tq-n8n-1 -f
+  ```
+
+### 13.4 Bezpieczny odczyt i modyfikacja pliku `.env` na VPS
+* Podgląd całego pliku `.env`:
+  ```bash
+  python3 scripts/vps_helper.py env get --dir /docker/n8n-g7tq
+  ```
+* Pobranie wartości konkretnego klucza:
+  ```bash
+  python3 scripts/vps_helper.py env get --dir /docker/n8n-g7tq --key TIMEZONE
+  ```
+* Zmiana wartości (lub dodanie nowej zmiennej):
+  ```bash
+  python3 scripts/vps_helper.py env set --dir /docker/n8n-g7tq --key TIMEZONE --value Europe/Warsaw
+  ```
+  *(Automatycznie koduje treść za pomocą base64 w celu uniknięcia błędów parsowania znaków specjalnych w konsoli).*
+
