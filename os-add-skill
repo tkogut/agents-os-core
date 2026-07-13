@@ -6,7 +6,10 @@ import re
 import urllib.request
 import urllib.error
 
-API_URL = "https://api.github.com/repos/sickn33/antigravity-awesome-skills/contents/skills/{skill_name}"
+# Konfiguracja źródeł zdalnych
+TKOGUT_API_URL = "https://api.github.com/repos/tkogut/agents-os-core/contents/global_skills/{skill_name}"
+SICKN33_API_URL = "https://api.github.com/repos/sickn33/antigravity-awesome-skills/contents/skills/{skill_name}"
+
 HEADERS = {"User-Agent": "Antigravity-Agent-Swarm"}
 
 def find_project_root():
@@ -27,7 +30,7 @@ def download_item(url, dest_path):
     except Exception as e:
         print(f"   ❌ Nie udało się pobrać {url}: {e}")
 
-def fetch_dir(skill_name, api_url, dest_dir, skill_root_dir=None):
+def fetch_dir(skill_name, api_url, dest_dir, prefix_to_strip, skill_root_dir=None):
     if skill_root_dir is None:
         skill_root_dir = dest_dir
     req = urllib.request.Request(api_url, headers=HEADERS)
@@ -36,10 +39,10 @@ def fetch_dir(skill_name, api_url, dest_dir, skill_root_dir=None):
             items = json.loads(response.read().decode('utf-8'))
     except urllib.error.HTTPError as e:
         if e.code == 404:
-            print(f"❌ Skill '{skill_name}' nie został odnaleziony w oficjalnym rejestrze.")
+            return False
         else:
             print(f"❌ Błąd API GitHub ({e.code}): {e.reason}")
-        return False
+            return False
     except Exception as e:
         print(f"❌ Błąd połączenia z API GitHub: {e}")
         return False
@@ -54,10 +57,9 @@ def fetch_dir(skill_name, api_url, dest_dir, skill_root_dir=None):
         download_url = item.get("download_url")
         path = item.get("path")
         
-        # Relatywna ścieżka od folderu skilla
-        prefix = f"skills/{skill_name}/"
-        if path.startswith(prefix):
-            rel_path = path[len(prefix):]
+        # Obcinanie relatywnego prefiksu w zależności od repozytorium
+        if path.startswith(prefix_to_strip):
+            rel_path = path[len(prefix_to_strip):]
         else:
             rel_path = name
         
@@ -72,7 +74,7 @@ def fetch_dir(skill_name, api_url, dest_dir, skill_root_dir=None):
             download_item(download_url, target_path)
         elif item_type == "dir":
             # Rekurencyjne pobranie podkatalogu
-            fetch_dir(skill_name, item.get("url"), target_path, skill_root_dir)
+            fetch_dir(skill_name, item.get("url"), target_path, prefix_to_strip, skill_root_dir)
             
     return True
 
@@ -95,30 +97,59 @@ def main():
 
     dest_dir = os.path.abspath(os.path.join(project_root, ".agents", "skills", skill_name))
 
-    # 1. NAJPIERW SPRAWDŹ LOKALNE SZABLONY (Złoty Standard)
+    # ==========================================================================
+    # ŹRÓDŁO 1: LOKALNY SZABLON (Najwyższy priorytet - offline, natychmiast)
+    # ==========================================================================
     local_template_path = os.path.expanduser(f"~/.antigravity/templates/v5.0-swarm/.agents/skills/{skill_name}")
     if os.path.exists(local_template_path):
-        print(f"🪐 Instalacja skilla '{skill_name}' z lokalnego szablonu (v5.0-swarm)...")
+        print(f"🪐 [1/3] Pobieranie skilla '{skill_name}' z lokalnego szablonu (v5.0-swarm)...")
         import shutil
         try:
             if os.path.exists(dest_dir):
                 shutil.rmtree(dest_dir)
             shutil.copytree(local_template_path, dest_dir)
-            print(f"✅ Skill '{skill_name}' został pomyślnie dodany do projektu.")
-            print(f"   Lokalizacja: {dest_dir}")
+            print(f"✅ Skill '{skill_name}' zainstalowany lokalnie.")
             sys.exit(0)
         except Exception as e:
-            print(f"❌ Błąd podczas kopiowania lokalnego skilla: {e}")
-            sys.exit(1)
+            print(f"⚠️ Błąd kopiowania lokalnego (próbuję pobrać z sieci): {e}")
 
-    # 2. FALLBACK DO GITHUB
-    print(f"🪐 Pobieranie skilla '{skill_name}' z oficjalnego katalogu GitHub...")
-    success = fetch_dir(skill_name, API_URL.format(skill_name=skill_name), dest_dir)
-    if success:
-        print(f"✅ Skill '{skill_name}' został pomyślnie dodany do projektu.")
-        print(f"   Lokalizacja: {dest_dir}")
-    else:
-        sys.exit(1)
+    # ==========================================================================
+    # ŹRÓDŁO 2: TWÓJ GITHUB (tkogut/agents-os-core)
+    # ==========================================================================
+    print(f"🪐 [2/3] Szukam skilla '{skill_name}' w repozytorium tkogut/agents-os-core...")
+    # W tkogut/agents-os-core skille są w global_skills/<nazwa-skilla>, stąd prefiks:
+    prefix_tkogut = f"global_skills/{skill_name}/"
+    success_tkogut = fetch_dir(
+        skill_name, 
+        TKOGUT_API_URL.format(skill_name=skill_name), 
+        dest_dir, 
+        prefix_to_strip=prefix_tkogut
+    )
+    
+    if success_tkogut:
+        print(f"✅ Skill '{skill_name}' pobrany pomyślnie z repozytorium tkogut/agents-os-core.")
+        sys.exit(0)
+
+    # ==========================================================================
+    # ŹRÓDŁO 3: OFICJALNY GITHUB (sickn33/antigravity-awesome-skills)
+    # ==========================================================================
+    print(f"🪐 [3/3] Szukam skilla '{skill_name}' w rejestrze sickn33/antigravity-awesome-skills...")
+    # W awesome-skills skille są w skills/<nazwa-skilla>, stąd prefiks:
+    prefix_sickn33 = f"skills/{skill_name}/"
+    success_sickn33 = fetch_dir(
+        skill_name, 
+        SICKN33_API_URL.format(skill_name=skill_name), 
+        dest_dir, 
+        prefix_to_strip=prefix_sickn33
+    )
+
+    if success_sickn33:
+        print(f"✅ Skill '{skill_name}' pobrany pomyślnie z rejestru awesome-skills.")
+        sys.exit(0)
+
+    # Jeśli żadne źródło nie powiodło się
+    print(f"❌ BŁĄD: Skill '{skill_name}' nie został znaleziony w żadnym z dostępnych źródeł.")
+    sys.exit(1)
 
 if __name__ == "__main__":
     main()
