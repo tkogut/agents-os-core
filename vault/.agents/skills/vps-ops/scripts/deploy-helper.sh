@@ -54,7 +54,7 @@ fi
 
 # 3. Environment Check
 if [ ! -f .env ]; then
-  echo "❌ BŁĄD: Brak pliku .env! Skopiuj .env.example i skonfiguruj zmienne."
+  echo "❌ BŁĄD: Brak pliku .env! Skopiuj .env.example i skonfiguruj zmiennes."
   exit 1
 fi
 
