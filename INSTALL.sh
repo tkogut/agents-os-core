@@ -99,6 +99,11 @@ if [ -d "$AGY_DIR/templates/v4.2-swarm" ]; then
     echo "   ✓ Usunięto przestarzały szablon v4.2-swarm"
 fi
 
+# Automatyczna synchronizacja skilli przed wdrożeniem szablonu
+if [ -f "./scripts/sync-skills.sh" ]; then
+    bash ./scripts/sync-skills.sh
+fi
+
 echo "✨ Deploy: The Template Vault (Złoty Standard)..."
 mkdir -p "$VAULT_DIR"
 cp -ra ./vault/. "$VAULT_DIR/"
