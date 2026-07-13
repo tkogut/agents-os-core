@@ -94,8 +94,25 @@ def main():
         sys.exit(1)
 
     dest_dir = os.path.abspath(os.path.join(project_root, ".agents", "skills", skill_name))
-    print(f"🪐 Pobieranie skilla '{skill_name}' z oficjalnego katalogu...")
-    
+
+    # 1. NAJPIERW SPRAWDŹ LOKALNE SZABLONY (Złoty Standard)
+    local_template_path = os.path.expanduser(f"~/.antigravity/templates/v5.0-swarm/.agents/skills/{skill_name}")
+    if os.path.exists(local_template_path):
+        print(f"🪐 Instalacja skilla '{skill_name}' z lokalnego szablonu (v5.0-swarm)...")
+        import shutil
+        try:
+            if os.path.exists(dest_dir):
+                shutil.rmtree(dest_dir)
+            shutil.copytree(local_template_path, dest_dir)
+            print(f"✅ Skill '{skill_name}' został pomyślnie dodany do projektu.")
+            print(f"   Lokalizacja: {dest_dir}")
+            sys.exit(0)
+        except Exception as e:
+            print(f"❌ Błąd podczas kopiowania lokalnego skilla: {e}")
+            sys.exit(1)
+
+    # 2. FALLBACK DO GITHUB
+    print(f"🪐 Pobieranie skilla '{skill_name}' z oficjalnego katalogu GitHub...")
     success = fetch_dir(skill_name, API_URL.format(skill_name=skill_name), dest_dir)
     if success:
         print(f"✅ Skill '{skill_name}' został pomyślnie dodany do projektu.")
