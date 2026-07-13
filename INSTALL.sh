@@ -6,7 +6,10 @@
 
 set -e
 
-echo "🚀 Rozpoczynam instalację AGENTS-OS v5.0 Swarm Edition..."
+# Ustalenie absolutnej ścieżki do katalogu instalatora
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "🚀 Rozpoczynam instalację AGENTS-OS v5.0 Swarm Edition z katalogu: $SCRIPT_DIR..."
 
 # 1. Zależności systemu
 
@@ -100,68 +103,68 @@ if [ -d "$AGY_DIR/templates/v4.2-swarm" ]; then
 fi
 
 # Automatyczna synchronizacja skilli przed wdrożeniem szablonu
-if [ -f "./scripts/sync-skills.sh" ]; then
-    bash ./scripts/sync-skills.sh
+if [ -f "$SCRIPT_DIR/scripts/sync-skills.sh" ]; then
+    bash "$SCRIPT_DIR/scripts/sync-skills.sh"
 fi
 
 echo "✨ Deploy: The Template Vault (Złoty Standard)..."
 mkdir -p "$VAULT_DIR"
-cp -ra ./vault/. "$VAULT_DIR/"
+cp -ra "$SCRIPT_DIR/vault/." "$VAULT_DIR/"
 
 # 4. Globalne Umiejętności (Skille)
 echo "🧠 Wdrażanie systemów automatyzacji (Swarm Bootstrapper)..."
 mkdir -p "$AGY_DIR/skills/swarm-bootstrapper"
-cp -ra ./global_skills/swarm-bootstrapper/. "$AGY_DIR/skills/swarm-bootstrapper/"
+cp -ra "$SCRIPT_DIR/global_skills/swarm-bootstrapper/." "$AGY_DIR/skills/swarm-bootstrapper/"
 
 mkdir -p "$AGY_DIR/skills/browser-connectivity"
-cp -ra ./global_skills/browser-connectivity/. "$AGY_DIR/skills/browser-connectivity/"
+cp -ra "$SCRIPT_DIR/global_skills/browser-connectivity/." "$AGY_DIR/skills/browser-connectivity/"
 
 mkdir -p "$AGY_DIR/skills/github-orchestrator"
-cp -ra ./global_skills/github-orchestrator/. "$AGY_DIR/skills/github-orchestrator/"
+cp -ra "$SCRIPT_DIR/global_skills/github-orchestrator/." "$AGY_DIR/skills/github-orchestrator/"
 
 mkdir -p "$AGY_DIR/skills/logic-auditor"
-cp -ra ./global_skills/logic-auditor/. "$AGY_DIR/skills/logic-auditor/"
+cp -ra "$SCRIPT_DIR/global_skills/logic-auditor/." "$AGY_DIR/skills/logic-auditor/"
 
 mkdir -p "$AGY_DIR/skills/skill-rebuild"
-cp -ra ./global_skills/skill-rebuild/. "$AGY_DIR/skills/skill-rebuild/"
+cp -ra "$SCRIPT_DIR/global_skills/skill-rebuild/." "$AGY_DIR/skills/skill-rebuild/"
 
 echo "⚙️ Pobieranie katalogu skilli RAG..."
 mkdir -p "$VAULT_DIR/.agents/specs"
 curl -fsSL -o "$VAULT_DIR/.agents/specs/awesome-skills-catalog.md" "https://raw.githubusercontent.com/sickn33/antigravity-awesome-skills/main/CATALOG.md" || echo "⚠️  Nie udało się pobrać katalogu skilli."
 
 echo "⚙️ Rejestracja narzędzi systemowych (backend)..."
-if [ -f "./os-init" ]; then
+if [ -f "$SCRIPT_DIR/os-init" ]; then
     # Sprzątanie: usuń stary plik os-init z v4.x jeśli istnieje w PATH
     sudo -n rm -f /usr/local/bin/os-init 2>/dev/null || rm -f "$HOME/.local/bin/os-init" 2>/dev/null || true
 
-    if sudo -n cp ./os-init /usr/local/bin/os-init-run 2>/dev/null; then
+    if sudo -n cp "$SCRIPT_DIR/os-init" /usr/local/bin/os-init-run 2>/dev/null; then
         sudo -n chmod +x /usr/local/bin/os-init-run
         echo "✓ os-init-run zarejestrowany w /usr/local/bin/os-init-run"
     else
         mkdir -p "$HOME/.local/bin"
-        cp ./os-init "$HOME/.local/bin/os-init-run"
+        cp "$SCRIPT_DIR/os-init" "$HOME/.local/bin/os-init-run"
         chmod +x "$HOME/.local/bin/os-init-run"
         echo "✓ os-init-run zarejestrowany w $HOME/.local/bin/os-init-run"
     fi
 fi
 
-if [ -f "./os-add-skill" ]; then
+if [ -f "$SCRIPT_DIR/os-add-skill" ]; then
     # Sprzątanie: usuń stary plik os-add-skill-run z v4.1.x jeśli istnieje
     sudo -n rm -f /usr/local/bin/os-add-skill-run 2>/dev/null || rm -f "$HOME/.local/bin/os-add-skill-run" 2>/dev/null || true
 
-    if sudo -n cp ./os-add-skill /usr/local/bin/os-add-skill 2>/dev/null; then
+    if sudo -n cp "$SCRIPT_DIR/os-add-skill" /usr/local/bin/os-add-skill 2>/dev/null; then
         sudo -n chmod +x /usr/local/bin/os-add-skill
         echo "✓ os-add-skill zainstalowany w /usr/local/bin/os-add-skill"
     else
         mkdir -p "$HOME/.local/bin"
-        cp ./os-add-skill "$HOME/.local/bin/os-add-skill"
+        cp "$SCRIPT_DIR/os-add-skill" "$HOME/.local/bin/os-add-skill"
         chmod +x "$HOME/.local/bin/os-add-skill"
         echo "✓ os-add-skill zainstalowany w $HOME/.local/bin/os-add-skill"
     fi
 fi
 
 echo "⚙️ Automatyczna generacja skrótów komend ukośnika (/) dla skilli..."
-python3 ./scripts/generate_commands.py
+python3 "$SCRIPT_DIR/scripts/generate_commands.py"
 
 echo "⚙️ Generowanie i rejestracja konfiguracji powłoki w ~/.bashrc.d/antigravity..."
 mkdir -p "$HOME/.bashrc.d"
