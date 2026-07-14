@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # validate-handshakes.py — Walidacja protokołu handshake subagentów
-# Wersja: 5.0-swarm
+# Wersja: 6.0-swarm
 
 import os
 import sys

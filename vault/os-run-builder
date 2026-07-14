@@ -1,6 +1,6 @@
 #!/bin/bash
 # os-run-builder — Automatyzacja izolacji Git Worktree dla Buildera
-# Wersja: 5.0-swarm
+# Wersja: 6.0-swarm
 
 if [ -z "$1" ]; then
     echo "Użycie: ./os-run-builder <nazwa_gałęzi_roboczej>"
