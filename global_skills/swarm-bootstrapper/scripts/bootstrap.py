@@ -142,7 +142,7 @@ try:
     hook_path = os.path.join(hooks_dir, "pre-commit")
     hook_content = """#!/bin/bash
 # Swarm Triad Role Enforcement pre-commit hook
-# Version: 5.0-swarm
+# Version: 6.0-swarm
 
 ROLE=${SWARM_ROLE:-"coordinator"}
 
