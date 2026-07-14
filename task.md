@@ -14,10 +14,23 @@
   - [x] Create automated E2E script `execution/test_bootstrap.sh`
 
 - [x] Dynamic Skill Loading & CLI enhancements (v4.2.0)
-  - [x] Implement `os-add-skill` script (Python downloader with recursive API directory fetch)
-  - [x] Update `INSTALL.sh` (remove global awesome-skills, deploy `os-add-skill`, auto-generate `~/.bashrc.d/antigravity` and update `~/.bashrc`)
-  - [x] Update `os-init` (dynamic Windows user scanning & extract project name basename for GitHub URL)
-  - [x] Update `bootstrap.py` (use `git branch -M main` and support relative/absolute paths)
-  - [x] Update `test_bootstrap.sh` (verify dynamic `os-add-skill` functionality)
+  - [x] Update Caveman plugin installation in `INSTALL.sh` to use github URL
+  - [x] Implement old template clean-up in `INSTALL.sh`
+  - [x] Create automated E2E script `execution/test_bootstrap.sh`
+  - [x] Update `os-add-skill` script
+  - [x] Update `INSTALL.sh`
+  - [x] Update `os-init`
+  - [x] Update `bootstrap.py`
+  - [x] Update `test_bootstrap.sh`
+
+- [x] Systemic Version Bump & Documentation Upgrade (v6.0)
+  - [x] **TSK-016**: Stworzenie izolowanego środowiska Git Worktree pod gałąź `feature/v6-upgrade`.
+  - [x] **TSK-017**: Aktualizacja Konstytucji `AGENTS-OS.md` do wersji v6.0 (wdrożenie rygorów Swarm Triad i automatyzacji sprzątania).
+  - [x] **TSK-018**: Kompleksowa aktualizacja `README.md` i `CHANGELOG.md` dla v6.0 ("Enterprise Swarm Edition").
+  - [x] **TSK-019**: Przeskanowanie i zmiana zmiennych wersji w `INSTALL.sh`, `os-init`, `os-add-skill`, `agents.yaml`, `vault/agents.yaml`, `bootstrap.py`.
+  - [x] **TSK-020**: Usunięcie przestarzałych plików dokumentacji (`walkthrough.md`, `implementation_plan.md`, `refactor_decision.md`).
+  - [x] **TSK-021**: Uruchomienie testu integracyjnego `test_bootstrap.sh` w celu walidacji poprawności działania instalacji v6.0.
+
+
 
 
