@@ -18,3 +18,8 @@
   3. All project documentation (`README.md`, `CHANGELOG.md`, etc.).
   4. Core configuration templates in the Vault (`vault/` directory).
 - Under no circumstances should mismatched or stale version strings remain in the code or config.
+
+## Rule 5: Secrets Sanitization and Masking (R-SEC-01)
+- Kategoryczny zakaz odpytywania, czytania lub wyświetlania plików `.env`, zmiennych środowiskowych i baz danych konfiguracyjnych w surowej postaci do czatu dewelopera lub logów sesji.
+- Wszystkie odczyty z konsoli (np. `cat .env`, zapytania SQLite do tabeli `settings`) MUSZĄ być maskowane lub filtrowane za pomocą komend bash (np. `grep -v`, `sed`, `awk` lub SQL `REPLACE`) w celu ukrycia wartości kluczy (API keys, passwords, tokens).
+- Ujawnienie surowych wartości poświadczeń w logach lub czacie stanowi błąd krytyczny i wymaga natychmiastowej rotacji kluczy u dewelopera.

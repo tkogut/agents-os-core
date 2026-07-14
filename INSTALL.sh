@@ -163,6 +163,18 @@ if [ -f "$SCRIPT_DIR/os-add-skill" ]; then
     fi
 fi
 
+if [ -f "$SCRIPT_DIR/os-run-builder" ]; then
+    if sudo -n cp "$SCRIPT_DIR/os-run-builder" /usr/local/bin/os-run-builder 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-run-builder
+        echo "✓ os-run-builder zainstalowany w /usr/local/bin/os-run-builder"
+    else
+        mkdir -p "$HOME/.local/bin"
+        cp "$SCRIPT_DIR/os-run-builder" "$HOME/.local/bin/os-run-builder"
+        chmod +x "$HOME/.local/bin/os-run-builder"
+        echo "✓ os-run-builder zainstalowany w $HOME/.local/bin/os-run-builder"
+    fi
+fi
+
 echo "⚙️ Automatyczna generacja skrótów komend ukośnika (/) dla skilli..."
 python3 "$SCRIPT_DIR/scripts/generate_commands.py"
 

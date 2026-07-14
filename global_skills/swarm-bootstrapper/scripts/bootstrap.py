@@ -136,6 +136,45 @@ try:
     else:
         repo = git.Repo(TARGET_DIR)
 
+    # Wdrożenie pre-commit hooka dla Swarm Triad
+    hooks_dir = os.path.join(TARGET_DIR, ".git", "hooks")
+    os.makedirs(hooks_dir, exist_ok=True)
+    hook_path = os.path.join(hooks_dir, "pre-commit")
+    hook_content = """#!/bin/bash
+# Swarm Triad Role Enforcement pre-commit hook
+# Version: 5.0-swarm
+
+ROLE=${SWARM_ROLE:-"coordinator"}
+
+if [ "$ROLE" = "coordinator" ] || [ "$ROLE" = "gem" ]; then
+    STAGED_FILES=$(git diff --cached --name-only)
+    VIOLATION=0
+    for file in $STAGED_FILES; do
+        if [[ "$file" == "os-add-skill" ]] || \\
+           [[ "$file" == "os-init" ]] || \\
+           [[ "$file" == "INSTALL.sh" ]] || \\
+           [[ "$file" == scripts/* ]] || \\
+           [[ "$file" == global_skills/* ]] || \\
+           [[ "$file" == src/* ]]; then
+            echo "ERR: Role '$ROLE' (Coordinator/GEM) is forbidden from directly committing functional changes to '$file'!"
+            echo "Staged file violation: $file"
+            VIOLATION=1
+        fi
+    done
+    
+    if [ $VIOLATION -ne 0 ]; then
+        echo "ERR: Commit aborted. Under Swarm Triad rules, functional modifications must be implemented by the Builder role."
+        exit 1
+    fi
+fi
+"""
+    with open(hook_path, "w", encoding="utf-8") as hf:
+        hf.write(hook_content)
+    try:
+        os.chmod(hook_path, 0o755)
+    except Exception:
+        pass
+
     # Upewnij się, że branch to main
     try:
         repo.git.checkout("-b", "main")

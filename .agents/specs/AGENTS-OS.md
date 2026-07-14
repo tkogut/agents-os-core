@@ -77,4 +77,11 @@ Komunikacja z ekosystemem opiera się na natywnych, ustrukturyzowanych komendach
 - Rygor Bezpieczeństwa: Instalacja musi być wykonywana z restrykcyjnym filtrem ryzyka za pomocą komendy:
   - `./os-add-skill <nazwa-skilla>` lub `npx antigravity-awesome-skills --path .agents/skills --risk safe,none`
 
+🔒 8. ŚRODKI BEZPIECZEŃSTWA & GIT WORKTREE AUTOMATION
+- **Secrets Sanitization (R-SEC-01):** Kategoryczny zakaz bezpośredniego odczytywania plików `.env` i tabel konfiguracyjnych w bazie danych bez ich maskowania w wyjściu konsoli (np. poprzez `grep -v`, `sed`, `awk`).
+- **Role Enforcement (Git Hook):** W katalogu `.git/hooks/pre-commit` wdrożono automatyczny hook weryfikujący rolę `SWARM_ROLE`. Zabraniacz ten blokuje modyfikacje plików wykonawczych (`os-add-skill`, `os-init`, `INSTALL.sh`, `scripts/`, `global_skills/`) jeśli aktywna rola to `coordinator` lub `gem`.
+- **Git Worktree Isolation:** Do uruchamiania subagentów Builder należy bezwzględnie stosować skrypt `./os-run-builder <nazwa_gałęzi>`. Skrypt ten tworzy odizolowane środowisko w katalogu `./tmp/worktrees/`, co zapobiega zanieczyszczeniu głównej kopii roboczej.
+- **Protokół Handshake (.agents/swarm/):** Builder oraz Auditor przed zakończeniem prac mają obowiązek zapisać plik handshake (raport z weryfikacją matematyczną i listą zmian) w katalogu `.agents/swarm/` w formacie `<conversation_id>_<role>_handshake.json`.
+
 Podpisano: Antigravity Orchestrator & GEM
+
