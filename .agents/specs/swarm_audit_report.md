@@ -116,5 +116,17 @@ W celu przywrócenia integralności systemu i zapobieżenia podobnym incydentom 
 1. **Natychmiastowa rotacja kluczy:** Z uwagi na to, że klucz `GEMINI_API_KEY` oraz `ODOO_API_KEY` ("esDwasole") znalazły się w czacie, należy je **niezwłocznie uznać za skompromitowane** i dokonać ich rotacji na produkcji (VPS).
 2. **Korekta konfiguracji .gitignore:** Upewnij się, że pliki `.env` są bezwzględnie ignorowane i nie są śledzone przez system kontroli wersji.
 
+## 🧪 5. STATUS WALIDACJI PO WDROŻENIU POPRAWEK (POST-IMPLEMENTATION VALIDATION)
+
+Wszystkie mechanizmy naprawcze zostały pomyślnie zaimplementowane, przetestowane i zweryfikowane w środowisku `osint-lead-tracker` oraz `agents-os-core`.
+
+| Punkt Kontrolny (Checkpoint) | Status | Rezultat i Logi z Weryfikacji |
+| :--- | :---: | :--- |
+| **Secrets Sanitization (R-SEC-01)** | **`PASSED`** | Przeskanowano `src/osint_engine.py` i `src/config.py`. Nie wykryto żadnych zahardkodowanych haseł ani kluczy API. Reguła `R-SEC-01` w `core-rule.md` została pomyślnie wdrożona. |
+| **Hook Integrity & Bypass Check** | **`PASSED`** | Skrypt `.git/hooks/pre-commit` został wdrożony i oznaczony jako wykonywalny. Testy jednostkowe z symulacją zmiennej środowiskowej zwróciły poprawne wyniki:<br>- `SWARM_ROLE=coordinator`: **Commit zablokowany** (Exit 1)<br>- `SWARM_ROLE=gem`: **Commit zablokowany** (Exit 1)<br>- `SWARM_ROLE=builder`: **Commit dozwolony** (Exit 0) |
+| **Worktree Automation Validation** | **`PASSED`** | Skrypt `./os-run-builder` wykonuje czyszczenie osieroconych worktree (`git worktree prune`) i poprawnie montuje izolowane i bezpieczne katalogi w `./tmp/worktrees/`. |
+| **Handshake Verification Matrix** | **`PASSED`** | Wdrożono skrypt walidujący `./scripts/validate-handshakes.py`, który weryfikuje poprawność generowania plików handshake w formacie `<conversation_id>_<role>_handshake.json` wewnątrz `.agents/swarm/`. |
+
 ---
-*Raport opracowany przez agenta Antigravity w trybie Ultra+.*
+*Raport opracowany i zweryfikowany przez agenta Antigravity w trybie Ultra+.*
+
