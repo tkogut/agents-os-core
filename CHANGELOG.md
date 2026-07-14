@@ -1,6 +1,10 @@
-# 🛸 Historia Zmian / Changelog — AGENTS-OS v5.0 (Universal Swarm)
+# 🛸 Historia Zmian / Changelog — AGENTS-OS v6.0 (Enterprise Swarm Edition)
 
-Wszystkie zmiany w tej wersji są bezpośrednią odpowiedzią na audyt przenaszalności systemu zawarty w [AGENTS-OS_Evaluation_Report.md](file:///home/tkogut/projects/agents-os-core/AGENTS-OS_Evaluation_Report.md).
+## 🛸 Historia Zmian / Changelog — AGENTS-OS v6.0 (Enterprise Swarm Edition)
+Dokumentującą:
+- Pełną refaktoryzację rdzenia i przejście na model asynchronicznych agentów (Swarm Triad).
+- Usunięcie martwego kodu (dead code) i przestarzałych skryptów.
+- Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 
 ---
 

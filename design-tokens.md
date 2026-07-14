@@ -1,4 +1,4 @@
-# 🎨 Design Tokens (v5.0)
+# 🎨 Design Tokens (v6.0)
 
 ## Colors (Swarm Palette)
 - **Primary**: #00D1FF (Electric Blue)

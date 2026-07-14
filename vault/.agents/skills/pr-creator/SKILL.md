@@ -1,10 +1,10 @@
 ---
 name: pr-creator
-description: Coordinator logic for PR creation and validation. Standard v5.0.
+description: Coordinator logic for PR creation and validation. Standard v6.0.
 trigger_words: ["create pr", "submit pull request", "make pr", "utwórz pr", "zrób pull request"]
 ---
 
-# 🌿 PR Creator (v5.0)
+# 🌿 PR Creator (v6.0)
 
 🎯 **Purpose**
 Automatyzacja tworzenia Pull Requestów na GitHubie po przejściu testów jakościowych i walidacji gałęzi.

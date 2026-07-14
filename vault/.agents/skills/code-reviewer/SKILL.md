@@ -1,10 +1,10 @@
 ---
 name: code-reviewer
-description: Auditor logic for PR and local changes. Standard v5.0.
+description: Auditor logic for PR and local changes. Standard v6.0.
 trigger_words: ["review code", "review pr", "check changes", "zrób code review", "przeanalizuj zmiany"]
 ---
 
-# 🔍 Code Reviewer (v5.0)
+# 🔍 Code Reviewer (v6.0)
 
 🎯 **Purpose**
 Techniczny audyt poprawności zmian, bezpieczeństwa (wycieki sekretów) i czystości kodu przed wykonaniem commita lub Pull Requesta.

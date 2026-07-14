@@ -4,7 +4,7 @@ description: Instrukcja i automatyzacja pracy z serwerem VPS, Docker Compose, re
 trigger_words: ["vps deploy", "vps setup", "docker-compose rebuild", "deploy production", "setup env vps", "git branch switch vps", "redeploy", "zrób redeploy", "przebuduj kontener"]
 ---
 
-# VPS Operations & Docker Deploy (v5.0)
+# VPS Operations & Docker Deploy (v6.0)
 
 ## Purpose
 Standard pracy, wdrażania i diagnostyki na serwerach VPS z Docker Compose + Traefik.

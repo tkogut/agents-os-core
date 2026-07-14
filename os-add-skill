@@ -100,9 +100,9 @@ def main():
     # ==========================================================================
     # ŹRÓDŁO 1: LOKALNY SZABLON (Najwyższy priorytet - offline, natychmiast)
     # ==========================================================================
-    local_template_path = os.path.expanduser(f"~/.antigravity/templates/v5.0-swarm/.agents/skills/{skill_name}")
+    local_template_path = os.path.expanduser(f"~/.antigravity/templates/v6.0-swarm/.agents/skills/{skill_name}")
     if os.path.exists(local_template_path):
-        print(f"🪐 [1/3] Pobieranie skilla '{skill_name}' z lokalnego szablonu (v5.0-swarm)...")
+        print(f"🪐 [1/3] Pobieranie skilla '{skill_name}' z lokalnego szablonu (v6.0-swarm)...")
         import shutil
         try:
             if os.path.exists(dest_dir):

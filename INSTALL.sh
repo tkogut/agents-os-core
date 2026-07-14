@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# AGENTS-OS v5.0 SWARM EDITION - UNIVERSAL INSTALLER
+# AGENTS-OS v6.0 SWARM EDITION - UNIVERSAL INSTALLER
 # Architekt: Antigravity Orchestrator & User tkogut
 # ==============================================================================
 
@@ -9,7 +9,7 @@ set -e
 # Ustalenie absolutnej ścieżki do katalogu instalatora
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🚀 Rozpoczynam instalację AGENTS-OS v5.0 Swarm Edition z katalogu: $SCRIPT_DIR..."
+echo "🚀 Rozpoczynam instalację AGENTS-OS v6.0 Swarm Edition z katalogu: $SCRIPT_DIR..."
 
 # 1. Zależności systemu
 
@@ -93,13 +93,17 @@ echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."
 
 # 3. Kopiowanie The Vault
 AGY_DIR="$HOME/.antigravity"
-VAULT_DIR="$AGY_DIR/templates/v5.0-swarm"
+VAULT_DIR="$AGY_DIR/templates/v6.0-swarm"
 
 # Czyszczenie starych wersji szablonów w celu zachowania czystości systemu
 echo "🧹 Czyszczenie starych szablonów..."
-if [ -d "$AGY_DIR/templates/v4.2-swarm" ]; then
-    rm -rf "$AGY_DIR/templates/v4.2-swarm"
-    echo "   ✓ Usunięto przestarzały szablon v4.2-swarm"
+if [ -d "$AGY_DIR/templates/v5.0-swarm" ]; then
+    rm -rf "$AGY_DIR/templates/v5.0-swarm"
+    echo "   ✓ Usunięto przestarzały szablon v5.0-swarm"
+fi
+if [ -d "$AGY_DIR/templates/v6.0-swarm" ]; then
+    rm -rf "$AGY_DIR/templates/v6.0-swarm"
+    echo "   ✓ Usunięto przestarzały szablon v6.0-swarm"
 fi
 
 # Automatyczna synchronizacja skilli przed wdrożeniem szablonu
@@ -320,7 +324,7 @@ else
 fi
 
 echo "===================================================================="
-echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: SYSTEM AGENTS-OS v5.0 GOTOWY."
+echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: SYSTEM AGENTS-OS v6.0 GOTOWY."
 echo ""
 echo "Następne kroki:"
 echo "  1. Załaduj shell config:  source ~/.bashrc.d/antigravity"

@@ -6,7 +6,7 @@
       "id": ".agents/specs/AGENTS-OS.md",
       "label": "AGENTS-OS.md",
       "type": "Ultimate Source of Truth",
-      "description": "Constitution of AGENTS-OS v5.0 governing all Swarm rules and system operations."
+      "description": "Constitution of AGENTS-OS v6.0 governing all Swarm rules and system operations."
     },
     {
       "id": "INSTALL.sh",
@@ -18,7 +18,7 @@
       "id": "os-init",
       "label": "os-init",
       "type": "Critical Infrastructure",
-      "description": "System bootstrap tool to initialize new workspace nodes with v5.0 Swarm Template Vault."
+      "description": "System bootstrap tool to initialize new workspace nodes with v6.0 Swarm Template Vault."
     },
     {
       "id": "vault",
