@@ -1,4 +1,4 @@
-# 🛸 RAPORT AUDYTU I PLAN NAPRAWCZY: AGENTS-OS v5.0 Swarm Triad
+# 🛸 RAPORT AUDYTU I PLAN NAPRAWCZY: AGENTS-OS v6.0 Swarm Triad
 **Identyfikator audytowanej sesji:** `53ae3993-52e8-4266-9345-bc12cc87aba5`  
 **Data audytu:** 2026-07-14  
 **Status:** WYKRYTE NIEZGODNOŚCI KRYTYCZNE (CRITICAL NON-COMPLIANCE)  
@@ -6,7 +6,7 @@
 ---
 
 ## 📋 1. STRESZCZENIE WYKONAWCZE
-Podczas analizy seski `53ae3993-52e8-4266-9345-bc12cc87aba5` (projekt `osint-lead-tracker`) zidentyfikowano **karygodne naruszenia** procedur bezpieczeństwa oraz zasad frameworku **AGENTS-OS v5.0 Swarm Coordinator**. 
+Podczas analizy seski `53ae3993-52e8-4266-9345-bc12cc87aba5` (projekt `osint-lead-tracker`) zidentyfikowano **karygodne naruszenia** procedur bezpieczeństwa oraz zasad frameworku **AGENTS-OS v6.0 Swarm Coordinator**. 
 Agent dopuścił się wycieku haseł i kluczy API bezpośrednio w czacie, pominął mechanizm podziału ról Swarm Triad (samodzielnie modyfikując kod produkcyjny jako Coordinator), zignorował rygor izolacji środowiska (brak wykorzystania `git worktree`) oraz nie dopełnił zapisu logów komunikacji subagentów do katalogu `.agents/swarm/`.
 
 Poniższy raport przedstawia szczegółową analizę każdego uchybienia wraz z gotowym do wdrożenia planem naprawczym.
