@@ -31,12 +31,12 @@ def main():
 
         # b) Initialize git repository
         print("Initializing Git repository...")
-        subprocess.run(["git", "init"], cwd=project_path, check=True, capture_output=True)
+        _ = subprocess.run(["git", "init"], cwd=project_path, check=True, capture_output=True)
         print(" -> Git repository initialized.")
 
         # c) Create hidden root commit
         print("Creating initial root commit...")
-        subprocess.run(
+        _ = subprocess.run(
             ["git", "commit", "--allow-empty", "-m", "chore: initial commit", "--no-verify"],
             cwd=project_path,
             check=True,
@@ -56,21 +56,21 @@ def main():
         destination_settings = os.path.join(zed_dir, "settings.json")
         
         print(f"Copying Zed settings template from {settings_template}...")
-        shutil.copyfile(settings_template, destination_settings)
+        _ = shutil.copyfile(settings_template, destination_settings)
         print(f" -> Settings copied to {destination_settings}")
 
         # e) Open project in Zed
         # Format for Windows UNC path to access WSL filesystem
         windows_path = f"\\\\wsl.localhost\\Ubuntu\\home\\{user}\\projects\\{project_name}"
         print(f"Opening project in Zed: {windows_path}")
-        subprocess.run(["zed", windows_path], check=True)
+        _ = subprocess.run(["zed", windows_path], check=True)
         print(" -> Zed launched successfully.")
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred during a subprocess call: {e}", file=sys.stderr)
-        if e.stdout:
+        if e.stdout is not None:
             print(f"STDOUT: {e.stdout.decode()}", file=sys.stderr)
-        if e.stderr:
+        if e.stderr is not None:
             print(f"STDERR: {e.stderr.decode()}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
