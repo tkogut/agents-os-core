@@ -118,9 +118,29 @@ def main():
         else:
             print(f"✅ Wszystkie wymagane role złożyły handshake: {', '.join(required)}")
 
+    # --- Safety Gate: Coordinator Self-Signed Builder Check (R-ROLE-01) ---
+    coordinator_session_id = os.environ.get("COORDINATOR_SESSION_ID", "").strip()
+    self_signed_violation = False
+    if coordinator_session_id:
+        for entry in entries:
+            if entry.get("data") and "builder" in entry["data"].get("role", "").lower():
+                hs_conv_id = entry["data"].get("conversation_id", "")
+                if hs_conv_id == coordinator_session_id:
+                    print(f"  🚨 DIRECT_COORDINATOR_EDIT_FORBIDDEN: {entry['file']}")
+                    print(f"     Builder handshake conversation_id matches Coordinator session!")
+                    print(f"     Self-signed handshake detected — Swarm Triad violation (R-ROLE-01).")
+                    all_valid = False
+                    self_signed_violation = True
+    # -----------------------------------------------------------------------
+
     if all_valid:
         print("\n✅ WALIDACJA ZAKOŃCZONA: Wszystkie pliki handshake są poprawne.")
         sys.exit(0)
+    elif self_signed_violation:
+        print("\n🚨 WALIDACJA NIEUDANA: NARUSZENIE PROTOKOŁU Swarm Triad (R-ROLE-01).")
+        print("   Coordinator próbował samodzielnie podpisać handshake Buildera (self-signed).")
+        print("   Deleguj zmiany kodu produkcyjnego do subagenta Builder przez invoke_subagent.")
+        sys.exit(2)
     else:
         print("\n❌ WALIDACJA NIEUDANA: Wykryto błędy w plikach handshake.")
         sys.exit(1)

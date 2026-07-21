@@ -23,3 +23,18 @@
 - Kategoryczny zakaz odpytywania, czytania lub wyświetlania plików `.env`, zmiennych środowiskowych i baz danych konfiguracyjnych w surowej postaci do czatu dewelopera lub logów sesji.
 - Wszystkie odczyty z konsoli (np. `cat .env`, zapytania SQLite do tabeli `settings`) MUSZĄ być maskowane lub filtrowane za pomocą komend bash (np. `grep -v`, `sed`, `awk` lub SQL `REPLACE`) w celu ukrycia wartości kluczy (API keys, passwords, tokens).
 - Ujawnienie surowych wartości poświadczeń w logach lub czacie stanowi błąd krytyczny i wymaga natychmiastowej rotacji kluczy u dewelopera.
+
+## Rule 6: Coordinator Source Code Edit Prohibition (R-ROLE-01) ⛔ KRITYCZNY
+
+**Status: MANDATORY | Priority: CRITICAL | Version: v6.1+**
+
+Główny wątek agenta (Coordinator) ma **kategoryczny zakaz** bezpośredniego wywoływania narzędzi modyfikujących kod produkcyjny (`replace_file_content`, `write_to_file`, `multi_replace_file_content`) dla plików w katalogach `/src`, `/api`, `src/`, `api/`.
+
+**Jedyna dopuszczalna ścieżka modyfikacji kodu:** delegowanie przez `invoke_subagent` do roli `cavecrew-builder` lub `swarm_builder`.
+
+**Safety Gate:**
+- Skrypt `scripts/validate-handshakes.py` sprawdza, czy `conversation_id` w `*_builder_handshake.json` jest różny od `COORDINATOR_SESSION_ID`.
+- Jeśli conversation_id Buildera = ID Coordinatora → błąd `DIRECT_COORDINATOR_EDIT_FORBIDDEN`, exit code 2.
+- Hook `scripts/check_coordinator_role.sh` blokuje commit zmian w `src/` bez ważnego Builder handshake od subagenta.
+
+**Naruszenie:** Commit blokowany. Sesja oznaczana jako `GOVERNANCE_VIOLATION`.
