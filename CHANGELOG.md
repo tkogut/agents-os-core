@@ -8,6 +8,16 @@ Dokumentującą:
 
 ---
 
+## [6.1.0] - 2026-07-21
+
+### 🛡️ Hardening: Coordinator Safety Gate (R-ROLE-01)
+
+- **Rule 6** dodana do `core-rule.md`: kategoryczny zakaz edycji kodu `/src` przez Coordinator bez delegacji.
+- **`scripts/validate-handshakes.py`**: Safety Gate wykrywa self-signed Builder handshake (exit 2 `DIRECT_COORDINATOR_EDIT_FORBIDDEN`).
+- **`scripts/check_coordinator_role.sh`**: Guard blokujący commit zmian w `src/` bez ważnego Builder handshake od subagenta.
+
+---
+
 ## [5.0.0] - 2026-06-10
 
 ### 🚀 Aktualizacja Systemowa do v5.0 (System-wide Version Increment)
