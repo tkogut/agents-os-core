@@ -38,3 +38,7 @@ Główny wątek agenta (Coordinator) ma **kategoryczny zakaz** bezpośredniego w
 - Hook `scripts/check_coordinator_role.sh` blokuje commit zmian w `src/` bez ważnego Builder handshake od subagenta.
 
 **Naruszenie:** Commit blokowany. Sesja oznaczana jako `GOVERNANCE_VIOLATION`.
+
+## Rule 7: LLM Cost & Swarm Optimization (v6.1+)
+- **Caveman Prompts**: Wszystkie prompty i instrukcje do subagentów muszą być pisane w skróconym formacie Caveman (bez uprzejmości, czysty techniczny styl), co eliminuje narzut tokenów.
+- **Direct Git Actions**: Coordinator wykonuje operacje Git (stage, commit, push, deploy) bezpośrednio z głównego terminala za pomocą `smart_commit.sh`, bez powoływania dedykowanego, kosztownego subagenta.

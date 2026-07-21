@@ -165,6 +165,23 @@ def verify_frontend_backend_contract():
         })
     return warnings
 
+def check_python_syntax(files_changes):
+    """Kompiluje i weryfikuje składnię Python dla zmodyfikowanych plików."""
+    warnings = []
+    import ast
+    for filepath in files_changes.keys():
+        if filepath.endswith(".py") and os.path.exists(filepath):
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    ast.parse(f.read(), filename=filepath)
+            except SyntaxError as e:
+                warnings.append({
+                    "file": filepath,
+                    "category": "CRITICAL / SYNTAX ERROR",
+                    "reason": f"Błąd składni Python: {e.msg} (linia {e.lineno}, kolumna {e.offset})"
+                })
+    return warnings
+
 def main():
     print("🔍 Uruchamianie lokalnego Asystenta Code Review...")
     
@@ -184,6 +201,9 @@ def main():
     # 2. Analiza pod kątem obecności testów jednostkowych
     test_warnings = check_tests_existence(changes)
     warnings.extend(test_warnings)
+    
+    # 3. Weryfikacja składni plików Python
+    warnings.extend(check_python_syntax(changes))
     
     # Prezentacja raportu
     if not warnings:
