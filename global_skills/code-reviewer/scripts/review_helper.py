@@ -120,6 +120,51 @@ def check_tests_existence(files_changes):
                 
     return warnings
 
+def verify_frontend_backend_contract():
+    """Weryfikuje spójność pól modelu AccountCreate (schemas.py) z payloadem formularza w app.js."""
+    warnings = []
+    schemas_path = "src/schemas.py"
+    app_js_path = "src/static/app.js"
+    
+    if not os.path.exists(schemas_path) or not os.path.exists(app_js_path):
+        return warnings
+        
+    try:
+        with open(schemas_path, "r", encoding="utf-8") as f:
+            schemas_content = f.read()
+        with open(app_js_path, "r", encoding="utf-8") as f:
+            app_js_content = f.read()
+            
+        # Wyciągamy pola klasy AccountCreate
+        match = re.search(r"class AccountCreate\(BaseModel\):(.*?)class", schemas_content, re.DOTALL)
+        if match:
+            class_body = match.group(1)
+            fields = []
+            for line in class_body.split("\n"):
+                line = line.strip()
+                if line and not line.startswith("#") and ":" in line and not line.startswith("@"):
+                    field_name = line.split(":")[0].strip()
+                    if field_name and not field_name.startswith("def "):
+                        fields.append(field_name)
+                        
+            # Sprawdzamy czy każde z pól występuje w app.js (klucz w payloadzie)
+            cleaned_js = app_js_content.replace(" ", "").replace("'", '"')
+            for field in fields:
+                # Wyszukujemy wzorca "field:" lub '"field":' lub "'field':"
+                if f"{field}:" not in cleaned_js and f'"{field}":' not in cleaned_js:
+                    warnings.append({
+                        "file": app_js_path,
+                        "category": "CRITICAL / INTEGRATION CONTRACT",
+                        "reason": f"Pola '{field}' zdefiniowanego w modelu backendowym AccountCreate (schemas.py) brakuje w payloadzie wysyłanym z frontendu w app.js!"
+                    })
+    except Exception as e:
+        warnings.append({
+            "file": "review_helper.py",
+            "category": "WARNING / INTEGRATION",
+            "reason": f"Nie udało się zweryfikować kontraktu frontend-backend: {e}"
+        })
+    return warnings
+
 def main():
     print("🔍 Uruchamianie lokalnego Asystenta Code Review...")
     
@@ -132,6 +177,9 @@ def main():
     
     # 1. Analiza kodu pod kątem wycieków i debugerów
     warnings = analyze_changes(changes)
+    
+    # Kontrola kontraktu integracyjnego Frontend <-> Backend
+    warnings.extend(verify_frontend_backend_contract())
     
     # 2. Analiza pod kątem obecności testów jednostkowych
     test_warnings = check_tests_existence(changes)
@@ -154,7 +202,8 @@ def main():
         for w in criticals:
             print(f"   • Plik: {w['file']}")
             print(f"     Problem: {w['reason']}")
-            print(f"     Kod:     {w['line_content']}")
+            if "line_content" in w:
+                print(f"     Kod:     {w['line_content']}")
             print("-" * 60)
             
     if non_criticals:
@@ -167,7 +216,7 @@ def main():
             print("-" * 60)
             
     print("\n[Werdykt]: Zmiany wymagają weryfikacji i poprawek przed commitem.")
-    sys.exit(1 if criticals else 0)
+    sys.exit(1 if any("CRITICAL" in w["category"] for w in warnings) else 0)
 
 if __name__ == "__main__":
     main()
