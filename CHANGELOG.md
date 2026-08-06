@@ -6,6 +6,12 @@ Dokumentującą:
 - Usunięcie martwego kodu (dead code) i przestarzałych skryptów.
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 
+## [6.2.0] - 2026-08-06
+
+### 🚀 Quality Infrastructure: test-creator Skill (v2.2)
+- **Nowy globalny skill `test-creator`**: Dodano skill do `global_skills/test-creator/` w celu ujednolicenia standardu testów jednostkowych (Vitest), integracyjnych API (Pytest) oraz end-to-end (Playwright).
+- **Szablony referencyjne**: Wdrożono wzorcowe konfiguracje `references/vitest_template.js`, `references/pytest_template.py` i `references/playwright_template.js` umożliwiające natychmiastowe generowanie pokrycia testowego w nowych projektach.
+
 ---
 
 ## [6.1.0] - 2026-07-21

@@ -26,7 +26,7 @@
 
 ## Rule 6: Coordinator Source Code Edit Prohibition (R-ROLE-01) ⛔ KRITYCZNY
 
-**Status: MANDATORY | Priority: CRITICAL | Version: v6.1+**
+**Status: MANDATORY | Priority: CRITICAL | Version: v6.2+**
 
 Główny wątek agenta (Coordinator) ma **kategoryczny zakaz** bezpośredniego wywoływania narzędzi modyfikujących kod produkcyjny (`replace_file_content`, `write_to_file`, `multi_replace_file_content`) dla plików w katalogach `/src`, `/api`, `src/`, `api/`.
 
@@ -39,6 +39,6 @@ Główny wątek agenta (Coordinator) ma **kategoryczny zakaz** bezpośredniego w
 
 **Naruszenie:** Commit blokowany. Sesja oznaczana jako `GOVERNANCE_VIOLATION`.
 
-## Rule 7: LLM Cost & Swarm Optimization (v6.1+)
+## Rule 7: LLM Cost & Swarm Optimization (v6.2+)
 - **Caveman Prompts**: Wszystkie prompty i instrukcje do subagentów muszą być pisane w skróconym formacie Caveman (bez uprzejmości, czysty techniczny styl), co eliminuje narzut tokenów.
 - **Direct Git Actions**: Coordinator wykonuje operacje Git (stage, commit, push, deploy) bezpośrednio z głównego terminala za pomocą `smart_commit.sh`, bez powoływania dedykowanego, kosztownego subagenta.
