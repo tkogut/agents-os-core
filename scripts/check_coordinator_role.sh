@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check_coordinator_role.sh — Safety Gate v6.1 (R-ROLE-01)
+# check_coordinator_role.sh — Safety Gate v6.2 (R-ROLE-01)
 # Weryfikuje obecność poprawnego Builder handshake przed commitem zmian w src/
 
 SWARM_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/.agents/swarm"
