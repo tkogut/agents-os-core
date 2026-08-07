@@ -1,4 +1,4 @@
-# AGENTS-OS v6.2 Swarm Edition — Instrukcja obsługi
+# AGENTS-OS v6.5 Swarm Edition — Instrukcja obsługi
 
 > **Dla kogo jest ten dokument?**
 > Dla każdego — nawet jeśli nie programujesz na co dzień.

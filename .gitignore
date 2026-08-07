@@ -1,14 +1,69 @@
-# AGENTS-OS v4.1 Default ignore
-tmp/
-*.log
-__pycache__/
-.DS_Store
+# AGENTS-OS v6.5 Default ignore
+
+# Dependencies
 node_modules/
+*.pyc
+__pycache__/
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+.cache/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# Secrets & keys
 .env
+.env.local
+.env.production
+*.pem
+*.key
+*.cert
+credentials.json
+serviceAccountKey.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Temp & backup
+*.tmp
+*.temp
+*.bak
+*_old.*
+*_backup.*
+*_copy.*
+
+# Test artifacts
+coverage/
+.nyc_output/
+test-results/
+
+# Session artifacts (ephemeral)
+task.md
+design-tokens.md
+implementation_plan.md
+walkthrough.md
 
 # Dynamically installed skills
 .agents/skills/
 
-# Agent session artifacts
-implementation_plan.md
-walkthrough.md
+# Generated files
+.agents/mcp-servers/antigravity-docs/rendered_page.html
+
+# Agent worktrees
+tmp/
