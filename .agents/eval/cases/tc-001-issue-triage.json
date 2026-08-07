@@ -1,0 +1,19 @@
+{
+  "id": "tc-001",
+  "name": "Issue Triage Accuracy",
+  "skill": "om-prepare-issue",
+  "description": "Verify that issue triage correctly labels and prioritizes a mobile bug report",
+  "input": {
+    "issue_title": "Login button not working on mobile Safari",
+    "issue_body": "Steps to reproduce:\n1. Open app on iPhone Safari\n2. Enter credentials\n3. Tap 'Login' button\n4. Nothing happens\n\nExpected: User is logged in\nActual: No response to tap"
+  },
+  "expected_output": {
+    "labels": ["bug", "mobile", "auth", "safari"],
+    "priority": "high",
+    "has_acceptance_criteria": true,
+    "acceptance_criteria_min_count": 3
+  },
+  "tolerance": 0.8,
+  "model_baseline": "gemini-pro",
+  "created": "2026-08-07"
+}
