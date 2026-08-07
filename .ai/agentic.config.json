@@ -1,0 +1,46 @@
+{
+  "$schema": "https://agents-os.dev/schemas/agentic-config/v1",
+  "version": "6.5-swarm",
+  "project": {
+    "name": "agents-os-core",
+    "type": "meta-framework",
+    "primary_language": "bash"
+  },
+  "pipeline": {
+    "gates": {
+      "lint": { "command": "shellcheck scripts/*.sh", "required": true },
+      "typecheck": { "command": "python3 -m py_compile scripts/*.py", "required": false },
+      "test": { "command": "python3 scripts/validate-handshakes.py", "required": true },
+      "build": { "command": "echo 'meta-framework: no build step'", "required": false }
+    },
+    "commit_policy": "atomic",
+    "pr_auto_merge": false,
+    "qa_required": true,
+    "qa_label": "needs-qa"
+  },
+  "swarm": {
+    "roles": {
+      "coordinator": { "model": "gemini", "permissions": ["plan", "route", "review"] },
+      "builder": { "model": "claude", "permissions": ["implement", "commit", "test"] },
+      "auditor": { "model": "gemini-low", "permissions": ["lint", "audit", "block"] }
+    },
+    "handshake_dir": ".agents/swarm",
+    "heartbeat_interval_s": 300,
+    "max_ram_per_instance_gb": 10
+  },
+  "context": {
+    "router_file": ".agents/agents.md",
+    "domain_modules": [
+      ".agents/agents-pipeline.md",
+      ".agents/agents-qa.md",
+      ".agents/agents-ux.md"
+    ],
+    "max_context_files": 3
+  },
+  "evaluator": {
+    "enabled": true,
+    "test_cases_dir": ".agents/eval/cases",
+    "downscale_target": "gemini-flash",
+    "validation_interval": "weekly"
+  }
+}
