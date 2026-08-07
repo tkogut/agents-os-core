@@ -1,10 +1,33 @@
-# 🛸 Historia Zmian / Changelog — AGENTS-OS v6.0 (Enterprise Swarm Edition)
+# 🛸 Historia Zmian / Changelog — AGENTS-OS v6.5 (Enterprise Swarm Edition)
 
-## 🛸 Historia Zmian / Changelog — AGENTS-OS v6.0 (Enterprise Swarm Edition)
+## 🛸 Historia Zmian / Changelog — AGENTS-OS v6.5 (Enterprise Swarm Edition)
 Dokumentującą:
 - Pełną refaktoryzację rdzenia i przejście na model asynchronicznych agentów (Swarm Triad).
 - Usunięcie martwego kodu (dead code) i przestarzałych skryptów.
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
+- Integrację 36 skilli Open-Mercato SDLC oraz architektury Cezar Runtime.
+
+## [6.5.0] - 2026-08-07
+
+### 🏗️ Enterprise Architecture: Open-Mercato Integration & Cezar Runtime
+- **36 skilli Open-Mercato SDLC**: Pełna integracja pipeline'u deweloperskiego (`om-auto-*`, `om-setup-agent-pipeline`, `om-code-review`, `om-ux-*`) do `global_skills/` i `vault/.agents/skills/`.
+- **`.ai/agentic.config.json`**: Nowy centralny plik konfiguracyjny definiujący gate commands (lint, typecheck, test, build), role Swarm Triad, heartbeat, evaluator i context routing.
+- **`SDLC.md`**: Source of Truth dla 6-fazowego cyklu życia kodu (Issue → Branch → Worktree → Implementation → Handshake → QA Gate → PR Merge).
+- **`vault/HANDOFF.md`**: Template Cezar Runtime dla fault-tolerance i wznowienia sesji agentów.
+- **Task Router** (`.agents/agents.md`): Lean entry-point router z budget kontekstowym (max 3 moduły domenowe).
+- **Domain Modules**: `agents-pipeline.md` (SDLC workflow), `agents-qa.md` (QA gate policy), `agents-ux.md` (Visual Proof-of-Work).
+- **Evaluator Module**: `.agents/eval/evaluator.md` + test case `tc-001` dla walidacji down-scalingu promptów.
+- **Pre-commit hook** (`vault/.git-hooks/pre-commit`): Swarm Triad role enforcement z blokowaniem commita dla niedozwolonych ról.
+- **Specyfikacja architektoniczna**: `vault/.agents/specs/integracja archotectury open-mercato.md` — pełna dokumentacja Enterprise Swarm.
+
+### 🧹 Pre-Push Cleanup
+- Usunięto stale artifacts: `task.md`, `design-tokens.md`, `implementation_plan.md`, `walkthrough.md`.
+- Usunięto `rendered_page.html` (108KB build artifact) z tracked files.
+- Zaktualizowano `.gitignore` — 50+ wzorców (pyc, pem, IDE, coverage, session artifacts).
+- Wyrównano wersje: `agents.yaml`, `INSTALL.sh`, `README.md`, `CHANGELOG.md` → `v6.5-swarm`.
+- Usunięto stale worktree `feature/core-init-zed`.
+
+---
 
 ## [6.2.0] - 2026-08-06
 
