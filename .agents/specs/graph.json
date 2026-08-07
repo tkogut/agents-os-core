@@ -25,6 +25,12 @@
       "label": "vault/",
       "type": "Critical Infrastructure",
       "description": "Standard directory vault acting as the blueprint standard for all new sub-agents."
+    },
+    {
+      "id": ".agents/specs/knowledge/integracja archotectury open-mercato.md",
+      "label": "Integracja Archotectury Open Mercato",
+      "type": "Expert Knowledge",
+      "description": "Knowledge base note synchronized from NotebookLM: Integracja Archotectury Open Mercato"
     }
   ],
   "edges": [
@@ -42,10 +48,15 @@
       "source": "os-init",
       "target": "vault",
       "relation": "replicates"
+    },
+    {
+      "source": ".agents/specs/AGENTS-OS.md",
+      "target": ".agents/specs/knowledge/integracja archotectury open-mercato.md",
+      "relation": "governs_knowledge"
     }
   ],
   "metadata": {
-    "last_distillation": "2026-05-22",
+    "last_distillation": "2026-08-07",
     "source": "Inception Engine"
   }
 }
