@@ -1,0 +1,111 @@
+#!/bin/bash
+# ==============================================================================
+# os-init-claude <nazwa-projektu>
+# AGENTS-OS v6.5 SWARM — Claude Code Project Initializer
+#
+# Analogiczne do os-init, ale:
+#   - Używa vault/CLAUDE.md + vault/.claude/commands/ jako szablon
+#   - Otwiera VS Code zamiast Antigravity IDE
+#   - Ustawia domyślną rolę claude-code w agents.yaml
+# ==============================================================================
+
+set -e
+
+SKILL_SCRIPT="$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap-claude.py"
+
+# Fallback: użyj lokalnej kopii jeśli nie zainstalowano globalnie
+if [ ! -f "$SKILL_SCRIPT" ]; then
+    SKILL_SCRIPT="$(dirname "$(realpath "$0")")/global_skills/swarm-bootstrapper/scripts/bootstrap-claude.py"
+fi
+
+if [ ! -f "$SKILL_SCRIPT" ]; then
+    echo "❌ ERR: bootstrap-claude.py nie znaleziony. Uruchom najpierw INSTALL.sh."
+    exit 1
+fi
+
+# --------------------------------------------------------------------------- #
+# 1. Uruchom bootstrapper i przechwyć output
+# --------------------------------------------------------------------------- #
+echo "🤖 os-init-claude: Inicjalizacja projektu Agent-Swarm dla Claude Code..."
+
+PYTHON_BIN="python3"
+if [ -f "$HOME/.antigravity/venv/bin/python" ]; then
+    PYTHON_BIN="$HOME/.antigravity/venv/bin/python"
+fi
+
+OUTPUT=$("$PYTHON_BIN" "$SKILL_SCRIPT" "$@" 2>&1)
+
+# Wyświetl output (bez ostatniej linii z ścieżką)
+echo "$OUTPUT" | grep -v "^__PROJECT_DIR__:" || true
+
+# --------------------------------------------------------------------------- #
+# 2. Wyciągnij ścieżkę projektu
+# --------------------------------------------------------------------------- #
+PROJECT_DIR=$(echo "$OUTPUT" | grep "^__PROJECT_DIR__:" | sed 's/^__PROJECT_DIR__://')
+
+if [ -z "$PROJECT_DIR" ]; then
+    echo "⚠️  Nie udało się wykryć ścieżki projektu. Sprawdź bootstrap-claude.py."
+    exit 1
+fi
+
+echo ""
+echo "📁 Projekt gotowy w: $PROJECT_DIR"
+
+# --------------------------------------------------------------------------- #
+# 3. Otwórz VS Code w środowisku WSL:Ubuntu
+# --------------------------------------------------------------------------- #
+if [ "${OS_INIT_TEST:-false}" = "true" ]; then
+    echo "🧪 [TEST] Pomijam otwieranie VS Code w trybie testowym."
+else
+    echo "🖥️  Otwieranie VS Code (WSL:Ubuntu) w: $PROJECT_DIR"
+
+    if command -v code &>/dev/null; then
+        code "$PROJECT_DIR" &
+        echo "   ✅ VS Code otwarty."
+    elif command -v code-insiders &>/dev/null; then
+        code-insiders "$PROJECT_DIR" &
+        echo "   ✅ VS Code Insiders otwarty."
+    else
+        # Fallback Windows path przez wslpath
+        WIN_PATH=$(wslpath -w "$PROJECT_DIR" 2>/dev/null || echo "")
+        if [ -n "$WIN_PATH" ]; then
+            # Próba uruchomienia przez PowerShell
+            powershell.exe -Command "code '$WIN_PATH'" &>/dev/null 2>&1 &
+            echo "   ✅ VS Code uruchomiony przez PowerShell."
+        else
+            echo "   ℹ️  VS Code nie znaleziony. Otwórz ręcznie:"
+            echo "   code \"$PROJECT_DIR\""
+        fi
+    fi
+fi
+
+# --------------------------------------------------------------------------- #
+# 4. Podsumowanie
+# --------------------------------------------------------------------------- #
+GH_USER="twoj-github-username"
+if command -v gh &>/dev/null; then
+    GH_USER=$(gh api user -q .login 2>/dev/null || echo "twoj-github-username")
+fi
+if [ "$GH_USER" = "twoj-github-username" ]; then
+    GH_USER=$(git config github.user 2>/dev/null || git config user.name 2>/dev/null | tr -d ' ' || echo "twoj-github-username")
+fi
+
+PROJECT_NAME=$(basename "$PROJECT_DIR")
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  ✅ PROJEKT CLAUDE CODE GOTOWY: $PROJECT_DIR"
+echo "  🐙 GitHub: https://github.com/${GH_USER}/${PROJECT_NAME}"
+echo "  🤖 IDE: VS Code + Claude Code Extension"
+echo ""
+echo "  Pierwsze kroki w Claude Code:"
+echo "  1. Otwórz projekt w VS Code"
+echo "  2. Claude Code automatycznie wczyta CLAUDE.md (rola Builder)"
+echo "  3. Użyj /worktree-init przed implementacją"
+echo "  4. Użyj /handshake po zakończeniu zadania"
+echo ""
+echo "  Aby przejść do projektu w terminalu:"
+echo "  cd \"$PROJECT_DIR\""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+export OS_INIT_PROJECT_DIR="$PROJECT_DIR"
