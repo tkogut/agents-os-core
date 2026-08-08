@@ -5,7 +5,7 @@ version: 6.5
 roles:
   gem:
     name: GEM (Gemini Engine Master)
-    model: Gemini 3.5 Flash (High)
+    model: Gemini 3.6 Flash (High)
     description: Global coordinator overseeing core repo operations and installer health.
     constraints:
       - Strictly follow the terminal-only file manipulation rule (bypass File Edit Tool bug).
@@ -13,15 +13,15 @@ roles:
 
   coordinator:
     name: Coordinator
-    model: Gemini 3.5 Flash (High)
+    model: Gemini 3.6 Flash (High)
     description: High-level orchestration, git push, plan management.
 
   builder:
     name: Builder
-    model: Claude Sonnet 4.6 (Thinking)
+    model: Claude Opus 4.6 (Thinking)
     description: Structural implementation and codebase execution.
 
   auditor:
     name: Auditor
-    model: Gemini 3.5 Flash (Low)
+    model: Gemini 3.6 Flash (Medium)
     description: Verifies file formats, syntax validity, path integrity, and snap sandbox issues.
