@@ -11,12 +11,13 @@
 1. [Czym jest AGENTS-OS?](#1-czym-jest-agents-os)
 2. [Co potrzebujesz zanim zaczniesz](#2-wymagania)
 3. [Instalacja — jednorazowa konfiguracja](#3-instalacja)
-4. [Tworzenie nowego projektu — komenda `os-init`](#4-os-init)
-5. [Struktura nowego projektu](#5-struktura-projektu)
-6. [Codzienna praca — jak otwierać projekty](#6-codzienna-praca)
-7. [Najczęstsze problemy i rozwiązania](#7-najczestsze-problemy)
-8. [Jak działa system od środka](#8-jak-dziala-od-srodka)
-9. [English version](#english)
+4. [Tworzenie nowego projektu — komenda `os-init` (Antigravity)](#4-os-init)
+5. [Tworzenie nowego projektu — komenda `os-init-claude` (Claude Code / VS Code)](#5-os-init-claude)
+6. [Struktura nowego projektu](#6-struktura-projektu)
+7. [Codzienna praca — jak otwierać projekty](#7-codzienna-praca)
+8. [Najczęstsze problemy i rozwiązania](#8-najczestsze-problemy)
+9. [Jak działa system od środka](#9-jak-dziala-od-srodka)
+10. [English version](#english)
 
 ---
 
@@ -29,8 +30,9 @@ System składa się z trzech elementów:
 | Element | Co to jest | Do czego służy |
 |---|---|---|
 | **INSTALL.sh** | Skrypt instalacyjny | Jednorazowe ustawienie wszystkiego na komputerze |
-| **os-init** | Komenda startowa | Tworzenie nowego projektu jedną komendą |
-| **Vault (Złoty Standard)** | Szablon folderów | Gotowa struktura, która kopiuje się do każdego projektu |
+| **os-init** | Komenda startowa (Antigravity IDE) | Tworzenie nowego projektu — otwiera Antigravity IDE |
+| **os-init-claude** | Komenda startowa (VS Code + Claude Code) | Tworzenie nowego projektu — otwiera VS Code z Claude Code |
+| **Vault (Złoty Standard)** | Szablon folderów | Gotowa struktura kopiowana do każdego projektu (obu trybów) |
 
 ---
 
@@ -42,6 +44,8 @@ Zanim zaczniesz, upewnij się że masz zainstalowane:
 |---|---|---|
 | **WSL2 + Ubuntu** (Windows) | `wsl --version` w PowerShell | [docs.microsoft.com](https://docs.microsoft.com/pl-pl/windows/wsl/install) |
 | **Antigravity IDE** | Czy masz ikonę w Menu Start | Zainstaluj przez oficjalny instalator |
+| **VS Code** *(opcjonalne — tryb Claude Code)* | `code --version` | [code.visualstudio.com](https://code.visualstudio.com/) |
+| **Claude Code extension** *(opcjonalne)* | Rozszerzenie w VS Code Marketplace | Szukaj: `claude.ai/code` |
 | **Antigravity (okno czatu)** | Czy działa aplikacja asystenta | Jak wyżej |
 | **Python 3** | `python3 --version` w terminalu WSL | Preinstalowany w Ubuntu |
 | **Git** | `git --version` | `sudo apt install git` |
@@ -101,7 +105,7 @@ source ~/.bashrc.d/antigravity
 
 ---
 
-## 4. `os-init` — Tworzenie nowego projektu
+## 4. `os-init` — Tworzenie nowego projektu (Antigravity IDE)
 
 > 💡 **Jedna komenda robi wszystko.**
 
@@ -148,9 +152,35 @@ https://github.com/<twój-użytkownik-git>/moja-aplikacja
 
 ---
 
-## 5. Struktura projektu
+## 5. `os-init-claude` — Tworzenie projektu pod Claude Code (VS Code)
 
-Każdy projekt tworzony przez `os-init` ma identyczną, gotową strukturę:
+> 🤖 **Dla użytkowników VS Code i rozszerzenia Claude Code.**
+
+### Jak używać
+
+Wpisz w terminalu WSL:
+
+```bash
+os-init-claude moja-aplikacja
+```
+
+### Co się dzieje automatycznie
+
+Skrypt wykonuje dokładnie te same kroki co `os-init`, ale dodatkowo:
+1. 📄 **Generuje `CLAUDE.md`** — plik konfiguracji roli Builder wczytywany automatycznie przez rozszerzenie Claude Code po otwarciu projektu.
+2. ⚡ **Instaluje slash commands** w `.claude/commands/`:
+   - `/worktree-init` — automatyczne tworzenie git worktree przed implementacją
+   - `/handshake` — generowanie pliku handshake JSON po ukończeniu zadania
+   - `/qa-gate` — uruchamianie linterów i testów przed PR
+   - `/commit` — bezpieczne atomic commity w konwencji Conventional Commits
+3. ⚙️ **Ustawia rolę Builder** jako `claude-code` w `agents.yaml`.
+4. 🖥️ **Otwiera projekt w VS Code** (zamiast Antigravity IDE).
+
+---
+
+## 6. Struktura projektu
+
+Każdy projekt tworzony przez `os-init` / `os-init-claude` ma identyczną, gotową strukturę:
 
 ```
 moja-aplikacja/
@@ -160,7 +190,10 @@ moja-aplikacja/
 ├── agents.yaml              ← Konfiguracja ról asystenta AI
 ├── design-tokens.md         ← Wytyczne wizualne (kolory, fonty, itp.)
 ├── task.md                  ← 📋 TU PISZESZ CO AI MA ZROBIĆ
+├── CLAUDE.md                ← Manifest roli Builder dla Claude Code (gdy użyto os-init-claude)
 │
+├── .claude/                 ← Slash commands dla Claude Code
+│   └── commands/
 ├── execution/               ← Skrypty uruchomieniowe
 ├── tmp/                     ← Logi tymczasowe (ignorowane przez Git)
 │
@@ -187,7 +220,7 @@ Dodaj nagłówek, sekcję hero i stopkę.
 
 ---
 
-## 6. Codzienna praca
+## 7. Codzienna praca
 
 ### Otwieranie istniejącego projektu w IDE
 
@@ -225,7 +258,7 @@ Lub powiedz asystentowi: *„zapisz i wyślij na GitHub"* — zrobi to za Ciebie
 
 ---
 
-## 7. Najczęstsze problemy
+## 8. Najczęstsze problemy
 
 ### ❌ `Permission denied` przy `~/.bashrc.d/antigravity`
 
@@ -242,7 +275,7 @@ source ~/.bashrc.d/antigravity
 
 ---
 
-### ❌ `os-init: command not found`
+### ❌ `os-init: command not found` / `os-init-claude: command not found`
 
 **Problem:** Konfiguracja shella nie jest załadowana.
 
@@ -253,10 +286,11 @@ source ~/.bashrc.d/antigravity
 
 Jeśli nadal nie działa, sprawdź instalację:
 ```bash
-ls ~/.local/bin/os-init-run   # powinien istnieć
+ls ~/.local/bin/os-init-run         # powinien istnieć dla Antigravity
+ls ~/.local/bin/os-init-claude-run  # powinien istnieć dla Claude Code
 ```
 
-Jeśli pliku nie ma — uruchom ponownie `bash INSTALL.sh`.
+Jeśli plików nie ma — uruchom ponownie `bash INSTALL.sh`.
 
 ---
 
@@ -266,10 +300,11 @@ Jeśli pliku nie ma — uruchom ponownie `bash INSTALL.sh`.
 
 **Rozwiązanie:** Otwieraj IDE zawsze przez terminal WSL:
 ```bash
-antigravity .
+antigravity .   # dla Antigravity IDE
+code .          # dla VS Code
 ```
 
-Lub używaj `os-init` — otwiera IDE automatycznie z flagą `--remote wsl+Ubuntu`.
+Lub używaj `os-init` / `os-init-claude` — otwierają IDE automatycznie z odpowiednią flagą środowiskową.
 
 ---
 
@@ -311,20 +346,20 @@ agy                    # uruchamia CLI asystenta (czat w terminalu)
 
 ---
 
-## 8. Jak działa system od środka
+## 9. Jak działa system od środka
 
 > Ta sekcja jest dla ciekawskich — nie musisz tego czytać żeby używać systemu.
 
-### Dlaczego `os-init` jest funkcją shella, a nie skryptem?
+### Dlaczego `os-init` i `os-init-claude` są funkcjami shella, a nie skryptami?
 
 W systemie Linux, skrypt uruchomiony jako osobny proces **nie może zmienić katalogu** (`cd`) w terminalu rodzica. To fundamentalne ograniczenie systemu.
 
-Dlatego `os-init` jest **funkcją shella** zdefiniowaną w `~/.bashrc.d/antigravity`:
-1. Wywołuje `os-init-run` (właściwy skrypt)
+Dlatego `os-init` oraz `os-init-claude` są **funkcjami shella** zdefiniowanymi w `~/.bashrc.d/antigravity`:
+1. Wywołują `os-init-run` lub `os-init-claude-run` (właściwy skrypt)
 2. Skrypt wypisuje na końcu `__PROJECT_DIR__:/ścieżka/do/projektu`
 3. Funkcja przechwytuje tę linię i wykonuje `cd` — **w bieżącym terminalu**
 
-### Kolejność operacji w `bootstrap.py`
+### Kolejność operacji w `bootstrap.py` / `bootstrap-claude.py`
 
 ```
 git init  →  vault copy  →  .gitignore  →  README.md  →  git commit  →  gh repo create  →  git push
