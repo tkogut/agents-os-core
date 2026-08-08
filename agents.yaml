@@ -21,6 +21,17 @@ roles:
     model: Claude Opus 4.6 (Thinking)
     description: Structural implementation and codebase execution.
 
+  claude-code:
+    name: Claude Code (VS Code)
+    model: Claude Sonnet 4.6 (Thinking)
+    ide: vscode-claude-code
+    description: Builder role via VS Code Claude Code extension. Operates in git worktrees, generates handshake JSON, uses CLAUDE.md as session manifest.
+    constraints:
+      - ALWAYS create a git worktree before implementation (SDLC Phase 2).
+      - Generate _builder_handshake.json after task completion (SDLC Phase 4).
+      - Commits must use SWARM_ROLE=builder environment variable.
+      - QA Gate (shellcheck + py_compile + validate-handshakes) required before PR.
+
   auditor:
     name: Auditor
     model: Gemini 3.6 Flash (Medium)
