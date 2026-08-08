@@ -97,14 +97,12 @@ VAULT_DIR="$AGY_DIR/templates/v6.5-swarm"
 
 # Czyszczenie starych wersji szablonów w celu zachowania czystości systemu
 echo "🧹 Czyszczenie starych szablonów..."
-if [ -d "$AGY_DIR/templates/v5.0-swarm" ]; then
-    rm -rf "$AGY_DIR/templates/v5.0-swarm"
-    echo "   ✓ Usunięto przestarzały szablon v5.0-swarm"
-fi
-if [ -d "$AGY_DIR/templates/v6.5-swarm" ]; then
-    rm -rf "$AGY_DIR/templates/v6.5-swarm"
-    echo "   ✓ Usunięto przestarzały szablon v6.5-swarm"
-fi
+for old_tmpl in v5.0-swarm v6.0-swarm v6.2-swarm v6.5-swarm; do
+    if [ -d "$AGY_DIR/templates/$old_tmpl" ]; then
+        rm -rf "$AGY_DIR/templates/$old_tmpl"
+        echo "   ✓ Usunięto przestarzały szablon $old_tmpl"
+    fi
+done
 
 # Automatyczna synchronizacja skilli przed wdrożeniem szablonu
 if [ -f "$SCRIPT_DIR/scripts/sync-skills.sh" ]; then

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AGENTS-OS v6.0 SWARM - Project Bootstrapper
+AGENTS-OS v6.5 SWARM - Project Bootstrapper
 Kolejność: folder → vault → .gitignore → git init → commit → gh repo create → push
 Wypisuje __PROJECT_DIR__:<ścieżka> jako ostatnią linię (używana przez os-init do cd).
 Używa natywnych bibliotek GitPython i PyGithub zamiast surowych wywołań subprocess.
@@ -13,7 +13,7 @@ import git
 import github
 from github import Github, GithubException
 
-VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v6.0-swarm")
+VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v6.5-swarm")
 if not os.path.exists(VAULT_DIR):
     # Domyślnie fallback do lokalnego folderu jeśli brak globalnej instalacji
     local_vault = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "vault")
@@ -136,13 +136,21 @@ try:
     else:
         repo = git.Repo(TARGET_DIR)
 
-    # Wdrożenie pre-commit hooka dla Swarm Triad
+    # Wdrożenie pre-commit hooka dla Swarm Triad z vault lub szablonu
     hooks_dir = os.path.join(TARGET_DIR, ".git", "hooks")
     os.makedirs(hooks_dir, exist_ok=True)
     hook_path = os.path.join(hooks_dir, "pre-commit")
-    hook_content = """#!/bin/bash
+    
+    vault_hook = os.path.join(TARGET_DIR, "vault", ".git-hooks", "pre-commit")
+    if not os.path.exists(vault_hook):
+        vault_hook = os.path.join(VAULT_DIR, ".git-hooks", "pre-commit")
+        
+    if os.path.exists(vault_hook):
+        shutil.copy2(vault_hook, hook_path)
+    else:
+        hook_content = """#!/bin/bash
 # Swarm Triad Role Enforcement pre-commit hook
-# Version: 6.0-swarm
+# Version: 6.5-swarm
 
 ROLE=${SWARM_ROLE:-"coordinator"}
 
@@ -168,8 +176,9 @@ if [ "$ROLE" = "coordinator" ] || [ "$ROLE" = "gem" ]; then
     fi
 fi
 """
-    with open(hook_path, "w", encoding="utf-8") as hf:
-        hf.write(hook_content)
+        with open(hook_path, "w", encoding="utf-8") as hf:
+            hf.write(hook_content)
+
     try:
         os.chmod(hook_path, 0o755)
     except Exception:
@@ -207,7 +216,9 @@ if repo.is_dirty(untracked_files=True):
     print("📝 Initial commit...")
     try:
         repo.git.add(A=True)
-        repo.index.commit("init: agents-os v6.0 swarm bootstrap")
+        env = os.environ.copy()
+        env["SWARM_ROLE"] = "builder"
+        repo.git.commit("-m", "init: agents-os v6.5 swarm bootstrap", env=env)
         print("   ✅ Commit gotowy.")
     except Exception as e:
         print(f"❌ Commit failed: {e}")
