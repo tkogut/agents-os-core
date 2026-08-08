@@ -150,6 +150,32 @@ if [ -f "$SCRIPT_DIR/os-init" ]; then
     fi
 fi
 
+# --------------------------------------------------------------------------- #
+# os-init-claude (VS Code + Claude Code)
+# --------------------------------------------------------------------------- #
+if [ -f "$SCRIPT_DIR/os-init-claude" ]; then
+    sudo -n rm -f /usr/local/bin/os-init-claude 2>/dev/null || rm -f "$HOME/.local/bin/os-init-claude" 2>/dev/null || true
+
+    if sudo -n cp "$SCRIPT_DIR/os-init-claude" /usr/local/bin/os-init-claude-run 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-init-claude-run
+        echo "✓ os-init-claude-run zarejestrowany w /usr/local/bin/os-init-claude-run"
+    else
+        mkdir -p "$HOME/.local/bin"
+        cp "$SCRIPT_DIR/os-init-claude" "$HOME/.local/bin/os-init-claude-run"
+        chmod +x "$HOME/.local/bin/os-init-claude-run"
+        echo "✓ os-init-claude-run zarejestrowany w $HOME/.local/bin/os-init-claude-run"
+    fi
+fi
+
+# --------------------------------------------------------------------------- #
+# bootstrap-claude.py (Claude Code bootstrapper)
+# --------------------------------------------------------------------------- #
+BOOTSTRAP_CLAUDE_SRC="$SCRIPT_DIR/global_skills/swarm-bootstrapper/scripts/bootstrap-claude.py"
+if [ -f "$BOOTSTRAP_CLAUDE_SRC" ]; then
+    cp "$BOOTSTRAP_CLAUDE_SRC" "$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap-claude.py" 2>/dev/null || true
+    echo "✓ bootstrap-claude.py skopiowany do ~/.antigravity/skills/"
+fi
+
 if [ -f "$SCRIPT_DIR/os-add-skill" ]; then
     # Sprzątanie: usuń stary plik os-add-skill-run z v4.1.x jeśli istnieje
     sudo -n rm -f /usr/local/bin/os-add-skill-run 2>/dev/null || rm -f "$HOME/.local/bin/os-add-skill-run" 2>/dev/null || true
@@ -235,6 +261,43 @@ os-init() {
     fi
 
     # Wyciągnij ścieżkę i wejdź do folderu projektu
+    local project_dir
+    project_dir=$(echo "$output" | grep "^__PROJECT_DIR__:" | sed 's/^__PROJECT_DIR__://')
+    if [ -n "$project_dir" ] && [ -d "$project_dir" ]; then
+        echo ""
+        echo "🔀 Przechodzę do katalogu projektu..."
+        cd "$project_dir" && echo "📁 Jesteś w: $(pwd)"
+    fi
+}
+
+# ==============================================================================
+# os-init-claude <nazwa-projektu>
+# Shell function wrapper dla Claude Code — analogia os-init.
+# Tworzy projekt Agent-Swarm z CLAUDE.md + .claude/commands/ i otwiera VS Code.
+# ==============================================================================
+os-init-claude() {
+    local script
+    if command -v os-init-claude-run &>/dev/null; then
+        script="os-init-claude-run"
+    elif [ -f "$HOME/.local/bin/os-init-claude-run" ]; then
+        script="$HOME/.local/bin/os-init-claude-run"
+    elif [ -f "/usr/local/bin/os-init-claude-run" ]; then
+        script="/usr/local/bin/os-init-claude-run"
+    else
+        echo "❌ os-init-claude: skrypt nie znaleziony. Uruchom INSTALL.sh."
+        return 1
+    fi
+
+    local output
+    output=$(bash "$script" "$@")
+    local exit_code=$?
+
+    echo "$output" | grep -v "^__PROJECT_DIR__:"
+
+    if [ $exit_code -ne 0 ]; then
+        return $exit_code
+    fi
+
     local project_dir
     project_dir=$(echo "$output" | grep "^__PROJECT_DIR__:" | sed 's/^__PROJECT_DIR__://')
     if [ -n "$project_dir" ] && [ -d "$project_dir" ]; then

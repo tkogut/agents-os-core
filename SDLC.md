@@ -16,9 +16,13 @@ Issue → Branch → Worktree → Implementation → Handshake → QA Gate → P
 
 ### Phase 2: Branch & Worktree
 - **Trigger**: Issue assigned to Builder
-- **Agent**: Builder (Claude)
+- **Agent**: Builder (Claude Opus / Claude Code VS Code)
 - **Output**: Isolated git worktree at `tmp/worktrees/<branch-name>`
 - **Script**: `os-run-builder <branch-name>`
+- **Claude Code**: Use `/worktree-init` slash command or run manually:
+  ```bash
+  git worktree add tmp/worktrees/feature/<branch> -b feature/<branch>
+  ```
 
 ### Phase 3: Implementation
 - **Trigger**: Worktree ready
