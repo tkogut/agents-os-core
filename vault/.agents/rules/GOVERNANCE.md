@@ -24,8 +24,11 @@ Every agent session operates under the Triad model. Switching roles requires a f
 
 2. **The Builder (Feature Architect)**
    - **Mandate**: Implementation (React, Python, etc.), coding, local testing.
-   - **Constraint**: Forbidden from modifying `.agents/plans/` without Coordinator approval.
-   - **Tools**: `execution/*`, `python`, `terminal`, `browser`.
+   - **Environments**:
+     - **Antigravity IDE**: Active via standard Builder subagent / CLI.
+     - **VS Code + Claude Code**: Active via `CLAUDE.md` manifest and `/worktree-init`, `/handshake`, `/qa-gate`, `/commit` slash commands.
+   - **Constraint**: Forbidden from modifying `.agents/plans/` without Coordinator approval. ALWAYS operates within isolated Git Worktree (`tmp/worktrees/`).
+   - **Tools**: `execution/*`, `python`, `terminal`, `browser`, `code`.
 
 3. **The Auditor (QA & Security Specialist)**
    - **Mandate**: Mathematical consistency, Z-Index audits, security reviews.
