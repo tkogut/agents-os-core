@@ -1,0 +1,11 @@
+{
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "ai_privacy": "high",
+  "default_model": {
+    "provider": "google",
+    "name": "gemini-2.5-flash"
+  }
+}
