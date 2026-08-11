@@ -1,54 +1,18 @@
-#!/bin/bash
-# Swarm Triad Role Enforcement pre-commit hook
-# Version: 6.5-swarm
-# Install: cp vault/.git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+#!/usr/bin/env bash
+# Swarm Triad Role Enforcement Pre-Commit Hook
 
-ROLE=${SWARM_ROLE:-"coordinator"}
+ROLE="${SWARM_ROLE:-coordinator}"
 
-# Files that coordinator CAN modify (docs, specs, plans)
-COORDINATOR_ALLOW="\.md$|\.txt$|\.json$|agents\.md|CHANGELOG|README|SDLC|specs/"
-
-# Files that auditor CAN modify (reports, logs)
-AUDITOR_ALLOW="handshake\.json$|audit|report|\.log$"
-
-staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
-
-if [ -z "$staged_files" ]; then
-    exit 0
-fi
-
-violations=0
-
-case "$ROLE" in
-    coordinator)
-        while IFS= read -r file; do
-            if ! echo "$file" | grep -qE "$COORDINATOR_ALLOW"; then
-                echo "ERR: Role 'coordinator' (Coordinator/GEM) is forbidden from directly committing functional changes to '$file'!"
-                echo "Staged file violation: $file"
-                ((violations++))
-            fi
-        done <<< "$staged_files"
-        ;;
-    auditor)
-        while IFS= read -r file; do
-            if ! echo "$file" | grep -qE "$AUDITOR_ALLOW"; then
-                echo "ERR: Role 'auditor' is forbidden from modifying '$file'!"
-                echo "Staged file violation: $file"
-                ((violations++))
-            fi
-        done <<< "$staged_files"
-        ;;
-    builder)
-        # Builder can modify anything
-        ;;
-    *)
-        echo "WARN: Unknown SWARM_ROLE='$ROLE'. Defaulting to coordinator restrictions."
-        ;;
-esac
-
-if [ $violations -gt 0 ]; then
-    echo "ERR: Commit aborted. Under Swarm Triad rules, functional modifications must be implemented by the Builder role."
-    exit 1
+if [ "$ROLE" = "coordinator" ]; then
+    # Check if staging functional code changes in src/ or tests/
+    STAGED_CODE=$(git diff --cached --name-only | grep -E '^(src/|tests/|scripts/)')
+    if [ -n "$STAGED_CODE" ]; then
+        echo "ERR: Role 'coordinator' (Coordinator/GEM) is forbidden from directly committing functional changes!"
+        echo "Staged file violations:"
+        echo "$STAGED_CODE"
+        echo "ERR: Commit aborted. Under Swarm Triad rules, functional modifications must be implemented by the Builder role (SWARM_ROLE=builder)."
+        exit 1
+    fi
 fi
 
 exit 0

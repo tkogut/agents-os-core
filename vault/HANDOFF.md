@@ -1,38 +1,36 @@
-# HANDOFF — Agent State Transfer Document
+# 🛡️ Cezar Runtime HANDOFF Template (Fault-Tolerance & Session Resumption)
 
-> Template for Cezar Runtime fault-tolerance.
+**System:** mms4tk + Hermes Agent Swarm  
+**Purpose:** Fault-tolerance protocol for agent session crashes, server restarts, or context handoffs.
 
-## Session Info
-- **Conversation ID**: `<auto-fill>`
-- **Role**: `<coordinator|builder|auditor>`
-- **Timestamp**: `<ISO-8601>`
-- **Status**: `<in-progress|completed|failed|timeout>`
+---
 
-## Current Task
-- **Issue**: `#<number>`
-- **Branch**: `<branch-name>`
-- **Worktree**: `tmp/worktrees/<branch-name>`
+## 📌 Session Resumption Checklist
 
-## Progress
-- [ ] Phase 1: Issue Triage
-- [ ] Phase 2: Branch & Worktree
-- [ ] Phase 3: Implementation
-- [ ] Phase 4: Handshake
-- [ ] Phase 5: QA Gate
-- [ ] Phase 6: PR Merge
+In the event of a system interrupt or context reset:
 
-## State Snapshot
-### Files Modified
-- `<path>`: `<description>`
+1. **State Recovery**:
+   - Inspect `.agents/swarm/logs.db` for the last recorded daemon cycle and strategy state (`BASE_MODE` vs `SCOUT_MODE`).
+   - Query `/api/v1/state` and `/api/v1/daemon/status`.
 
-### Pending Actions
-1. `<next action>`
+2. **Active Worktree Audit**:
+   - Run `git worktree list` to detect open feature branches under `tmp/worktrees/`.
+   - If an active worktree exists, read its latest commit message and `git status`.
 
-### Blockers
-- `<none | description>`
+3. **Pending Webhook & Kanban Queue**:
+   - Query `kanban.db` tasks in `/docker/hermes-agent/data/kanban.db`.
+   - Resolve any blocked HITL cards via `POST /api/v1/hermes/hitl_resolve`.
 
-## Recovery Instructions
-If this session was interrupted, resume with:
-```bash
-om-auto-continue-pr <branch-name>
+---
+
+## 📑 Handoff Receipt Template
+
+```markdown
+### 📋 Session Handoff Receipt
+- **Timestamp**: {{ TIMESTAMP_ISO }}
+- **Active State**: {{ BASE_MODE | SCOUT_MODE }}
+- **Current Leverage**: {{ LEVERAGE_MULTIPLIER }}
+- **Trading Symbol**: {{ MMS4_SYMBOL }}
+- **Pending Tasks**: {{ PENDING_KANBAN_TASKS }}
+- **Last Clean Commit**: {{ GIT_COMMIT_SHA }}
 ```

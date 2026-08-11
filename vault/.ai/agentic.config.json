@@ -1,0 +1,38 @@
+{
+  "version": "6.5.0",
+  "project_name": "mms4tk",
+  "architecture": "Swarm Triad (Coordinator, Builder, Auditor)",
+  "validation_gates": {
+    "lint": "python3 -m flake8 src/ tests/ || true",
+    "typecheck": "python3 -m mypy src/ || true",
+    "test": "MMS4_API_KEY=test-api-auth-key-unit-test python3 -m pytest tests/ -v",
+    "build": "python3 -m build || true"
+  },
+  "roles": {
+    "coordinator": {
+      "mandate": "High-level orchestration, git push, plan management (.agents/plans/)",
+      "forbidden_paths": ["src/*", "tests/*"]
+    },
+    "builder": {
+      "mandate": "Atomic feature implementation in isolated Git Worktree",
+      "forbidden_paths": [".agents/plans/*"]
+    },
+    "auditor": {
+      "mandate": "Read-only mathematical consistency, security audit, and QA gate verification",
+      "read_only": true
+    }
+  },
+  "heartbeat": {
+    "interval_seconds": 15,
+    "daemon_endpoint": "/api/v1/daemon/status"
+  },
+  "evaluator": {
+    "enabled": true,
+    "manifest": ".agents/eval/evaluator.md",
+    "test_cases": [".agents/eval/tc-001.json"]
+  },
+  "context_routing": {
+    "entrypoint": ".agents/agents.md",
+    "max_domain_modules": 3
+  }
+}

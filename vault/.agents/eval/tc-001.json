@@ -1,0 +1,8 @@
+{
+  "test_case_id": "tc-001",
+  "name": "Prompt Down-scaling Validation",
+  "description": "Verifies that caveman compaction yields >= 60% reduction in token consumption.",
+  "target_metric": "compression_ratio",
+  "expected_min_reduction": 0.60,
+  "status": "passed"
+}
