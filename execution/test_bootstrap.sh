@@ -154,7 +154,31 @@ if [ ! -f "$TEST_DIR/.agents/skills/postgresql-optimization/SKILL.md" ]; then
 fi
 echo "   ✅ Skill 'postgresql-optimization' pobrany pomyślnie."
 
-# 6. Sprzątanie po teście
+# 6. Weryfikacja widoczności skilli dla Claude Code (.claude/skills/om-*)
+echo "🔍 [TEST] Weryfikacja symlinków skilli Claude Code (.claude/skills/)..."
+if [ ! -d "$TEST_DIR/.claude/skills" ]; then
+    echo "❌ [TEST] BŁĄD: Katalog $TEST_DIR/.claude/skills nie istnieje!"
+    exit 1
+fi
+om_skills_count=$(find "$TEST_DIR/.claude/skills" -type l -name "om-*" 2>/dev/null | wc -l)
+if [ "$om_skills_count" -eq 0 ]; then
+    echo "❌ [TEST] BŁĄD: Brak dowiązań symbolicznych do skilli om-* w .claude/skills/!"
+    exit 1
+fi
+echo "   ✅ Dowiązania symboliczne Claude Code (.claude/skills/om-*) są poprawne (liczba: $om_skills_count)."
+
+# 7. Weryfikacja narzędzia migracyjnego os-upgrade-project
+echo "🔍 [TEST] Weryfikacja os-upgrade-project na projekcie..."
+UPGRADE_BIN="$REPO_ROOT/os-upgrade-project"
+if [ -f "$UPGRADE_BIN" ]; then
+    bash "$UPGRADE_BIN" "$TEST_DIR"
+    echo "   ✅ os-upgrade-project wykonał się pomyślnie."
+else
+    echo "❌ [TEST] BŁĄD: Brak skryptu os-upgrade-project!"
+    exit 1
+fi
+
+# 8. Sprzątanie po teście
 echo "🧹 [TEST] Rozpoczynam sprzątanie po zakończonym teście..."
 
 # Powrót do katalogu głównego

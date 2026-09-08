@@ -15,7 +15,9 @@ Dokumentującą:
 - **Globalne i Lokalne Ustawienia Git**: W instalatorze `INSTALL.sh`, `os-init`, `os-init-claude` i skryptach bootstrappera zautomatyzowano konfigurację `pull.rebase true` oraz `merge.conflictstyle diff3`.
 - **Złoty Standard Pamięci (MEMORY.md v0.42.1)**: Dodano szablon pamięci maszynowej z rejestrem węzłów Swarm i logami sesji.
 - **Żelazna Zasada Koordynatora (R-SYNC-01)**: Wprowadzono bezwzględny obowiązek wykonania zrzutu stanu (state-dump) przed finalnym raportem do użytkownika.
-- **E2E Test Suite**: Zaktualizowano `execution/test_bootstrap.sh` z pełną asercją reguł `.gitattributes`, hooków i parametrów gita.
+- **Claude Code Skill Visibility (.claude/skills/)**: Zaimplementowano automatyczne dowiązania symboliczne (`ln -sf`) z `.agents/skills/om-*` do `.claude/skills/` w szablonie Vault, instalatorze i bootstrapperach.
+- **Project Modernizer (`os-upgrade-project`)**: Dodano dedykowane narzędzie CLI do bezpiecznej aktualizacji starszych projektów do standardu v6.5 Swarm.
+- **E2E Test Suite**: Zaktualizowano `execution/test_bootstrap.sh` z pełną asercją reguł `.gitattributes`, hooków, parametrów gita, dowiązań Claude Code oraz weryfikacją `os-upgrade-project`.
 
 ## [6.5.0] - 2026-08-07
 

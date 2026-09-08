@@ -121,6 +121,15 @@ echo "✨ Deploy: The Template Vault (Złoty Standard)..."
 mkdir -p "$VAULT_DIR"
 cp -ra "$SCRIPT_DIR/vault/." "$VAULT_DIR/"
 
+echo "🔗 Konfiguracja dowiązań symbolicznych skilli Claude Code (.claude/skills/om-*)..."
+mkdir -p "$VAULT_DIR/.claude/skills"
+for skill_dir in "$VAULT_DIR"/.agents/skills/om-*; do
+    if [ -d "$skill_dir" ]; then
+        skill_name=$(basename "$skill_dir")
+        (cd "$VAULT_DIR/.claude/skills" && ln -sf "../../.agents/skills/$skill_name" "$skill_name")
+    fi
+done
+
 # 4. Globalne Umiejętności (Skille)
 echo "🧠 Wdrażanie systemów automatyzacji (Swarm Bootstrapper)..."
 mkdir -p "$AGY_DIR/skills/swarm-bootstrapper"
@@ -208,6 +217,18 @@ if [ -f "$SCRIPT_DIR/os-run-builder" ]; then
         cp "$SCRIPT_DIR/os-run-builder" "$HOME/.local/bin/os-run-builder"
         chmod +x "$HOME/.local/bin/os-run-builder"
         echo "✓ os-run-builder zainstalowany w $HOME/.local/bin/os-run-builder"
+    fi
+fi
+
+if [ -f "$SCRIPT_DIR/os-upgrade-project" ]; then
+    if sudo -n cp "$SCRIPT_DIR/os-upgrade-project" /usr/local/bin/os-upgrade-project 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-upgrade-project
+        echo "✓ os-upgrade-project zainstalowany w /usr/local/bin/os-upgrade-project"
+    else
+        mkdir -p "$HOME/.local/bin"
+        cp "$SCRIPT_DIR/os-upgrade-project" "$HOME/.local/bin/os-upgrade-project"
+        chmod +x "$HOME/.local/bin/os-upgrade-project"
+        echo "✓ os-upgrade-project zainstalowany w $HOME/.local/bin/os-upgrade-project"
     fi
 fi
 

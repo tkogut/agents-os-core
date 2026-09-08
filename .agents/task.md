@@ -36,7 +36,7 @@ Worktree: `tmp/worktrees/feature/distributed-sync-core`
   - **Status**: COMPLETE
 
 - [x] **P7: E2E Test Suite & Distributed Sync Assertions**
-  - **Description**: Rozszerzenie skryptu `execution/test_bootstrap.sh` o weryfikację `.gitattributes`, `hooks.json`, ustawień `pull.rebase` i `merge.conflictstyle` oraz plików pamięci; uruchomienie testów lokalnych.
+  - **Description**: Rozszerzenie skryptu `execution/test_bootstrap.sh` o weryfikację `.gitattributes`, `hooks.json`, ustawień `pull.rebase` i `merge.conflictstyle`, dowiązań symbolicznych Claude Code oraz uruchomienie `os-upgrade-project`.
   - **Target**: `execution/test_bootstrap.sh`
   - **Status**: COMPLETE
 
@@ -49,3 +49,8 @@ Worktree: `tmp/worktrees/feature/distributed-sync-core`
   - **Description**: Przegląd diffa, przygotowanie `CHANGELOG.md`, weryfikacja czystości drzewa git i zgłoszenie gotowości do wdrożenia poprzez PR.
   - **Target**: `CHANGELOG.md`, git commit
   - **Status**: READY_FOR_PR
+
+- [x] **P10: Claude Code Skill Visibility & Project Modernizer (os-upgrade-project)**
+  - **Description**: Implementacja automatycznego mapowania dowiązań symbolicznych (`ln -sf`) z `.agents/skills/om-*` do `.claude/skills/` oraz stworzenie skryptu aktualizacyjnego `os-upgrade-project`.
+  - **Target**: `INSTALL.sh`, `os-init`, `os-init-claude`, `bootstrap.py`, `bootstrap-claude.py`, `os-upgrade-project`
+  - **Status**: COMPLETE

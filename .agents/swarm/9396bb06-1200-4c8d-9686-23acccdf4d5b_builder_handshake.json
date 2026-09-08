@@ -12,6 +12,7 @@
     "INSTALL.sh",
     "os-init",
     "os-init-claude",
+    "os-upgrade-project",
     "global_skills/swarm-bootstrapper/scripts/bootstrap.py",
     "global_skills/swarm-bootstrapper/scripts/bootstrap-claude.py",
     "vault/.agents/MEMORY.md",
@@ -30,6 +31,6 @@
     ".agents/task.md"
   ],
   "math_consistency_check": "PASSED",
-  "timestamp": "2026-09-08T20:46:23Z",
-  "notes": "Upgraded distributed multi-agent sync core with union merge, lifecycle hooks, and git rebase automation"
+  "timestamp": "2026-09-08T20:54:18Z",
+  "notes": "Upgraded distributed multi-agent sync core with union merge, lifecycle hooks, git rebase automation, Claude Code skills symlinks, and os-upgrade-project modernizer"
 }
