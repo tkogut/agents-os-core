@@ -72,20 +72,21 @@ else:
     for d in [".agents/plans", ".agents/skills", "execution", "tmp"]:
         os.makedirs(os.path.join(TARGET_DIR, d), exist_ok=True)
 
-# Mapowanie widoczności skilli dla Claude Code (.claude/skills/om-*)
+# Mapowanie widoczności skilli dla Claude Code (.claude/skills/*)
 claude_skills_dir = os.path.join(TARGET_DIR, ".claude", "skills")
 os.makedirs(claude_skills_dir, exist_ok=True)
 agents_skills_dir = os.path.join(TARGET_DIR, ".agents", "skills")
 if os.path.isdir(agents_skills_dir):
     for item in os.listdir(agents_skills_dir):
-        if item.startswith("om-") and os.path.isdir(os.path.join(agents_skills_dir, item)):
-            target_link = os.path.join(claude_skills_dir, item)
-            src_rel = os.path.join("..", "..", ".agents", "skills", item)
-            if not os.path.exists(target_link) and not os.path.islink(target_link):
-                try:
-                    os.symlink(src_rel, target_link)
-                except Exception:
-                    pass
+        if item.startswith("."):
+            continue
+        target_link = os.path.join(claude_skills_dir, item)
+        src_rel = os.path.join("..", "..", ".agents", "skills", item)
+        if not os.path.exists(target_link) and not os.path.islink(target_link):
+            try:
+                os.symlink(src_rel, target_link)
+            except Exception:
+                pass
 
 # --------------------------------------------------------------------------- #
 # 3. Tworzenie .gitattributes oraz .gitignore jeśli brak

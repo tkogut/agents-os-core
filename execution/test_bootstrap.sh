@@ -154,7 +154,7 @@ if [ ! -f "$TEST_DIR/.agents/skills/postgresql-optimization/SKILL.md" ]; then
 fi
 echo "   ✅ Skill 'postgresql-optimization' pobrany pomyślnie."
 
-# 6. Weryfikacja widoczności skilli dla Claude Code (.claude/skills/om-*)
+# 6. Weryfikacja widoczności skilli dla Claude Code (.claude/skills/*)
 echo "🔍 [TEST] Weryfikacja symlinków skilli Claude Code (.claude/skills/)..."
 if [ ! -d "$TEST_DIR/.claude/skills" ]; then
     echo "❌ [TEST] BŁĄD: Katalog $TEST_DIR/.claude/skills nie istnieje!"
@@ -165,7 +165,15 @@ if [ "$om_skills_count" -eq 0 ]; then
     echo "❌ [TEST] BŁĄD: Brak dowiązań symbolicznych do skilli om-* w .claude/skills/!"
     exit 1
 fi
-echo "   ✅ Dowiązania symboliczne Claude Code (.claude/skills/om-*) są poprawne (liczba: $om_skills_count)."
+if [ ! -e "$TEST_DIR/.claude/skills/grill-me" ] && [ ! -e "$TEST_DIR/.claude/skills/grill-me.js" ]; then
+    echo "❌ [TEST] BŁĄD: Brak dowiązania symbolicznego do 'grill-me' w .claude/skills/!"
+    exit 1
+fi
+if [ ! -f "$TEST_DIR/.agents/skills/grill-me.js" ]; then
+    echo "❌ [TEST] BŁĄD: Brak pliku wykonywalnego .agents/skills/grill-me.js!"
+    exit 1
+fi
+echo "   ✅ Dowiązania symboliczne Claude Code (.claude/skills/* tym grill-me) są poprawne (om-* count: $om_skills_count)."
 
 # 7. Weryfikacja narzędzia migracyjnego os-upgrade-project
 echo "🔍 [TEST] Weryfikacja os-upgrade-project na projekcie..."

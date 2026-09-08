@@ -57,12 +57,12 @@ if [ -d "$PROJECT_DIR/.git" ]; then
     git -C "$PROJECT_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
 fi
 
-# Mapowanie widoczności skilli dla Claude Code (.claude/skills/om-*)
+# Mapowanie widoczności skilli dla Claude Code (.claude/skills/)
 mkdir -p "$PROJECT_DIR/.claude/skills"
 if [ -d "$PROJECT_DIR/.agents/skills" ]; then
-    for skill_dir in "$PROJECT_DIR"/.agents/skills/om-*; do
-        if [ -d "$skill_dir" ]; then
-            skill_name=$(basename "$skill_dir")
+    for skill_item in "$PROJECT_DIR"/.agents/skills/*; do
+        if [ -e "$skill_item" ]; then
+            skill_name=$(basename "$skill_item")
             (cd "$PROJECT_DIR/.claude/skills" && ln -sf "../../.agents/skills/$skill_name" "$skill_name")
         fi
     done
