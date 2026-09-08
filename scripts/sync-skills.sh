@@ -21,6 +21,7 @@ SHARED_SKILLS=(
     "skill-rebuild"
     "pr-creator"
     "code-reviewer"
+    "grill-me"
 )
 
 echo "🔄 Rozpoczynam synchronizację skilli Agents-OS..."

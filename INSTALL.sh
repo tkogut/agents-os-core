@@ -121,11 +121,11 @@ echo "✨ Deploy: The Template Vault (Złoty Standard)..."
 mkdir -p "$VAULT_DIR"
 cp -ra "$SCRIPT_DIR/vault/." "$VAULT_DIR/"
 
-echo "🔗 Konfiguracja dowiązań symbolicznych skilli Claude Code (.claude/skills/om-*)..."
+echo "🔗 Konfiguracja dowiązań symbolicznych skilli Claude Code (.claude/skills/)..."
 mkdir -p "$VAULT_DIR/.claude/skills"
-for skill_dir in "$VAULT_DIR"/.agents/skills/om-*; do
-    if [ -d "$skill_dir" ]; then
-        skill_name=$(basename "$skill_dir")
+for skill_item in "$VAULT_DIR"/.agents/skills/*; do
+    if [ -e "$skill_item" ]; then
+        skill_name=$(basename "$skill_item")
         (cd "$VAULT_DIR/.claude/skills" && ln -sf "../../.agents/skills/$skill_name" "$skill_name")
     fi
 done

@@ -7,6 +7,14 @@ Dokumentującą:
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 - Integrację 36 skilli Open-Mercato SDLC oraz architektury Cezar Runtime.
 
+## [6.5.2] - 2026-09-08
+
+### 🛸 Native Executable Grill-Me Skill & Universal Symlink Automation
+- **Physical Executable Skill (`vault/.agents/skills/grill-me.js`)**: Wdrożono skrypt CLI (Node.js + Python fallback `grill_me.py`) z 5 krytycznymi pytaniami pre-flight (topologia, auto-sync, bazy fail-closed, edge cases, state-dump).
+- **Claude Code & Antigravity Dual Integration**: Zdefiniowano `SKILL.md` w `vault/.agents/skills/grill-me/` i `global_skills/grill-me/` oraz manifest komendy slash `.claude/commands/grill-me.md`.
+- **Universal Skill Symlink Automation**: Rozszerzono automatyczne mapowanie symlinków w `INSTALL.sh`, `os-init`, `os-init-claude`, `bootstrap.py`, `bootstrap-claude.py` i `os-upgrade-project` na wszystkie skille w `.agents/skills/*` (w tym `grill-me` i `grill-me.js`).
+- **E2E Test Verification**: Rozbudowano zestaw testów w `execution/test_bootstrap.sh` o weryfikację obecności i poprawności dowiązań skilla `/grill-me`.
+
 ## [6.5.1] - 2026-09-08
 
 ### ⚡ Distributed Multi-Agent Asynchronous Auto-Sync Core

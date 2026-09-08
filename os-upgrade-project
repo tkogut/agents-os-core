@@ -145,25 +145,24 @@ if [ -d "$VAULT_DIR/.claude/commands" ]; then
     cp -rn "$VAULT_DIR/.claude/commands/." "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
 fi
 
-# Twórz bezpieczne symlinki relatywne do .agents/skills/om-*
+# Twórz bezpieczne symlinki relatywne do .agents/skills/
 SKILLS_COUNT=0
 if [ -d "$TARGET_DIR/.agents/skills" ]; then
-    for skill_path in "$TARGET_DIR"/.agents/skills/om-*; do
-        if [ -d "$skill_path" ]; then
+    for skill_path in "$TARGET_DIR"/.agents/skills/*; do
+        if [ -e "$skill_path" ]; then
             skill_name=$(basename "$skill_path")
             target_link="$TARGET_DIR/.claude/skills/$skill_name"
-            # Bezpieczny symlink relatywny
             ln -sf "../../.agents/skills/$skill_name" "$target_link"
             SKILLS_COUNT=$((SKILLS_COUNT + 1))
         fi
     done
 fi
 
-# Jeśli w projekcie brakowało skilli om-*, zsynchronizuj z Vault
+# Jeśli w projekcie brakowało skilli, zsynchronizuj z Vault
 if [ $SKILLS_COUNT -eq 0 ] && [ -d "$VAULT_DIR/.agents/skills" ]; then
-    echo -e "   🔄 Dociąganie skilli om-* z szablonu Vault..."
-    for skill_path in "$VAULT_DIR"/.agents/skills/om-*; do
-        if [ -d "$skill_path" ]; then
+    echo -e "   🔄 Dociąganie skilli z szablonu Vault..."
+    for skill_path in "$VAULT_DIR"/.agents/skills/*; do
+        if [ -e "$skill_path" ]; then
             skill_name=$(basename "$skill_path")
             cp -ra "$skill_path" "$TARGET_DIR/.agents/skills/"
             ln -sf "../../.agents/skills/$skill_name" "$TARGET_DIR/.claude/skills/$skill_name"
@@ -172,7 +171,7 @@ if [ $SKILLS_COUNT -eq 0 ] && [ -d "$VAULT_DIR/.agents/skills" ]; then
     done
 fi
 
-echo -e "${GREEN}   ✓ Zmapowano ${SKILLS_COUNT} skilli Open-Mercato do .claude/skills/ (symlink ln -sf).${NC}"
+echo -e "${GREEN}   ✓ Zmapowano ${SKILLS_COUNT} skilli do .claude/skills/ (symlink ln -sf, w tym /grill-me).${NC}"
 
 # --------------------------------------------------------------------------- #
 # 6. Silnik Pamięci (MEMORY.md v0.42.1) oraz task.md
