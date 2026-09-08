@@ -42,3 +42,7 @@ Główny wątek agenta (Coordinator) ma **kategoryczny zakaz** bezpośredniego w
 ## Rule 7: LLM Cost & Swarm Optimization (v6.2+)
 - **Caveman Prompts**: Wszystkie prompty i instrukcje do subagentów muszą być pisane w skróconym formacie Caveman (bez uprzejmości, czysty techniczny styl), co eliminuje narzut tokenów.
 - **Direct Git Actions**: Coordinator wykonuje operacje Git (stage, commit, push, deploy) bezpośrednio z głównego terminala za pomocą `smart_commit.sh`, bez powoływania dedykowanego, kosztownego subagenta.
+
+## Rule 8: Distributed State-Dump & Cloud Consistency (R-SYNC-01)
+- **Iron Rule**: Przed ostatecznym raportem dla użytkownika, rola Coordinator MUSI upewnić się, że stan prac w `.agents/MEMORY.md` oraz `.agents/task.md` został zrzucony (state-dump via git push), co zapewnia spójność chmury przy przełączaniu maszyn roboczych (laptop, desktop, VPS).
+- Automatyczne hooki cyklu życia (`SessionStart` i `SessionEnd` / `PreInvocation` i `Stop`) synchronizują pamięć przed rozpoczęciem i po zakończeniu sesji.

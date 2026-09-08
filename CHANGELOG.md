@@ -7,6 +7,16 @@ Dokumentującą:
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 - Integrację 36 skilli Open-Mercato SDLC oraz architektury Cezar Runtime.
 
+## [6.5.1] - 2026-09-08
+
+### ⚡ Distributed Multi-Agent Asynchronous Auto-Sync Core
+- **Conflict-Free Merge (.gitattributes)**: Wdrożono regułę `merge=union` dla plików pamięci (`.agents/MEMORY.md`) i zadań (`.agents/task.md`) w szablonie Vault i repozytorium bazowym.
+- **Natywne Hooki Synchronizacji Cyklu Życia**: Zdefiniowano zdarzenia `SessionStart` / `PreInvocation` (automatyczny `git pull origin main --rebase`) oraz `SessionEnd` / `Stop` (automatyczny zrzut pamięci `git add` + `git commit` + `git push origin HEAD`).
+- **Globalne i Lokalne Ustawienia Git**: W instalatorze `INSTALL.sh`, `os-init`, `os-init-claude` i skryptach bootstrappera zautomatyzowano konfigurację `pull.rebase true` oraz `merge.conflictstyle diff3`.
+- **Złoty Standard Pamięci (MEMORY.md v0.42.1)**: Dodano szablon pamięci maszynowej z rejestrem węzłów Swarm i logami sesji.
+- **Żelazna Zasada Koordynatora (R-SYNC-01)**: Wprowadzono bezwzględny obowiązek wykonania zrzutu stanu (state-dump) przed finalnym raportem do użytkownika.
+- **E2E Test Suite**: Zaktualizowano `execution/test_bootstrap.sh` z pełną asercją reguł `.gitattributes`, hooków i parametrów gita.
+
 ## [6.5.0] - 2026-08-07
 
 ### 🏗️ Enterprise Architecture: Open-Mercato Integration & Cezar Runtime

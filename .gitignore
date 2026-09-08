@@ -54,10 +54,13 @@ coverage/
 test-results/
 
 # Session artifacts (ephemeral)
-task.md
+/task.md
 design-tokens.md
 implementation_plan.md
 walkthrough.md
+!.agents/task.md
+!vault/.agents/task.md
+!vault/task.md
 
 # Dynamically installed skills
 .agents/skills/

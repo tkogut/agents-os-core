@@ -7,14 +7,14 @@
 
 set -e
 
-SKILL_SCRIPT="$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py"
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+LOCAL_SCRIPT="$SCRIPT_DIR/global_skills/swarm-bootstrapper/scripts/bootstrap.py"
 
-# Fallback: użyj lokalnej kopii jeśli nie zainstalowano globalnie
-if [ ! -f "$SKILL_SCRIPT" ]; then
-    SKILL_SCRIPT="$(dirname "$(realpath "$0")")/global_skills/swarm-bootstrapper/scripts/bootstrap.py"
-fi
-
-if [ ! -f "$SKILL_SCRIPT" ]; then
+if [ -f "$LOCAL_SCRIPT" ]; then
+    SKILL_SCRIPT="$LOCAL_SCRIPT"
+elif [ -f "$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py" ]; then
+    SKILL_SCRIPT="$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap.py"
+else
     echo "❌ ERR: bootstrap.py nie znaleziony. Uruchom najpierw INSTALL.sh."
     exit 1
 fi
@@ -44,6 +44,12 @@ fi
 
 echo ""
 echo "📁 Projekt gotowy w: $PROJECT_DIR"
+
+# Upewnij się, że ustawienia synchronizacji Git są aktywne lokalnie
+if [ -d "$PROJECT_DIR/.git" ]; then
+    git -C "$PROJECT_DIR" config --local pull.rebase true 2>/dev/null || true
+    git -C "$PROJECT_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
+fi
 
 # --------------------------------------------------------------------------- #
 # 3. Otwórz Antigravity IDE w środowisku WSL:Ubuntu
