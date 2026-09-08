@@ -1,0 +1,258 @@
+#!/bin/bash
+# ==============================================================================
+# os-upgrade-project [ścieżka-do-projektu]
+# AGENTS-OS v6.5 Swarm Edition — Project Modernizer & Auto-Sync Migration Tool
+#
+# Aktualizuje istniejące projekty do standardu v6.5 Swarm:
+#   1. Konfiguruje bezkonfliktowy merge (.gitattributes: merge=union)
+#   2. Wdraża natywne hooki cyklu życia (.antigravity/ / .gemini/ / .agents/)
+#   3. Ustawia lokalne parametry gita (pull.rebase true, merge.conflictstyle diff3)
+#   4. Tworzy dowiązania symboliczne dla Claude Code (.claude/skills/om-*)
+#   5. Inicjalizuje silnik pamięci MEMORY.md v0.42.1 i rejestr task.md jeśli brak
+#   6. Synchronizuje najnowsze skille z szablonu Vault
+# ==============================================================================
+
+set -e
+
+# Kolory wyjścia terminala
+GREEN="\033[0;32m"
+BLUE="\033[0;34m"
+YELLOW="\033[1;33m"
+RED="\033[0;31m"
+NC="\033[0m"
+
+# 1. Określenie katalogu docelowego
+TARGET_DIR="${1:-$(pwd)}"
+TARGET_DIR="$(realpath "$TARGET_DIR")"
+
+echo -e "${BLUE}🛸 AGENTS-OS v6.5 — Upgrade & Distributed Sync Modernizer${NC}"
+echo -e "📁 Ścieżka projektu: ${TARGET_DIR}"
+
+if [ ! -d "$TARGET_DIR" ]; then
+    echo -e "${RED}❌ BŁĄD: Katalog docelowy nie istnieje: $TARGET_DIR${NC}"
+    exit 1
+fi
+
+# Wykrywanie szablonu Vault
+VAULT_DIR="$HOME/.antigravity/templates/v6.5-swarm"
+if [ ! -d "$VAULT_DIR" ]; then
+    # Fallback do lokalnego katalogu repozytorium agents-os-core
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -d "$SCRIPT_DIR/vault" ]; then
+        VAULT_DIR="$SCRIPT_DIR/vault"
+    elif [ -d "$HOME/projects/agents-os-core/vault" ]; then
+        VAULT_DIR="$HOME/projects/agents-os-core/vault"
+    fi
+fi
+
+# --------------------------------------------------------------------------- #
+# 2. Bezkonfliktowy Merge (.gitattributes)
+# --------------------------------------------------------------------------- #
+echo -e "\n${BLUE}⚙️ [1/6] Konfiguracja .gitattributes (merge=union)...${NC}"
+GITATTR_PATH="$TARGET_DIR/.gitattributes"
+
+mkdir -p "$TARGET_DIR/.agents"
+
+if [ ! -f "$GITATTR_PATH" ]; then
+    cat << 'EOF' > "$GITATTR_PATH"
+# AGENTS-OS v6.5 Swarm Edition - Conflict-Free Distributed Sync
+.agents/MEMORY.md merge=union
+.agents/task.md merge=union
+MEMORY.md merge=union
+task.md merge=union
+EOF
+    echo -e "${GREEN}   ✓ Utworzono .gitattributes z regułami merge=union.${NC}"
+else
+    # Uzupełnij brakujące reguły
+    UPDATED=0
+    for rule in ".agents/MEMORY.md merge=union" ".agents/task.md merge=union" "MEMORY.md merge=union" "task.md merge=union"; do
+        if ! grep -Fxq "$rule" "$GITATTR_PATH"; then
+            echo "$rule" >> "$GITATTR_PATH"
+            UPDATED=1
+        fi
+    done
+    if [ $UPDATED -eq 1 ]; then
+        echo -e "${GREEN}   ✓ Zaktualizowano .gitattributes o reguły auto-sync.${NC}"
+    else
+        echo -e "${GREEN}   ✓ .gitattributes zawiera już wymagane reguły.${NC}"
+    fi
+fi
+
+# --------------------------------------------------------------------------- #
+# 3. Parametry Git (pull.rebase true, merge.conflictstyle diff3)
+# --------------------------------------------------------------------------- #
+echo -e "\n${BLUE}⚙️ [2/6] Konfiguracja lokalnych parametrów Gita...${NC}"
+if [ -d "$TARGET_DIR/.git" ]; then
+    git -C "$TARGET_DIR" config --local pull.rebase true 2>/dev/null || true
+    git -C "$TARGET_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
+    echo -e "${GREEN}   ✓ pull.rebase=true oraz merge.conflictstyle=diff3 aktywne w .git/config.${NC}"
+else
+    echo -e "${YELLOW}   ⚠️  Folder nie jest repozytorium git (.git brak). Pomijam config lokalny.${NC}"
+fi
+
+# --------------------------------------------------------------------------- #
+# 4. Natywne Hooki Synchronizacji Cyklu Życia
+# --------------------------------------------------------------------------- #
+echo -e "\n${BLUE}⚙️ [3/6] Wdrażanie natywnych hooków cyklu życia...${NC}"
+HOOKS_CONTENT='{
+  "distributed-sync": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "git pull origin main --rebase || git pull origin master --rebase || true",
+        "timeout": 30
+      }
+    ],
+    "SessionEnd": [
+      {
+        "type": "command",
+        "command": "git add .agents/MEMORY.md .agents/task.md && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" && git push origin HEAD || echo \"Brak zmian lub wymagany ręczny rebase\"",
+        "timeout": 30
+      }
+    ],
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "git pull origin main --rebase || git pull origin master --rebase || true",
+        "timeout": 30
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "git add .agents/MEMORY.md .agents/task.md && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" && git push origin HEAD || echo \"Brak zmian lub wymagany ręczny rebase\"",
+        "timeout": 30
+      }
+    ]
+  }
+}'
+
+mkdir -p "$TARGET_DIR/.antigravity" "$TARGET_DIR/.gemini" "$TARGET_DIR/.agents"
+echo "$HOOKS_CONTENT" > "$TARGET_DIR/.antigravity/hooks.json"
+echo "$HOOKS_CONTENT" > "$TARGET_DIR/.gemini/hooks.json"
+echo "$HOOKS_CONTENT" > "$TARGET_DIR/.agents/hooks.json"
+echo -e "${GREEN}   ✓ Pliki hooks.json zaktualizowane w .antigravity/, .gemini/ i .agents/.${NC}"
+
+# --------------------------------------------------------------------------- #
+# 5. Widoczność Skilli dla Claude Code (.claude/skills/om-*)
+# --------------------------------------------------------------------------- #
+echo -e "\n${BLUE}⚙️ [4/6] Mapowanie widoczności skilli dla Claude Code (.claude/skills/)...${NC}"
+mkdir -p "$TARGET_DIR/.claude/skills"
+mkdir -p "$TARGET_DIR/.claude/commands"
+
+# Kopiuj commands z vault jeśli brak
+if [ -d "$VAULT_DIR/.claude/commands" ]; then
+    cp -rn "$VAULT_DIR/.claude/commands/." "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
+fi
+
+# Twórz bezpieczne symlinki relatywne do .agents/skills/om-*
+SKILLS_COUNT=0
+if [ -d "$TARGET_DIR/.agents/skills" ]; then
+    for skill_path in "$TARGET_DIR"/.agents/skills/om-*; do
+        if [ -d "$skill_path" ]; then
+            skill_name=$(basename "$skill_path")
+            target_link="$TARGET_DIR/.claude/skills/$skill_name"
+            # Bezpieczny symlink relatywny
+            ln -sf "../../.agents/skills/$skill_name" "$target_link"
+            SKILLS_COUNT=$((SKILLS_COUNT + 1))
+        fi
+    done
+fi
+
+# Jeśli w projekcie brakowało skilli om-*, zsynchronizuj z Vault
+if [ $SKILLS_COUNT -eq 0 ] && [ -d "$VAULT_DIR/.agents/skills" ]; then
+    echo -e "   🔄 Dociąganie skilli om-* z szablonu Vault..."
+    for skill_path in "$VAULT_DIR"/.agents/skills/om-*; do
+        if [ -d "$skill_path" ]; then
+            skill_name=$(basename "$skill_path")
+            cp -ra "$skill_path" "$TARGET_DIR/.agents/skills/"
+            ln -sf "../../.agents/skills/$skill_name" "$TARGET_DIR/.claude/skills/$skill_name"
+            SKILLS_COUNT=$((SKILLS_COUNT + 1))
+        fi
+    done
+fi
+
+echo -e "${GREEN}   ✓ Zmapowano ${SKILLS_COUNT} skilli Open-Mercato do .claude/skills/ (symlink ln -sf).${NC}"
+
+# --------------------------------------------------------------------------- #
+# 6. Silnik Pamięci (MEMORY.md v0.42.1) oraz task.md
+# --------------------------------------------------------------------------- #
+echo -e "\n${BLUE}⚙️ [5/6] Sprawdzanie silnika pamięci MEMORY.md oraz task.md...${NC}"
+
+if [ ! -f "$TARGET_DIR/.agents/MEMORY.md" ]; then
+    cat << 'EOF' > "$TARGET_DIR/.agents/MEMORY.md"
+# 🧠 AGENTS-OS v6.5 SWARM MEMORY ENGINE (v0.42.1)
+
+---
+version: 0.42.1
+schema: agents-os-memory-v1
+sync_mode: distributed-union
+last_sync: init
+---
+
+## 🧭 Swarm Node & Machine Registry
+- **Active Node**: Local Workspace
+- **Sync Protocol**: Native Git Union Merge (`.gitattributes`)
+- **Lifecycle Triggers**: `SessionStart` (rebase pull) / `SessionEnd` (auto state-dump push)
+
+## 📌 Epics & Persistent Context
+- **Active Epic**: Project Architecture & Swarm Modernization
+- **System Constraints**:
+  - Triad Separation of Concerns (Coordinator: plan & route / Builder: implement & test / Auditor: lint & verify)
+  - Worktree Isolation Mandate (`tmp/worktrees/`)
+  - No direct pushes to main/master by execution roles
+
+## 📝 Decisions & Key Milestones
+- [INIT] Project upgraded to AGENTS-OS v6.5 Swarm Edition.
+- [SYNC] Conflict-free distributed auto-sync enabled for `MEMORY.md` and `task.md`.
+
+## 🔄 Machine Session Log
+<!-- Format: - [YYYY-MM-DD HH:MM UTC] [Node] [Role] Description -->
+- [INIT] [Local] [Coordinator] Swarm memory initialized with union-merge capability.
+EOF
+    echo -e "${GREEN}   ✓ Zainicjalizowano .agents/MEMORY.md (v0.42.1).${NC}"
+else
+    echo -e "${GREEN}   ✓ .agents/MEMORY.md już istnieje.${NC}"
+fi
+
+if [ ! -f "$TARGET_DIR/.agents/task.md" ]; then
+    cat << 'EOF' > "$TARGET_DIR/.agents/task.md"
+# 📋 AGENTS-OS v6.5 Swarm Task Backlog
+
+---
+version: 6.5-swarm
+sync_mode: distributed-union
+---
+
+## 🚀 Active Epics & Tickets
+- [ ] **T-001**: Project domain alignment and multi-agent coordination
+  - **Role**: Coordinator
+  - **Status**: READY
+
+## 📦 Backlog
+<!-- Add new tasks below. Conflict-free union merge enabled. -->
+
+## ✅ Completed Tasks
+<!-- Completed tasks move here with timestamp -->
+EOF
+    echo -e "${GREEN}   ✓ Zainicjalizowano .agents/task.md.${NC}"
+else
+    echo -e "${GREEN}   ✓ .agents/task.md już istnieje.${NC}"
+fi
+
+# --------------------------------------------------------------------------- #
+# 7. Aktualizacja CLAUDE.md i agents.yaml jeśli istnieją
+# --------------------------------------------------------------------------- #
+echo -e "\n${BLUE}⚙️ [6/6] Aktualizacja manifestów ról...${NC}"
+if [ -f "$TARGET_DIR/CLAUDE.md" ] && ! grep -q "state-dump" "$TARGET_DIR/CLAUDE.md"; then
+    sed -i '/| Coordinator |/s/$/ |/' "$TARGET_DIR/CLAUDE.md" 2>/dev/null || true
+fi
+
+echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}✅ PROJEKT ZAAKTUALIZOWANY DO AGENTS-OS v6.5 SWARM:${NC} $TARGET_DIR"
+echo -e "   • Bezkonfliktowy merge: .gitattributes (merge=union)"
+echo -e "   • Natywne hooki: SessionStart / SessionEnd auto-sync"
+echo -e "   • Parametry Git: pull.rebase=true, merge.conflictstyle=diff3"
+echo -e "   • Claude Code skille: .claude/skills/om-* (${SKILLS_COUNT} symlinków)"
+echo -e "   • Pamięć maszynowa: .agents/MEMORY.md (v0.42.1)"
+echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"

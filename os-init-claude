@@ -11,14 +11,14 @@
 
 set -e
 
-SKILL_SCRIPT="$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap-claude.py"
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+LOCAL_SCRIPT="$SCRIPT_DIR/global_skills/swarm-bootstrapper/scripts/bootstrap-claude.py"
 
-# Fallback: użyj lokalnej kopii jeśli nie zainstalowano globalnie
-if [ ! -f "$SKILL_SCRIPT" ]; then
-    SKILL_SCRIPT="$(dirname "$(realpath "$0")")/global_skills/swarm-bootstrapper/scripts/bootstrap-claude.py"
-fi
-
-if [ ! -f "$SKILL_SCRIPT" ]; then
+if [ -f "$LOCAL_SCRIPT" ]; then
+    SKILL_SCRIPT="$LOCAL_SCRIPT"
+elif [ -f "$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap-claude.py" ]; then
+    SKILL_SCRIPT="$HOME/.antigravity/skills/swarm-bootstrapper/scripts/bootstrap-claude.py"
+else
     echo "❌ ERR: bootstrap-claude.py nie znaleziony. Uruchom najpierw INSTALL.sh."
     exit 1
 fi
@@ -50,6 +50,23 @@ fi
 
 echo ""
 echo "📁 Projekt gotowy w: $PROJECT_DIR"
+
+# Upewnij się, że ustawienia synchronizacji Git są aktywne lokalnie
+if [ -d "$PROJECT_DIR/.git" ]; then
+    git -C "$PROJECT_DIR" config --local pull.rebase true 2>/dev/null || true
+    git -C "$PROJECT_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
+fi
+
+# Mapowanie widoczności skilli dla Claude Code (.claude/skills/om-*)
+mkdir -p "$PROJECT_DIR/.claude/skills"
+if [ -d "$PROJECT_DIR/.agents/skills" ]; then
+    for skill_dir in "$PROJECT_DIR"/.agents/skills/om-*; do
+        if [ -d "$skill_dir" ]; then
+            skill_name=$(basename "$skill_dir")
+            (cd "$PROJECT_DIR/.claude/skills" && ln -sf "../../.agents/skills/$skill_name" "$skill_name")
+        fi
+    done
+fi
 
 # --------------------------------------------------------------------------- #
 # 3. Otwórz VS Code w środowisku WSL:Ubuntu
