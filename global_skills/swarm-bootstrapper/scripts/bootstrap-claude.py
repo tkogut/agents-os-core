@@ -19,12 +19,11 @@ import git
 import github
 from github import Github, GithubException
 
-VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v6.5-swarm")
-if not os.path.exists(VAULT_DIR):
-    # Domyślnie fallback do lokalnego folderu jeśli brak globalnej instalacji
-    local_vault = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "vault")
-    if os.path.exists(local_vault):
-        VAULT_DIR = local_vault
+local_vault = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "vault")
+if os.path.exists(local_vault):
+    VAULT_DIR = local_vault
+else:
+    VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v6.5-swarm")
 
 # --------------------------------------------------------------------------- #
 # Argument handling
@@ -166,8 +165,14 @@ if os.path.exists(agents_yaml_path):
         print(f"   ⚠️  Nie udało się zaktualizować agents.yaml: {e}")
 
 # --------------------------------------------------------------------------- #
-# 3. Tworzenie .gitignore jeśli brak
+# 3. Tworzenie .gitattributes oraz .gitignore jeśli brak
 # --------------------------------------------------------------------------- #
+gitattributes_path = os.path.join(TARGET_DIR, ".gitattributes")
+if not os.path.exists(gitattributes_path):
+    print("📝 Tworzenie .gitattributes (merge=union)...")
+    with open(gitattributes_path, "w", encoding="utf-8") as f:
+        f.write("# AGENTS-OS v6.5 Swarm Edition - Distributed Auto-Sync Rules\n.agents/MEMORY.md merge=union\n.agents/task.md merge=union\nMEMORY.md merge=union\ntask.md merge=union\n")
+
 gitignore_path = os.path.join(TARGET_DIR, ".gitignore")
 if not os.path.exists(gitignore_path):
     print("📝 Tworzenie .gitignore...")
@@ -225,8 +230,13 @@ try:
         repo = git.Repo.init(TARGET_DIR)
         with repo.config_writer() as writer:
             writer.set_value("init", "defaultBranch", "main")
+            writer.set_value("pull", "rebase", "true")
+            writer.set_value("merge", "conflictstyle", "diff3")
     else:
         repo = git.Repo(TARGET_DIR)
+        with repo.config_writer() as writer:
+            writer.set_value("pull", "rebase", "true")
+            writer.set_value("merge", "conflictstyle", "diff3")
 
     # Wdrożenie pre-commit hooka dla Swarm Triad z vault lub szablonu
     hooks_dir = os.path.join(TARGET_DIR, ".git", "hooks")

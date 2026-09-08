@@ -41,10 +41,10 @@ fi
 # 2. Uruchom os-init-run (backend)
 echo "🚀 [TEST] Uruchamianie os-init dla projektu '$TEST_PROJECT'..."
 export OS_INIT_TEST=true
-if command -v os-init-run &>/dev/null; then
-    os-init-run "$TEST_PROJECT"
-elif [ -f "$REPO_ROOT/os-init" ]; then
+if [ -f "$REPO_ROOT/os-init" ]; then
     bash "$REPO_ROOT/os-init" "$TEST_PROJECT"
+elif command -v os-init-run &>/dev/null; then
+    os-init-run "$TEST_PROJECT"
 else
     echo "❌ [TEST] Nie znaleziono skryptu os-init!"
     exit 1
@@ -61,10 +61,13 @@ fi
 expected_files=(
     "$TEST_DIR/agents.yaml"
     "$TEST_DIR/task.md"
+    "$TEST_DIR/.gitattributes"
     "$TEST_DIR/design-tokens.md"
     "$TEST_DIR/execution"
     "$TEST_DIR/.agents/rules/GOVERNANCE.md"
     "$TEST_DIR/.agents/specs/AGENTS-OS.md"
+    "$TEST_DIR/.agents/MEMORY.md"
+    "$TEST_DIR/.agents/task.md"
 )
 
 for file in "${expected_files[@]}"; do
@@ -75,6 +78,26 @@ for file in "${expected_files[@]}"; do
 done
 echo "   ✅ Struktura katalogów i plików szablonu jest poprawna."
 
+# Weryfikacja reguł bezkonfliktowego merge w .gitattributes
+echo "🔍 [TEST] Weryfikacja reguł auto-sync w .gitattributes..."
+if ! grep -q "\.agents/MEMORY\.md merge=union" "$TEST_DIR/.gitattributes"; then
+    echo "❌ [TEST] BŁĄD: Brak reguły merge=union dla .agents/MEMORY.md w .gitattributes!"
+    exit 1
+fi
+if ! grep -q "\.agents/task\.md merge=union" "$TEST_DIR/.gitattributes"; then
+    echo "❌ [TEST] BŁĄD: Brak reguły merge=union dla .agents/task.md w .gitattributes!"
+    exit 1
+fi
+echo "   ✅ Reguły merge=union w .gitattributes są poprawne."
+
+# Weryfikacja hooków cyklu życia
+echo "🔍 [TEST] Weryfikacja konfiguracji hooków..."
+if [ ! -f "$TEST_DIR/.antigravity/hooks.json" ] && [ ! -f "$TEST_DIR/.gemini/hooks.json" ] && [ ! -f "$TEST_DIR/.agents/hooks.json" ]; then
+    echo "❌ [TEST] BŁĄD: Brak pliku hooks.json w katalogach konfiguracyjnych!"
+    exit 1
+fi
+echo "   ✅ Plik hooks.json jest poprawnie wdrożony."
+
 # 4. Weryfikacja Gita
 echo "🔍 [TEST] Weryfikacja repozytorium Git..."
 if [ ! -d "$TEST_DIR/.git" ]; then
@@ -83,6 +106,19 @@ if [ ! -d "$TEST_DIR/.git" ]; then
 fi
 
 cd "$TEST_DIR"
+
+# Weryfikacja parametrów synchronizacji Git
+rebase_val=$(git config --local pull.rebase 2>/dev/null || echo "")
+if [ "$rebase_val" != "true" ]; then
+    echo "❌ [TEST] BŁĄD: git pull.rebase nie jest ustawione na 'true'! (wartość: '$rebase_val')"
+    exit 1
+fi
+conflict_val=$(git config --local merge.conflictstyle 2>/dev/null || echo "")
+if [ "$conflict_val" != "diff3" ]; then
+    echo "❌ [TEST] BŁĄD: git merge.conflictstyle nie jest ustawione na 'diff3'! (wartość: '$conflict_val')"
+    exit 1
+fi
+echo "   ✅ Ustawienia Git (pull.rebase=true, merge.conflictstyle=diff3) są poprawne."
 
 # Sprawdź czy jest commit
 commit_count=$(git rev-list --count HEAD 2>/dev/null || echo "0")

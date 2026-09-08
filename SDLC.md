@@ -56,3 +56,4 @@ Issue → Branch → Worktree → Implementation → Handshake → QA Gate → P
 3. Auditor can BLOCK any merge.
 4. Every PR requires visual proof for UI changes.
 5. HANDOFF.md must exist before phase transition.
+6. Coordinator MUST execute state-dump (`.agents/MEMORY.md`, `.agents/task.md`) before final user report.
