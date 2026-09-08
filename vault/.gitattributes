@@ -1,0 +1,5 @@
+# AGENTS-OS v6.5 Swarm Edition - Conflict-Free Distributed Sync
+.agents/MEMORY.md merge=union
+.agents/task.md merge=union
+MEMORY.md merge=union
+task.md merge=union

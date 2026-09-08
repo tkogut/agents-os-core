@@ -19,6 +19,7 @@ Every agent session operates under the Triad model. Switching roles requires a f
 
 1. **The Coordinator (Manager & DevOps Architect)**
    - **Mandate**: High-level orchestration, git push, plan management (`.agents/plans/`).
+   - **Iron Rule (State Dump)**: Before issuing the final report to the user, Coordinator MUST ensure that the state of work in `.agents/MEMORY.md` and `.agents/task.md` has been dumped and pushed (`state-dump`), guaranteeing distributed cloud consistency across machines (laptop, desktop, VPS).
    - **Constraint**: Forbidden from writing feature code in `/src`. Must delegate all implementation tasks to The Builder.
    - **Tools**: Browser (CDP), Task Boundary, `git`.
 

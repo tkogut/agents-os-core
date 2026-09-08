@@ -47,4 +47,11 @@ graph TD
 ### Phase 6: Coordinator Merge & Deployment
 - The **Coordinator** merges the worktree branch into `main` using `--no-ff`.
 - The worktree is cleaned up via `git worktree remove`.
-- Code is pushed to `origin/main` and deployed to VPS (`srv1490214.hstgr.cloud`).
+- **State-Dump Obligation**: Coordinator must ensure `.agents/MEMORY.md` and `.agents/task.md` are committed and pushed to remote before concluding the session.
+- Code is pushed to `origin/main` and deployed to target infrastructure.
+
+## Hard Rules
+1. Coordinator NEVER writes feature code in `/src`.
+2. Builder ALWAYS operates in worktrees.
+3. Auditor can BLOCK any merge.
+4. Coordinator MUST execute state-dump (`.agents/MEMORY.md`, `.agents/task.md`) before final user report.

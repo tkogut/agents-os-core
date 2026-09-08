@@ -1,0 +1,32 @@
+{
+  "distributed-sync": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "git pull origin main --rebase || git pull origin master --rebase || true",
+        "timeout": 30
+      }
+    ],
+    "SessionEnd": [
+      {
+        "type": "command",
+        "command": "git add .agents/MEMORY.md .agents/task.md && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" && git push origin HEAD || echo \"Brak zmian lub wymagany ręczny rebase\"",
+        "timeout": 30
+      }
+    ],
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "git pull origin main --rebase || git pull origin master --rebase || true",
+        "timeout": 30
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "git add .agents/MEMORY.md .agents/task.md && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" && git push origin HEAD || echo \"Brak zmian lub wymagany ręczny rebase\"",
+        "timeout": 30
+      }
+    ]
+  }
+}
