@@ -317,35 +317,39 @@ Konfiguracja pipeline'u walidacji, bramek jakościowych i ról:
 
 ### `hooks.json`
 
-Konfiguracja natywnych hooków cyklu życia agenta (`.antigravity/hooks.json` / `.gemini/hooks.json` / `.agents/hooks.json`):
+Konfiguracja natywnych hooków cyklu życia agenta (`.antigravity/hooks.json` / `.gemini/hooks.json` / `.agents/hooks.json`) z wbudowaną ochroną gałęzi produkcyjnych (`main`/`master`):
 
 ```json
 {
-  "hooks": {
-    "SessionStart": {
-      "commands": [
-        "git pull origin $(git rev-parse --abbrev-ref HEAD) --rebase || true"
-      ]
-    },
-    "PreInvocation": {
-      "commands": [
-        "git pull origin $(git rev-parse --abbrev-ref HEAD) --rebase || true"
-      ]
-    },
-    "SessionEnd": {
-      "commands": [
-        "git add .agents/MEMORY.md .agents/task.md || true",
-        "git commit -m 'chore(sync): automatyczny zrzut pamieci i stanu sesji [skip ci]' || true",
-        "git push origin $(git rev-parse --abbrev-ref HEAD) || true"
-      ]
-    },
-    "Stop": {
-      "commands": [
-        "git add .agents/MEMORY.md .agents/task.md || true",
-        "git commit -m 'chore(sync): automatyczny zrzut pamieci i stanu sesji [skip ci]' || true",
-        "git push origin $(git rev-parse --abbrev-ref HEAD) || true"
-      ]
-    }
+  "distributed-sync": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
+        "timeout": 30
+      }
+    ],
+    "SessionEnd": [
+      {
+        "type": "command",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"ℹ️ [Auto-Sync] Pomijam push do remote na gałęzi $CURR (ochrona main/master)\"; fi",
+        "timeout": 30
+      }
+    ],
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
+        "timeout": 30
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"ℹ️ [Auto-Sync] Pomijam push do remote na gałęzi $CURR (ochrona main/master)\"; fi",
+        "timeout": 30
+      }
+    ]
   }
 }
 ```
