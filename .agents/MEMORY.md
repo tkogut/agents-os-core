@@ -29,8 +29,10 @@ last_sync: 2026-09-08T22:43:00Z
 - [2026-09-08] Implemented physical executable `grill-me.js` & `grill_me.py` with pre-flight architectural questions.
 - [2026-09-08] Registered `.claude/commands/grill-me.md` and universal symlink loop across all bootstrappers and installers.
 - [2026-09-08] Verified full E2E test suite (`execution/test_bootstrap.sh`) for `grill-me` skill and `os-upgrade-project`.
+- [2026-09-09] Hardened lifecycle hooks in `hooks.json` and `os-upgrade-project` with branch safety guard (no direct push to main/master).
 
 ## 🔄 Machine Session Log
 - [2026-09-08 22:40 UTC] [Local] [Builder] Distributed sync core upgrade in progress on worktree feature/distributed-sync-core.
 - [2026-09-08 22:58 UTC] [Local] [Coordinator] Merged feature branch to master. E2E verification 100% PASSED. State dumped.
 - [2026-09-08 23:10 UTC] [Local] [Builder] Native grill-me skill & universal symlink automation implemented and verified on branch feature/native-grill-me-skill. Handshake generated.
+- [2026-09-09 07:50 UTC] [Local] [Builder] Hardened SessionEnd/Stop hooks against direct main/master pushes on branch fix/hook-branch-protection.

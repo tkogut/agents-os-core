@@ -7,6 +7,13 @@ Dokumentującą:
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 - Integrację 36 skilli Open-Mercato SDLC oraz architektury Cezar Runtime.
 
+## [6.5.3] - 2026-09-09
+
+### 🛡️ Hardening: Lifecycle Hooks Branch Safety & Main/Master Protection
+- **Protected Branch Guard in `hooks.json`**: Hooki `SessionEnd` i `Stop` zostały zabezpieczone warunkiem wykrywającym bieżącą gałąź (`CURR`). Automatyczny `git push origin HEAD` wykonuje się wyłącznie na gałęziach funkcyjnych/roboczych (`feature/*`, `fix/*`, `tmp/worktrees/`), kategorycznie blokując bezpośrednie commity i pushe na `main`/`master` (zgodnie z regułą SDLC).
+- **Dynamic Branch Pull**: Hooki `SessionStart` i `PreInvocation` dynamicznie pobierają zmiany z właściwej gałęzi nadrzędnej (`origin "$CURR"`).
+- **Synchronizacja Wdrożeniowa**: Zaktualizowano `vault/`, `os-upgrade-project`, `INSTALL.sh`, `docs/API.md` oraz pliki konfiguracyjne rdzenia.
+
 ## [6.5.2] - 2026-09-08
 
 ### 🛸 Native Executable Grill-Me Skill & Universal Symlink Automation
