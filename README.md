@@ -1,573 +1,306 @@
-# AGENTS-OS v6.5 Swarm Edition — Instrukcja obsługi
+# 🛸 AGENTS-OS v6.5 Swarm Edition — Instrukcja Obsługi
 
-> **Dla kogo jest ten dokument?**
-> Dla każdego — nawet jeśli nie programujesz na co dzień.
-> Wyjaśniamy krok po kroku co robić i dlaczego.
+> **Dla kogo jest ten dokument?**  
+> Dla każdego programisty i operatora — wyjaśniamy krok po kroku architekturę asynchronicznego roju agentów AI, bezkonfliktową synchronizację rozproszoną oraz zestaw narzędzi CLI.
 
 ---
 
-## Spis treści
+## 📑 Spis treści
 
 1. [Czym jest AGENTS-OS?](#1-czym-jest-agents-os)
-2. [Co potrzebujesz zanim zaczniesz](#2-wymagania)
+2. [Wymagania wstępne](#2-wymagania-wstępne)
 3. [Instalacja — jednorazowa konfiguracja](#3-instalacja)
-4. [Tworzenie nowego projektu — komenda `os-init` (Antigravity)](#4-os-init)
-5. [Tworzenie nowego projektu — komenda `os-init-claude` (Claude Code / VS Code)](#5-os-init-claude)
-6. [Struktura nowego projektu](#6-struktura-projektu)
-7. [Codzienna praca — jak otwierać projekty](#7-codzienna-praca)
-8. [Najczęstsze problemy i rozwiązania](#8-najczestsze-problemy)
-9. [Jak działa system od środka](#9-jak-dziala-od-srodka)
-10. [English version](#english)
+4. [Tworzenie projektu pod Antigravity IDE — `os-init`](#4-os-init)
+5. [Tworzenie projektu pod Claude Code (VS Code) — `os-init-claude`](#5-os-init-claude)
+6. [Modernizacja istniejącego projektu — `os-upgrade-project`](#6-os-upgrade-project)
+7. [Dynamiczne pobieranie umiejętności — `os-add-skill`](#7-os-add-skill)
+8. [Protokół rygoru architektonicznego — `/grill-me`](#8-grill-me)
+9. [Struktura projektu i bezkonfliktowy Auto-Sync](#9-struktura-projektu-i-bezkonfliktowy-auto-sync)
+10. [The Swarm Triad i codzienna praca](#10-the-swarm-triad-i-codzienna-praca)
+11. [Najczęstsze problemy i rozwiązania](#11-najczęstsze-problemy)
+12. [Dokumentacja techniczna i API](#12-dokumentacja-techniczna-i-api)
+13. [English version](#english)
 
 ---
 
 ## 1. Czym jest AGENTS-OS?
 
-**AGENTS-OS** to zestaw narzędzi i konfiguracji, który sprawia że asystent AI (Antigravity) działa jak doświadczony programista — zamiast pisać długie elaboraty, dostaje konkretne zadanie i je wykonuje.
+**AGENTS-OS** to zaawansowany framework koordynacji i konteneryzacji pracy agentów sztucznej inteligencji (Antigravity IDE, Claude Code, Cursor, Zed). Zapewnia rygor architektoniczny, pracę w modelu asynchronicznej triady (**Swarm Triad**), bezkonfliktową synchronizację rozproszoną na wielu maszynach (Laptop WSL, VPS, Desktop) oraz dynamiczną integrację z biblioteką 1400+ skilli.
 
-System składa się z trzech elementów:
+### Kluczowe Komponenty Systemu:
 
-| Element | Co to jest | Do czego służy |
+| Narzędzie / Komponent | Typ | Przeznaczenie |
 |---|---|---|
-| **INSTALL.sh** | Skrypt instalacyjny | Jednorazowe ustawienie wszystkiego na komputerze |
-| **os-init** | Komenda startowa (Antigravity IDE) | Tworzenie nowego projektu — otwiera Antigravity IDE |
-| **os-init-claude** | Komenda startowa (VS Code + Claude Code) | Tworzenie nowego projektu — otwiera VS Code z Claude Code |
-| **Vault (Złoty Standard)** | Szablon folderów | Gotowa struktura kopiowana do każdego projektu (obu trybów) |
+| **`INSTALL.sh`** | Instalator | Jednorazowa konfiguracja środowiska, szablonów, zależności Pythona i komend powłoki |
+| **`os-init`** | CLI / Shell | Tworzy nowe repozytorium z szablonu Vault i otwiera Antigravity IDE |
+| **`os-init-claude`** | CLI / Shell | Tworzy nowe repozytorium zoptymalizowane pod VS Code i Claude Code |
+| **`os-upgrade-project`** | CLI | Migruje dowolny projekt do standardu v6.5 Swarm (auto-sync, union-merge, hooki, symlinki) |
+| **`os-add-skill`** | CLI | Dynamicznie pobiera i linkuje skille z rejestrów RAG oraz bazy `sickn33/awesome-skills` |
+| **`os-run-builder`** | CLI | Automatyzuje izolację środowiska roboczego w Git Worktree (`tmp/worktrees/`) |
+| **`/grill-me`** | CLI / Skill | Pre-flight interview weryfikujący topologię maszyn, bazy fail-closed i odporność na awarie |
+| **Vault (Złoty Standard)** | Szablon | Wzorcowa struktura repozytorium kopiowana do każdego projektu |
 
 ---
 
-## 2. Wymagania
+## 2. Wymagania Wstępne
 
 Zanim zaczniesz, upewnij się że masz zainstalowane:
 
 | Narzędzie | Jak sprawdzić | Gdzie pobrać |
 |---|---|---|
 | **WSL2 + Ubuntu** (Windows) | `wsl --version` w PowerShell | [docs.microsoft.com](https://docs.microsoft.com/pl-pl/windows/wsl/install) |
-| **Antigravity IDE** | Czy masz ikonę w Menu Start | Zainstaluj przez oficjalny instalator |
+| **Antigravity IDE** | Czy masz ikonę w Menu Start | Oficjalny instalator |
 | **VS Code** *(opcjonalne — tryb Claude Code)* | `code --version` | [code.visualstudio.com](https://code.visualstudio.com/) |
-| **Claude Code extension** *(opcjonalne)* | Rozszerzenie w VS Code Marketplace | Szukaj: `claude.ai/code` |
-| **Antigravity (okno czatu)** | Czy działa aplikacja asystenta | Jak wyżej |
-| **Python 3** | `python3 --version` w terminalu WSL | Preinstalowany w Ubuntu |
+| **Claude Code extension** *(opcjonalne)* | Rozszerzenie w VS Code Marketplace | `claude.ai/code` |
+| **Python 3** | `python3 --version` w terminalu WSL | Preinstalowany w Ubuntu (`>= 3.10`) |
 | **Git** | `git --version` | `sudo apt install git` |
-| **GitHub CLI** | `gh --version` | Instaluje się automatycznie przez INSTALL.sh |
-
-> **Skąd wziąć terminal WSL?**
-> W Windows naciśnij `Win + R`, wpisz `wsl` i Enter. Otworzy się czarny terminal Ubuntu.
+| **GitHub CLI** | `gh --version` | Instaluje się automatycznie przez `INSTALL.sh` |
 
 ---
 
 ## 3. Instalacja
 
-> ⚠️ **Wykonujesz to tylko raz** — przy pierwszym ustawieniu systemu na komputerze.
-
-### Krok 1 — Otwórz terminal WSL (Ubuntu)
-
-W Windows: `Win + R` → wpisz `wsl` → Enter
-
-### Krok 2 — Pobierz repozytorium
+> ⚠️ **Wykonujesz to tylko raz** — przy pierwszym uruchomieniu środowiska.
 
 ```bash
+# 1. Otwórz terminal WSL (Ubuntu)
+
+# 2. Sklonuj repozytorium rdzenia
 mkdir -p ~/projects
 git clone https://github.com/tkogut/agents-os-core.git ~/projects/agents-os-core
 cd ~/projects/agents-os-core
-```
 
-### Krok 3 — Uruchom instalator
-
-```bash
+# 3. Uruchom instalator
 bash INSTALL.sh
-```
 
-Instalator automatycznie:
-- Instaluje GitHub CLI (`gh`) przez repozytorium APT
-- Tworzy izolowane środowisko wirtualne Python (`~/.antigravity/venv`) z zależnościami (`GitPython`, `PyGithub`)
-- Kopiuje szablony projektów do `~/.antigravity/templates/`
-- Rejestruje komendę `os-init` w systemie
-- Dodaje konfigurację do `~/.bashrc.d/antigravity`
-
-### Krok 4 — Zaloguj się do GitHub
-
-```bash
+# 4. Zaloguj się do GitHub CLI (jeśli nie jesteś zalogowany)
 gh auth login
-```
 
-Wybierz: `GitHub.com` → `HTTPS` → `Login with a web browser` → wklej kod na stronie GitHub.
-
-### Krok 5 — Załaduj konfigurację shella
-
-```bash
+# 5. Załaduj konfigurację do bieżącego terminala
 source ~/.bashrc.d/antigravity
 ```
 
-> **Co to robi?**
-> Ładuje skróty i funkcje (w tym `os-init`) do Twojego terminala.
-> **Nowe terminale** ładują to automatycznie. Przy pierwszym razie musisz to zrobić ręcznie.
+---
+
+## 4. `os-init` — Tworzenie projektu (Antigravity IDE)
+
+Jedno polecenie wykonuje pełny bootstrap produkcyjnego projektu:
+
+```bash
+os-init nazwa-projektu
+```
+
+### Co dzieje się automatycznie:
+1. 📦 Tworzy katalog: `~/projects/nazwa-projektu`
+2. 🛡️ Kopiuje strukturę **Vault (Złoty Standard)** wraz z 70+ skillami.
+3. 📝 Konfiguruje `.gitattributes` (`merge=union` dla plików pamięci i zadań).
+4. ⚙️ Ustawia lokalne parametry Git: `pull.rebase=true` oraz `merge.conflictstyle=diff3`.
+5. 🔀 Inicjalizuje lokalne repozytorium Git i tworzy initial commit.
+6. 🐙 Tworzy publiczne repozytorium na GitHubie (`github.com/<user>/nazwa-projektu`).
+7. 🚀 Wysyła kod (`git push origin main`).
+8. 🔗 Mapuje symlinki `.claude/skills/*` dla kompatybilności krzyżowej IDE.
+9. 🖥️ Otwiera **Antigravity IDE** w środowisku WSL:Ubuntu.
+10. 🔀 Przechodzi (`cd`) do katalogu w bieżącym terminalu.
 
 ---
 
-## 4. `os-init` — Tworzenie nowego projektu (Antigravity IDE)
+## 5. `os-init-claude` — Tworzenie projektu (Claude Code / VS Code)
 
-> 💡 **Jedna komenda robi wszystko.**
-
-### Jak używać
-
-W terminalu WSL wpisz:
+Dla programistów preferujących edytor VS Code z rozszerzeniem Claude Code:
 
 ```bash
-os-init nazwa-twojego-projektu
+os-init-claude nazwa-projektu
 ```
 
-**Przykład:**
-
-```bash
-os-init moja-aplikacja
-```
-
-### Co się dzieje automatycznie
-
-```
-1. 📦  Tworzy folder: ~/projects/moja-aplikacja
-2. 🛡️  Kopiuje do niego Złoty Standard (szablony plików i folderów)
-3. 📝  Tworzy .gitignore i README.md
-4. 🔀  Inicjalizuje lokalne repozytorium Git
-5. 📝  Robi pierwszy commit ("init: agents-os v6.0 swarm bootstrap")
-6. 🐙  Tworzy publiczne repozytorium na GitHubie: github.com/<twój-użytkownik-git>/moja-aplikacja
-7. 🚀  Wysyła (push) kod na GitHub
-8. 🖥️  Otwiera Antigravity IDE w środowisku WSL:Ubuntu w folderze projektu
-9. 🔀  Przechodzi do folderu projektu w Twoim terminalu (cd)
-```
-
-### Po zakończeniu
-
-Twój terminal automatycznie przejdzie do nowego folderu:
-
-```bash
-📁 Jesteś w: /home/<użytkownik-linux>/projects/moja-aplikacja
-```
-
-A na GitHub pojawi się nowe repozytorium:
-```
-https://github.com/<twój-użytkownik-git>/moja-aplikacja
-```
+Dodatkowo:
+- Generuje manifest [`CLAUDE.md`](file:///home/tkogut/projects/agents-os-core/CLAUDE.md).
+- Konfiguruje natywne slash commands w `.claude/commands/` (`/grill-me`, `/worktree-init`, `/handshake`, `/qa-gate`, `/commit`).
+- Ustawia rolę Builder jako `claude-code` w `agents.yaml`.
+- Otwiera projekt poleceniem `code .`.
 
 ---
 
-## 5. `os-init-claude` — Tworzenie projektu pod Claude Code (VS Code)
+## 6. `os-upgrade-project` — Modernizacja Istniejących Projektów
 
-> 🤖 **Dla użytkowników VS Code i rozszerzenia Claude Code.**
-
-### Jak używać
-
-Wpisz w terminalu WSL:
+Jeśli masz starszy projekt i chcesz wdrożyć natywny silnik asynchronicznej pracy wielomaszynowej AGENTS-OS v6.5 Swarm:
 
 ```bash
-os-init-claude moja-aplikacja
+# Wewnątrz katalogu projektu:
+os-upgrade-project
+
+# Lub podając ścieżkę:
+os-upgrade-project ~/projects/stary-projekt
 ```
 
-### Co się dzieje automatycznie
-
-Skrypt wykonuje dokładnie te same kroki co `os-init`, ale dodatkowo:
-1. 📄 **Generuje `CLAUDE.md`** — plik konfiguracji roli Builder wczytywany automatycznie przez rozszerzenie Claude Code po otwarciu projektu.
-2. ⚡ **Instaluje slash commands** w `.claude/commands/`:
-   - `/worktree-init` — automatyczne tworzenie git worktree przed implementacją
-   - `/handshake` — generowanie pliku handshake JSON po ukończeniu zadania
-   - `/qa-gate` — uruchamianie linterów i testów przed PR
-   - `/commit` — bezpieczne atomic commity w konwencji Conventional Commits
-3. ⚙️ **Ustawia rolę Builder** jako `claude-code` w `agents.yaml`.
-4. 🖥️ **Otwiera projekt w VS Code** (zamiast Antigravity IDE).
+Skrypt automatycznie:
+- Wdraża reguły `.gitattributes` (`merge=union` dla `MEMORY.md` i `task.md`).
+- Ustawia parametry `pull.rebase=true` i `merge.conflictstyle=diff3`.
+- Wdraża natywne hooki cyklu życia (`SessionStart` pull / `SessionEnd` auto state-dump).
+- Tworzy dowiązania symboliczne do 70+ skilli w `.claude/skills/`.
+- Inicjalizuje standard pamięci maszynowej `.agents/MEMORY.md` (v0.42.1).
 
 ---
 
-## 6. Struktura projektu
+## 7. `os-add-skill` — Dynamiczne Pobieranie Umiejętności
 
-Każdy projekt tworzony przez `os-init` / `os-init-claude` ma identyczną, gotową strukturę:
+Potrzebujesz specjalistycznej wiedzy (np. optymalizacji PostgreSQL, bezpieczeństwa sieciowego, testów Playwright)?
+
+```bash
+os-add-skill postgresql-optimization
+os-add-skill n8n-ops
+```
+
+Skrypt przeszukuje lokalny rejestr, repozytorium główne oraz bazę **1400+ skilli `sickn33/antigravity-awesome-skills`**, pobiera pliki do `.agents/skills/` i natychmiast tworzy dowiązanie w `.claude/skills/`.
+
+---
+
+## 8. `/grill-me` — Protokół Rygoru Architektonicznego
+
+Przed przystąpieniem do kodowania nietrywialnych funkcji, uruchom protokół wywiadu architektonicznego:
+
+```bash
+# W oknie czatu asystenta:
+/grill-me
+
+# Lub bezpośrednio z terminala:
+node .agents/skills/grill-me.js
+```
+
+Asystent zweryfikuje:
+1. **Topologię maszyn** (który węzeł ma wyłączność na wdrożenie).
+2. **Auto-Sync** (rebase strategy i union merge).
+3. **Bazy danych i fallbacki** (Defensive Hybrid, Factory Defaults, 501 Fail-Closed).
+4. **Edge cases** (limity API, split-brain, Circuit Breakers).
+5. **Mandat zrzutu stanu** (State-Dump R-SYNC-01 do `.agents/MEMORY.md`).
+
+---
+
+## 9. Struktura Projektu i Bezkonfliktowy Auto-Sync
 
 ```
 moja-aplikacja/
 │
-├── README.md                ← Opis projektu (tu możesz pisać co to za projekt)
-├── .gitignore               ← Lista plików ignorowanych przez Git
-├── agents.yaml              ← Konfiguracja ról asystenta AI
-├── design-tokens.md         ← Wytyczne wizualne (kolory, fonty, itp.)
-├── task.md                  ← 📋 TU PISZESZ CO AI MA ZROBIĆ
-├── CLAUDE.md                ← Manifest roli Builder dla Claude Code (gdy użyto os-init-claude)
+├── .gitattributes           ← Reguły bezkonfliktowego łączenia (merge=union)
+├── agents.yaml              ← Konfiguracja ról i uprawnień Swarm Triad
+├── design-tokens.md         ← Standard UI i tokeny wizualne
+├── task.md                  ← 📋 Główny backlog zadań (append-only)
+├── CLAUDE.md                ← Konfiguracja Buildera dla Claude Code
 │
-├── .claude/                 ← Slash commands dla Claude Code
-│   └── commands/
-├── execution/               ← Skrypty uruchomieniowe
-├── tmp/                     ← Logi tymczasowe (ignorowane przez Git)
+├── .ai/
+│   └── agentic.config.json  ← Centralna konfiguracja pipeline'u i bramek QA
 │
-├── .github/                 ← Konfiguracja automatyzacji GitHub Actions
-│   └── workflows/
+├── .antigravity/            ← Hooki cyklu życia sesji (SessionStart/End)
+│   └── hooks.json
+├── .claude/
+│   ├── commands/            ← Slash commands (/grill-me, /commit, itd.)
+│   └── skills/              ← Automatyczne symlinki do .agents/skills/*
 │
-└── .agents/                 ← Pamięć i konfiguracja asystenta AI
-    ├── plans/               ← Długoterminowe plany projektu
-    ├── skills/              ← Umiejętności asystenta (pobierane automatycznie)
-    ├── specs/               ← Dokumentacja techniczna i wiedza RAG
-    └── workflows/           ← Zautomatyzowane instrukcje
-```
-
-### Najważniejszy plik: `task.md`
-
-To tutaj piszesz asystentowi co ma zrobić. Przykład:
-
-```markdown
-## Zadanie
-Stwórz stronę główną aplikacji w HTML i CSS.
-Użyj kolorów: niebieski (#2563EB), biały (#FFFFFF).
-Dodaj nagłówek, sekcję hero i stopkę.
+├── execution/               ← Skrypty testowe i weryfikacyjne
+├── tmp/
+│   └── worktrees/           ← Odizolowane środowiska pracy subagentów Builder
+│
+└── .agents/                 ← Rdzeń pamięci i inteligencji agenta
+    ├── MEMORY.md            ← Pamięć rozproszona v0.42.1 (rejestr węzłów i sesji)
+    ├── swarm/               ← Podpisy i pliki handshake (*_handshake.json)
+    ├── skills/              ← Fizyczne implementacje skilli
+    ├── specs/               ← Specyfikacje architektoniczne i RAG
+    └── rules/               ← Żelazne reguły bezpieczeństwa (GOVERNANCE.md)
 ```
 
 ---
 
-## 7. Codzienna praca
+## 10. The Swarm Triad i Codzienna Praca
 
-### Otwieranie istniejącego projektu w IDE
+System wymusza podział odpowiedzialności na trzy niezależne role:
 
-Masz dwie opcje:
-
-**Opcja A — z terminala WSL:**
-```bash
-source ~/.bashrc.d/antigravity   # tylko jeśli nowy terminal
-cd ~/projects/nazwa-projektu
-antigravity .
+```
+[COORDINATOR]  → Planuje w task.md, izoluje gałąź przez os-run-builder. ZAKAZ edycji src/.
+       ↓
+  [BUILDER]    → Implementuje kod w tmp/worktrees/, uruchamia testy, podpisuje _handshake.json.
+       ↓
+  [AUDITOR]    → Weryfikuje testy bramki QA, sprawdza spójność logiki, dopuszcza do PR.
 ```
 
-**Opcja B — z Menu Start Windows:**
-1. Uruchom **Antigravity IDE**
-2. `File` → `Open Folder`
-3. W pasku adresu Eksploratora wpisz: `\\wsl.localhost\Ubuntu\home\<użytkownik-linux>\projects\`
-4. Wybierz folder projektu
-
-> ⚠️ **Uwaga:** Jeśli Eksplorator Windows się zawiesza przy otwieraniu folderu WSL, wykonaj reset:
-> ```powershell
-> # W PowerShell (Windows):
-> wsl --shutdown
-> ```
-> Następnie uruchom ponownie terminal WSL.
-
-### Wysyłanie zmian na GitHub
-
+### Codzienna Praca:
 ```bash
-git add -A
-git commit -m "opis: co zrobiłem"
+# 1. Otwórz projekt
+cd ~/projects/moja-aplikacja
+antigravity .   # lub: code .
+
+# 2. Dopisuj zadania w task.md i wykonaj wywiad /grill-me
+
+# 3. Zapisz i zsynchronizuj stan
 git push
 ```
 
-Lub powiedz asystentowi: *„zapisz i wyślij na GitHub"* — zrobi to za Ciebie.
-
 ---
 
-## 8. Najczęstsze problemy
+## 11. Najczęstsze Problemy
 
-### ❌ `Permission denied` przy `~/.bashrc.d/antigravity`
-
-**Problem:** Próbujesz uruchomić plik zamiast go załadować.
-
-**Rozwiązanie:**
-```bash
-# ❌ ŹLE — uruchamia jako osobny proces
-~/.bashrc.d/antigravity
-
-# ✅ DOBRZE — ładuje do bieżącego terminala
-source ~/.bashrc.d/antigravity
-```
-
----
-
-### ❌ `os-init: command not found` / `os-init-claude: command not found`
-
-**Problem:** Konfiguracja shella nie jest załadowana.
-
-**Rozwiązanie:**
-```bash
-source ~/.bashrc.d/antigravity
-```
-
-Jeśli nadal nie działa, sprawdź instalację:
-```bash
-ls ~/.local/bin/os-init-run         # powinien istnieć dla Antigravity
-ls ~/.local/bin/os-init-claude-run  # powinien istnieć dla Claude Code
-```
-
-Jeśli plików nie ma — uruchom ponownie `bash INSTALL.sh`.
-
----
-
-### ❌ IDE otwiera się bez WSL:Ubuntu (projekt lokalny Windows)
-
-**Problem:** IDE otwiera pliki w trybie Windows, nie WSL — brak dostępu do narzędzi Linux.
-
-**Rozwiązanie:** Otwieraj IDE zawsze przez terminal WSL:
-```bash
-antigravity .   # dla Antigravity IDE
-code .          # dla VS Code
-```
-
-Lub używaj `os-init` / `os-init-claude` — otwierają IDE automatycznie z odpowiednią flagą środowiskową.
-
----
-
-### ❌ `gh repo create failed: --push enabled but no commits found`
-
-**Problem:** Stara wersja skryptu — naprawiona w wersji `05a271f`.
-
-**Rozwiązanie:** Pobierz najnowszą wersję i zainstaluj ponownie:
-```bash
-cd ~/projects/agents-os-core
-git pull origin master
-bash INSTALL.sh
-```
-
----
-
-### ❌ Eksplorator Windows zawiesza się przy `\\wsl.localhost`
-
-**Problem:** Błąd integracji WSL2 z systemem plików Windows (znany bug WSL).
-
-**Rozwiązanie:**
-```powershell
-# W PowerShell Windows:
-wsl --shutdown
-```
-Następnie uruchom ponownie terminal WSL. Reset trwa ~5 sekund.
-
----
-
-### ❌ `antigravity` otwiera okno czatu zamiast edytora kodu
-
-**Problem:** Konflikt między aplikacją Antigravity (czat) a Antigravity IDE (edytor).
-
-**Rozwiązanie:** Używaj konkretnych komend:
-```bash
-antigravity .          # otwiera IDE (edytor kodu) w bieżącym folderze
-agy                    # uruchamia CLI asystenta (czat w terminalu)
-```
-
----
-
-## 9. Jak działa system od środka
-
-> Ta sekcja jest dla ciekawskich — nie musisz tego czytać żeby używać systemu.
-
-### Dlaczego `os-init` i `os-init-claude` są funkcjami shella, a nie skryptami?
-
-W systemie Linux, skrypt uruchomiony jako osobny proces **nie może zmienić katalogu** (`cd`) w terminalu rodzica. To fundamentalne ograniczenie systemu.
-
-Dlatego `os-init` oraz `os-init-claude` są **funkcjami shella** zdefiniowanymi w `~/.bashrc.d/antigravity`:
-1. Wywołują `os-init-run` lub `os-init-claude-run` (właściwy skrypt)
-2. Skrypt wypisuje na końcu `__PROJECT_DIR__:/ścieżka/do/projektu`
-3. Funkcja przechwytuje tę linię i wykonuje `cd` — **w bieżącym terminalu**
-
-### Kolejność operacji w `bootstrap.py` / `bootstrap-claude.py`
-
-```
-git init  →  vault copy  →  .gitignore  →  README.md  →  git commit  →  gh repo create  →  git push
-```
-
-> Kolejność **musi** być taka — `gh repo create` wymaga żeby commit istniał zanim się go wywoła.
-
-### The Swarm Triad — 3 role asystenta
-
-System przypisuje asystentowi 3 tryby pracy (wspierane przez narzędzia automatycznego sprzątania i lintowania @brooks-lint oraz @finishing-a-development-branch):
-
-| Rola | Kiedy aktywna | Co robi |
+| Problem | Przyczyna | Rozwiązanie |
 |---|---|---|
-| **Coordinator** | Planowanie | Czyta `task.md`, tworzy plan, NIE pisze kodu |
-| **Builder** | Implementacja | Pisze kod, edytuje pliki, uruchamia komendy |
-| **Auditor** | Weryfikacja | Sprawdza błędy, logi, jakość kodu |
+| `Permission denied` przy `~/.bashrc.d/antigravity` | Próba uruchomienia zamiast ładowania (`source`) | Użyj `source ~/.bashrc.d/antigravity` |
+| `os-init: command not found` | Brak załadowanej konfiguracji shella | Uruchom `source ~/.bashrc.d/antigravity` |
+| Błędy merge w `MEMORY.md` | Brak reguły union w `.gitattributes` | Uruchom `os-upgrade-project` |
+| Claude Code nie widzi skilli | Brak dowiązań w `.claude/skills/` | Uruchom `os-upgrade-project` lub `bash INSTALL.sh` |
+| Explorer zawiesza się przy `\\wsl.localhost` | Znany błąd sieciowy WSL2 | W PowerShell uruchom `wsl --shutdown` |
 
 ---
 
-## 9. Integracja MCP & GitOps
+## 12. Dokumentacja Techniczna i API
 
-**MCP (Model Context Protocol) zintegrowany z GitOps** umożliwia dynamiczne aktualizowanie i dystrybucję bazy wiedzy o Antigravity IDE bezpośrednio z repozytorium GitHub.
-
-### Jak to działa?
-
-1. **Serwer MCP (`antigravity-docs`)**:
-   Zlokalizowany w `.agents/mcp-servers/antigravity-docs/`. Jest to serwer oparty o Node.js/stdio, który dostarcza zasoby (`docs://index`) oraz narzędzia (`search_docs`, `read_doc`, `list_document_names`) dla asystenta AI.
-   
-2. **Scraper & Extractor**:
-   Skrypty Pythonowe (`scraper.py` i `extractor.py`) używające biblioteki Playwright pobierają najnowsze wersje dokumentacji ze strony `https://antigravity.google/docs/get-started` bezpośrednio do formatu Markdown w katalogu `knowledge_base/`.
-
-3. **Cykliczny pipeline GitHub Actions (`mcp-docs-updater.yml`)**:
-   Skonfigurowany przepływ pracy w `.github/workflows/mcp-docs-updater.yml` automatycznie:
-   * Odpala się raz w miesiącu lub na żądanie (`workflow_dispatch`).
-   * Instaluje Pythona, zależności oraz przeglądarkę Chromium (Playwright).
-   * Wykonuje scraper i extractor.
-   * Porównuje różnice (`git diff`) i w przypadku zmian automatycznie commituje i pushuje nową wiedzę do repozytorium `master/main` jako `chore(mcp): auto-refresh Antigravity docs`.
-
-4. **Lokalna konfiguracja IDE (`.gemini/mcp_config.json`)**:
-   Lokalne środowisko automatycznie wczytuje serwer MCP podczas otwierania projektu, dając asystentowi natychmacowy dostęp do lokalnej, zaktualizowanej bazy wiedzy.
+Szczegółowa specyfikacja interfejsów, formatów JSON, schematów pamięci i protokołów bezpieczeństwa znajduje się w dedykowanych dokumentach:
+- 📖 [**Dokumentacja Techniczna API & CLI** (`docs/API.md`)](file:///home/tkogut/projects/agents-os-core/docs/API.md)
+- 🛡️ [**Standard Cyklu Życia SDLC** (`SDLC.md`)](file:///home/tkogut/projects/agents-os-core/SDLC.md)
+- 📜 [**Changelog i Historia Wdrożeń** (`CHANGELOG.md`)](file:///home/tkogut/projects/agents-os-core/CHANGELOG.md)
 
 ---
 
 <br><hr><br>
 
 <a name="english"></a>
-# [EN] AGENTS-OS v6.0 Swarm Edition — User Guide
+# [EN] AGENTS-OS v6.5 Swarm Edition — User Guide
 
-> **Who is this for?**
-> Everyone — even if you don't code every day.
-> Step-by-step instructions explaining what to do and why.
-
----
-
-## Table of Contents
-
-1. [What is AGENTS-OS?](#what-is-agents-os)
-2. [Requirements](#requirements)
-3. [Installation — one-time setup](#installation)
-4. [Creating a new project — `os-init`](#os-init)
-5. [Project structure](#project-structure)
-6. [Daily workflow](#daily-workflow)
-7. [Common issues & fixes](#common-issues)
+> **Enterprise-grade asynchronous multi-agent framework for Antigravity IDE and Claude Code.**
 
 ---
 
 ## What is AGENTS-OS?
 
-**AGENTS-OS** is a toolkit and configuration framework that makes the Antigravity AI assistant work like an experienced developer — instead of lengthy explanations, it receives a concrete task and executes it.
+**AGENTS-OS** provides orchestration, architectural rigor, and distributed multi-machine synchronization for AI coding agents. It enforces the **Swarm Triad** pattern (Coordinator / Builder / Auditor) with Git Worktree isolation and conflict-free memory merging.
 
-| Component | What it is | Purpose |
+### Core Tooling Suite:
+
+| Tool | Type | Purpose |
 |---|---|---|
-| **INSTALL.sh** | Installation script | One-time setup on your machine |
-| **os-init** | Startup command | Create a new project with one command |
-| **Vault (Golden Standard)** | Folder template | Ready-made structure copied into every project |
+| **`INSTALL.sh`** | Installer | Single-command system setup, Python venv, templates, and shell integration |
+| **`os-init`** | CLI | Creates a new Golden Standard repository and launches Antigravity IDE |
+| **`os-init-claude`** | CLI | Creates a new repository tailored for VS Code and Claude Code |
+| **`os-upgrade-project`** | CLI | Modernizes existing repositories to v6.5 Swarm (auto-sync, union-merge, hooks) |
+| **`os-add-skill`** | CLI | Dynamically fetches skills from RAG registries and 1,400+ community skills |
+| **`os-run-builder`** | CLI | Automates Git Worktree workspace isolation under `tmp/worktrees/` |
+| **`/grill-me`** | CLI / Skill | Pre-flight architectural interview ensuring fail-closed resilience and state dumps |
 
 ---
 
-## Requirements
-
-| Tool | How to check | Where to get |
-|---|---|---|
-| **WSL2 + Ubuntu** (Windows) | `wsl --version` in PowerShell | [docs.microsoft.com](https://docs.microsoft.com/en-us/windows/wsl/install) |
-| **Antigravity IDE** | Icon in Start Menu | Official installer |
-| **Antigravity (chat window)** | Does the assistant app work | Same as above |
-| **Python 3** | `python3 --version` in WSL | Pre-installed in Ubuntu |
-| **Git** | `git --version` | `sudo apt install git` |
-| **GitHub CLI** | `gh --version` | Auto-installed by INSTALL.sh |
-
----
-
-## Installation
-
-> ⚠️ **Run this only once** — when setting up the system for the first time.
+## Quick Start
 
 ```bash
-# 1. Open WSL terminal (Windows: Win+R → type "wsl" → Enter)
-
-# 2. Clone the repository
+# 1. Clone & Install
 mkdir -p ~/projects
 git clone https://github.com/tkogut/agents-os-core.git ~/projects/agents-os-core
 cd ~/projects/agents-os-core
-
-# 3. Run the installer
 bash INSTALL.sh
 
-# 4. Log in to GitHub
-gh auth login
-
-# 5. Load shell configuration
+# 2. Source environment
 source ~/.bashrc.d/antigravity
+
+# 3. Create a project
+os-init my-new-app
 ```
 
 ---
 
-## `os-init` — Creating a new project
+## Technical Reference
 
-```bash
-os-init my-project-name
-```
-
-**What happens automatically:**
-
-```
-1. 📦  Creates folder: ~/projects/my-project-name
-2. 🛡️  Copies Golden Standard (file/folder templates)
-3. 📝  Creates .gitignore and README.md
-4. 🔀  Initializes local Git repository
-5. 📝  Makes first commit
-6. 🐙  Creates public GitHub repo: github.com/<your-github-username>/my-project-name
-7. 🚀  Pushes code to GitHub
-8. 🖥️  Opens Antigravity IDE in WSL:Ubuntu environment
-9. 🔀  Changes terminal directory to the new project (cd)
-```
-
----
-
-## Project structure
-
-```
-my-project-name/
-│
-├── README.md                ← Project description
-├── .gitignore               ← Files ignored by Git
-├── agents.yaml              ← AI assistant role config
-├── task.md                  ← 📋 WRITE AI TASKS HERE
-│
-├── execution/               ← Runtime scripts
-├── tmp/                     ← Temporary logs (Git-ignored)
-├── .github/                 ← GitHub Actions automation
-│
-└── .agents/                 ← AI assistant memory & config
-    ├── plans/
-    ├── skills/
-    ├── specs/
-    └── workflows/
-```
-
----
-
-## Daily workflow
-
-```bash
-# Open existing project in IDE (from WSL terminal)
-cd ~/projects/my-project
-antigravity .
-
-# Push changes to GitHub
-git add -A
-git commit -m "describe: what you did"
-git push
-```
-
----
-
-## Common issues
-
-| Error | Cause | Fix |
-|---|---|---|
-| `Permission denied` on `~/.bashrc.d/antigravity` | Running instead of sourcing | Use `source ~/.bashrc.d/antigravity` |
-| `os-init: command not found` | Shell config not loaded | Run `source ~/.bashrc.d/antigravity` |
-| IDE opens without WSL:Ubuntu | Opening via .exe directly | Use `antigravity .` from WSL terminal |
-| Explorer freezes at `\\wsl.localhost` | Known WSL2 network bug | Run `wsl --shutdown` in PowerShell, then restart WSL |
-| `gh repo create failed: no commits` | Old script version | Run `git pull && bash INSTALL.sh` |
-
----
-
-## MCP & GitOps Integration
-
-**MCP (Model Context Protocol) integrated with GitOps** allows dynamic updating and distribution of the Antigravity IDE documentation directly via GitHub.
-
-### How it works:
-
-1. **MCP Server (`antigravity-docs`)**:
-   Located in `.agents/mcp-servers/antigravity-docs/`. It runs on Node.js/stdio, providing the AI agent with documentation resources (`docs://index`) and search/read tools.
-
-2. **Scraper & Extractor**:
-   Python scripts (`scraper.py` and `extractor.py`) use Playwright to crawl the official Antigravity Docs site (`https://antigravity.google/docs/get-started`) and generate clean Markdown files under `knowledge_base/`.
-
-3. **Cyklic GitHub Actions Pipeline (`mcp-docs-updater.yml`)**:
-   Located in `.github/workflows/mcp-docs-updater.yml`. It runs automatically:
-   * Monthly (cron) or via manual trigger (`workflow_dispatch`).
-   * Installs Python 3.11, Playwright (Chromium), and runs the scraper and extractor.
-   * Compares differences and automatically commits/pushes updates to `master/main` with `chore(mcp): auto-refresh Antigravity docs`.
-
-4. **Local IDE Integration (`.gemini/mcp_config.json`)**:
-   The editor dynamically registers the local MCP server when opening the workspace, giving the AI agent instant, zero-setup access to the latest documentation.
-
----
-
-*Document maintained by Antigravity Agent & tkogut. Last updated: June 2026.*
+For technical schemas (`MEMORY.md` v0.42.1, `*_handshake.json`, `.ai/agentic.config.json`, lifecycle hooks, and CLI API specifications), refer to [**`docs/API.md`**](file:///home/tkogut/projects/agents-os-core/docs/API.md).
