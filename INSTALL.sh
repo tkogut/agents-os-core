@@ -94,9 +94,11 @@ echo "🛡️ Integracja z modułem kompresji tożsamości (Caveman)..."
 echo "⚙️ Konfiguracja parametrów synchronizacji Git (pull.rebase true, merge.conflictstyle diff3)..."
 git config --global pull.rebase true 2>/dev/null || true
 git config --global merge.conflictstyle diff3 2>/dev/null || true
+git config --global core.symlinks true 2>/dev/null || true
 if git rev-parse --is-inside-work-tree &>/dev/null; then
     git config --local pull.rebase true 2>/dev/null || true
     git config --local merge.conflictstyle diff3 2>/dev/null || true
+    git config --local core.symlinks true 2>/dev/null || true
 fi
 
 # 3. Kopiowanie The Vault

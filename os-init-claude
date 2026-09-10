@@ -55,6 +55,7 @@ echo "📁 Projekt gotowy w: $PROJECT_DIR"
 if [ -d "$PROJECT_DIR/.git" ]; then
     git -C "$PROJECT_DIR" config --local pull.rebase true 2>/dev/null || true
     git -C "$PROJECT_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
+    git -C "$PROJECT_DIR" config --local core.symlinks true 2>/dev/null || true
 fi
 
 # Mapowanie widoczności skilli dla Claude Code (.claude/skills/)
