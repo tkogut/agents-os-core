@@ -3,28 +3,28 @@
     "SessionStart": [
       {
         "type": "command",
-        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
         "timeout": 30
       }
     ],
     "SessionEnd": [
       {
         "type": "command",
-        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"ℹ️ [Auto-Sync] Pomijam push do remote na gałęzi $CURR (ochrona main/master)\"; fi",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"ℹ️ [Auto-Sync] Pomijam push do remote na gałęzi $CURR (ochrona main/master)\"; fi",
         "timeout": 30
       }
     ],
     "PreInvocation": [
       {
         "type": "command",
-        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
         "timeout": 30
       }
     ],
     "Stop": [
       {
         "type": "command",
-        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo ''); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"ℹ️ [Auto-Sync] Pomijam push do remote na gałęzi $CURR (ochrona main/master)\"; fi",
+        "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamięci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"ℹ️ [Auto-Sync] Pomijam push do remote na gałęzi $CURR (ochrona main/master)\"; fi",
         "timeout": 30
       }
     ]
