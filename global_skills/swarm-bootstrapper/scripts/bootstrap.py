@@ -80,6 +80,8 @@ if os.path.isdir(agents_skills_dir):
     for item in os.listdir(agents_skills_dir):
         if item.startswith("."):
             continue
+        if not os.path.isdir(os.path.join(agents_skills_dir, item)):
+            continue
         target_link = os.path.join(claude_skills_dir, item)
         src_rel = os.path.join("..", "..", ".agents", "skills", item)
         if not os.path.exists(target_link) and not os.path.islink(target_link):
