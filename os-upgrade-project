@@ -148,9 +148,10 @@ echo "$HOOKS_CONTENT" > "$TARGET_DIR/.agents/hooks.json"
 echo -e "${GREEN}   ✓ Pliki hooks.json zaktualizowane w .antigravity/, .gemini/ i .agents/.${NC}"
 
 # --------------------------------------------------------------------------- #
-# 5. Widoczność Skilli dla Claude Code (.claude/skills/om-*)
+# 5. Synchronizacja Skilli z Vault i Widoczność dla Claude Code (.claude/skills/*)
 # --------------------------------------------------------------------------- #
-echo -e "\n${BLUE}⚙️ [4/6] Mapowanie widoczności skilli dla Claude Code (.claude/skills/)...${NC}"
+echo -e "\n${BLUE}⚙️ [4/6] Synchronizacja skilli z Vault i mapowanie do .claude/skills/...${NC}"
+mkdir -p "$TARGET_DIR/.agents/skills"
 mkdir -p "$TARGET_DIR/.claude/skills"
 mkdir -p "$TARGET_DIR/.claude/commands"
 
@@ -159,33 +160,37 @@ if [ -d "$VAULT_DIR/.claude/commands" ]; then
     cp -rn "$VAULT_DIR/.claude/commands/." "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
 fi
 
-# Twórz bezpieczne symlinki relatywne do .agents/skills/
-SKILLS_COUNT=0
-if [ -d "$TARGET_DIR/.agents/skills" ]; then
-    for skill_path in "$TARGET_DIR"/.agents/skills/*; do
-        if [ -e "$skill_path" ]; then
-            skill_name=$(basename "$skill_path")
-            target_link="$TARGET_DIR/.claude/skills/$skill_name"
-            ln -sf "../../.agents/skills/$skill_name" "$target_link"
-            SKILLS_COUNT=$((SKILLS_COUNT + 1))
-        fi
-    done
-fi
-
-# Jeśli w projekcie brakowało skilli, zsynchronizuj z Vault
-if [ $SKILLS_COUNT -eq 0 ] && [ -d "$VAULT_DIR/.agents/skills" ]; then
-    echo -e "   🔄 Dociąganie skilli z szablonu Vault..."
+# Dociągnij brakujące skille z szablonu Vault (w tym 36 skilli om-*, grill-me itp.)
+SYNCED_COUNT=0
+if [ -d "$VAULT_DIR/.agents/skills" ]; then
     for skill_path in "$VAULT_DIR"/.agents/skills/*; do
         if [ -e "$skill_path" ]; then
             skill_name=$(basename "$skill_path")
-            cp -ra "$skill_path" "$TARGET_DIR/.agents/skills/"
-            ln -sf "../../.agents/skills/$skill_name" "$TARGET_DIR/.claude/skills/$skill_name"
-            SKILLS_COUNT=$((SKILLS_COUNT + 1))
+            target_skill="$TARGET_DIR/.agents/skills/$skill_name"
+            if [ ! -e "$target_skill" ]; then
+                cp -ra "$skill_path" "$target_skill"
+                SYNCED_COUNT=$((SYNCED_COUNT + 1))
+            fi
         fi
     done
 fi
 
-echo -e "${GREEN}   ✓ Zmapowano ${SKILLS_COUNT} skilli do .claude/skills/ (symlink ln -sf, w tym /grill-me).${NC}"
+if [ $SYNCED_COUNT -gt 0 ]; then
+    echo -e "${GREEN}   ✓ Dociągnięto ${SYNCED_COUNT} nowych/brakujących skilli z Vault (w tym om-*).${NC}"
+fi
+
+# Zbuduj bezpieczne dowiązania symboliczne relatywne do .agents/skills/ dla WSZYSTKICH skilli
+SKILLS_COUNT=0
+for skill_path in "$TARGET_DIR"/.agents/skills/*; do
+    if [ -e "$skill_path" ]; then
+        skill_name=$(basename "$skill_path")
+        target_link="$TARGET_DIR/.claude/skills/$skill_name"
+        ln -sf "../../.agents/skills/$skill_name" "$target_link"
+        SKILLS_COUNT=$((SKILLS_COUNT + 1))
+    fi
+done
+
+echo -e "${GREEN}   ✓ Zmapowano ${SKILLS_COUNT} skilli do .claude/skills/ (symlink ln -sf, w tym om-* i grill-me).${NC}"
 
 # --------------------------------------------------------------------------- #
 # 6. Silnik Pamięci (MEMORY.md v0.42.1) oraz task.md
