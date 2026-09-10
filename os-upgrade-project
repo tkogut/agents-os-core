@@ -98,7 +98,8 @@ echo -e "\n${BLUE}⚙️ [2/6] Konfiguracja lokalnych parametrów Gita...${NC}"
 if [ -d "$TARGET_DIR/.git" ]; then
     git -C "$TARGET_DIR" config --local pull.rebase true 2>/dev/null || true
     git -C "$TARGET_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
-    echo -e "${GREEN}   ✓ pull.rebase=true oraz merge.conflictstyle=diff3 aktywne w .git/config.${NC}"
+    git -C "$TARGET_DIR" config --local core.symlinks true 2>/dev/null || true
+    echo -e "${GREEN}   ✓ pull.rebase=true, merge.conflictstyle=diff3, core.symlinks=true aktywne w .git/config.${NC}"
 else
     echo -e "${YELLOW}   ⚠️  Folder nie jest repozytorium git (.git brak). Pomijam config lokalny.${NC}"
 fi

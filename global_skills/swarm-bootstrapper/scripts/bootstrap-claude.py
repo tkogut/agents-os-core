@@ -248,11 +248,13 @@ try:
             writer.set_value("init", "defaultBranch", "main")
             writer.set_value("pull", "rebase", "true")
             writer.set_value("merge", "conflictstyle", "diff3")
+            writer.set_value("core", "symlinks", "true")
     else:
         repo = git.Repo(TARGET_DIR)
         with repo.config_writer() as writer:
             writer.set_value("pull", "rebase", "true")
             writer.set_value("merge", "conflictstyle", "diff3")
+            writer.set_value("core", "symlinks", "true")
 
     # Wdrożenie pre-commit hooka dla Swarm Triad z vault lub szablonu
     hooks_dir = os.path.join(TARGET_DIR, ".git", "hooks")
