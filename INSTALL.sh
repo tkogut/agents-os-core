@@ -132,9 +132,9 @@ cp -ra "$SCRIPT_DIR/vault/." "$VAULT_DIR/"
 echo "🔗 Konfiguracja dowiązań symbolicznych skilli Claude Code (.claude/skills/)..."
 mkdir -p "$VAULT_DIR/.claude/skills"
 for skill_item in "$VAULT_DIR"/.agents/skills/*; do
-    if [ -e "$skill_item" ]; then
+    if [ -d "$skill_item" ]; then
         skill_name=$(basename "$skill_item")
-        (cd "$VAULT_DIR/.claude/skills" && ln -sf "../../.agents/skills/$skill_name" "$skill_name")
+        (cd "$VAULT_DIR/.claude/skills" && ln -sfn "../../.agents/skills/$skill_name" "$skill_name")
     fi
 done
 

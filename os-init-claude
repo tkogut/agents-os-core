@@ -62,9 +62,9 @@ fi
 mkdir -p "$PROJECT_DIR/.claude/skills"
 if [ -d "$PROJECT_DIR/.agents/skills" ]; then
     for skill_item in "$PROJECT_DIR"/.agents/skills/*; do
-        if [ -e "$skill_item" ]; then
+        if [ -d "$skill_item" ]; then
             skill_name=$(basename "$skill_item")
-            (cd "$PROJECT_DIR/.claude/skills" && ln -sf "../../.agents/skills/$skill_name" "$skill_name")
+            (cd "$PROJECT_DIR/.claude/skills" && ln -sfn "../../.agents/skills/$skill_name" "$skill_name")
         fi
     done
 fi

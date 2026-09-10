@@ -170,7 +170,7 @@ fi
 SYNCED_COUNT=0
 if [ -d "$VAULT_DIR/.agents/skills" ]; then
     for skill_path in "$VAULT_DIR"/.agents/skills/*; do
-        if [ -e "$skill_path" ]; then
+        if [ -d "$skill_path" ]; then
             skill_name=$(basename "$skill_path")
             target_skill="$TARGET_DIR/.agents/skills/$skill_name"
             if [ ! -e "$target_skill" ]; then
@@ -188,10 +188,10 @@ fi
 # Zbuduj bezpieczne dowiązania symboliczne relatywne do .agents/skills/ dla WSZYSTKICH skilli
 SKILLS_COUNT=0
 for skill_path in "$TARGET_DIR"/.agents/skills/*; do
-    if [ -e "$skill_path" ]; then
+    if [ -d "$skill_path" ]; then
         skill_name=$(basename "$skill_path")
         target_link="$TARGET_DIR/.claude/skills/$skill_name"
-        ln -sf "../../.agents/skills/$skill_name" "$target_link"
+        ln -sfn "../../.agents/skills/$skill_name" "$target_link"
         SKILLS_COUNT=$((SKILLS_COUNT + 1))
     fi
 done
