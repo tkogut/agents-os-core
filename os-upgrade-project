@@ -99,6 +99,12 @@ if [ -d "$TARGET_DIR/.git" ]; then
     git -C "$TARGET_DIR" config --local pull.rebase true 2>/dev/null || true
     git -C "$TARGET_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
     git -C "$TARGET_DIR" config --local core.symlinks true 2>/dev/null || true
+    if [ -z "$(git -C "$TARGET_DIR" config user.name 2>/dev/null)" ]; then
+        git -C "$TARGET_DIR" config --local user.name "tkogut" 2>/dev/null || true
+    fi
+    if [ -z "$(git -C "$TARGET_DIR" config user.email 2>/dev/null)" ]; then
+        git -C "$TARGET_DIR" config --local user.email "tkogut9@gmail.com" 2>/dev/null || true
+    fi
     echo -e "${GREEN}   ✓ pull.rebase=true, merge.conflictstyle=diff3, core.symlinks=true aktywne w .git/config.${NC}"
 else
     echo -e "${YELLOW}   ⚠️  Folder nie jest repozytorium git (.git brak). Pomijam config lokalny.${NC}"

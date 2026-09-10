@@ -95,6 +95,12 @@ echo "⚙️ Konfiguracja parametrów synchronizacji Git (pull.rebase true, merg
 git config --global pull.rebase true 2>/dev/null || true
 git config --global merge.conflictstyle diff3 2>/dev/null || true
 git config --global core.symlinks true 2>/dev/null || true
+if [ -z "$(git config --global user.name 2>/dev/null)" ]; then
+    git config --global user.name "tkogut" 2>/dev/null || true
+fi
+if [ -z "$(git config --global user.email 2>/dev/null)" ]; then
+    git config --global user.email "tkogut9@gmail.com" 2>/dev/null || true
+fi
 if git rev-parse --is-inside-work-tree &>/dev/null; then
     git config --local pull.rebase true 2>/dev/null || true
     git config --local merge.conflictstyle diff3 2>/dev/null || true
