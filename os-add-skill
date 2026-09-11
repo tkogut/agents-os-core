@@ -78,6 +78,19 @@ def fetch_dir(skill_name, api_url, dest_dir, prefix_to_strip, skill_root_dir=Non
             
     return True
 
+def ensure_claude_symlink(project_root, skill_name):
+    claude_skills = os.path.join(project_root, ".claude", "skills")
+    os.makedirs(claude_skills, exist_ok=True)
+    target_link = os.path.join(claude_skills, skill_name)
+    src_rel = os.path.join("..", "..", ".agents", "skills", skill_name)
+    try:
+        if os.path.islink(target_link) or os.path.exists(target_link):
+            os.remove(target_link)
+        os.symlink(src_rel, target_link)
+        print(f"   🔗 Zmapowano dla Claude Code: .claude/skills/{skill_name}")
+    except Exception:
+        pass
+
 def main():
     if len(sys.argv) < 2:
         print("Użycie: os-add-skill <nazwa-skilla>")
@@ -108,6 +121,7 @@ def main():
             if os.path.exists(dest_dir):
                 shutil.rmtree(dest_dir)
             shutil.copytree(local_template_path, dest_dir)
+            ensure_claude_symlink(project_root, skill_name)
             print(f"✅ Skill '{skill_name}' zainstalowany lokalnie.")
             sys.exit(0)
         except Exception as e:
@@ -127,6 +141,7 @@ def main():
     )
     
     if success_tkogut:
+        ensure_claude_symlink(project_root, skill_name)
         print(f"✅ Skill '{skill_name}' pobrany pomyślnie z repozytorium tkogut/agents-os-core.")
         sys.exit(0)
 
@@ -144,6 +159,7 @@ def main():
     )
 
     if success_sickn33:
+        ensure_claude_symlink(project_root, skill_name)
         print(f"✅ Skill '{skill_name}' pobrany pomyślnie z rejestru awesome-skills.")
         sys.exit(0)
 
