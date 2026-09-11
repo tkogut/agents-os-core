@@ -182,6 +182,23 @@ python3 .agents/skills/grill-me/scripts/grill_me.py
 
 ---
 
+### `swarm-onboarding` (`/swarm-onboarding`)
+
+Uniwersalny protokół onboardingu i synchronizacji kontekstu dla dowolnego nowego agenta (Antigravity, Claude Code, Cursor) dołączającego do projektu. Bada stan Gita, czyta SSOT `.agents/MEMORY.md`, `task.md` (w tym odrzucone hipotezy i zakazy), pliki planów oraz reguły bezpieczeństwa.
+
+```bash
+# Uruchomienie bezpośrednie CLI:
+python3 .agents/skills/swarm-onboarding/scripts/onboard.py
+
+# Uruchomienie w czacie agenta:
+/swarm-onboarding
+
+# Instalacja w dowolnym projekcie AGENTS-OS:
+os-add-skill swarm-onboarding
+```
+
+---
+
 ### `generate-handshake.py`
 
 Generuje podpisany kryptograficznie/strukturalnie plik handshake JSON dla protokołu Swarm Triad.
