@@ -1,5 +1,8 @@
 # AGENTS-OS v6.5 Default ignore
 
+# Personal Claude Code overrides (not team-shared)
+.claude/settings.local.json
+
 # Dependencies
 node_modules/
 *.pyc
