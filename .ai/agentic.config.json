@@ -42,5 +42,35 @@
     "test_cases_dir": ".agents/eval/cases",
     "downscale_target": "gemini-flash",
     "validation_interval": "weekly"
-  }
+  },
+  "baseBranch": "auto",
+  "tracker": "github",
+  "browser": { "provider": "agent-browser" },
+  "validation": {
+    "commands": [
+      "shellcheck scripts/*.sh",
+      "python3 -m py_compile scripts/*.py",
+      "python3 scripts/validate-handshakes.py",
+      "bash execution/test_bootstrap.sh"
+    ]
+  },
+  "labels": {
+    "enabled": true,
+    "pipeline": ["review", "changes-requested", "qa", "qa-failed", "merge-queue", "blocked", "do-not-merge"],
+    "category": ["bug", "feature", "refactor", "security", "dependencies", "documentation"],
+    "meta": ["needs-qa", "skip-qa", "qa-approved", "qa-self-verified", "in-progress", "ci-monitoring"],
+    "priority": ["priority-low", "priority-medium", "priority-high", "priority-extreme"],
+    "risk": ["risk-low", "risk-medium", "risk-high"]
+  },
+  "qaGate": true,
+  "ci": { "maxWaitMinutes": 40 },
+  "engine": { "loopStepThreshold": 20, "executorTier": "standard", "stepReview": "final" },
+  "paths": {
+    "runs": ".ai/runs",
+    "analysis": ".ai/analysis",
+    "specs": ".ai/specs",
+    "scripts": ".ai/scripts",
+    "qa": ".ai/qa"
+  },
+  "reviewChecklist": null
 }
