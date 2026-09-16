@@ -5,11 +5,13 @@
 #
 # Aktualizuje istniejące projekty do standardu v6.5 Swarm:
 #   1. Konfiguruje bezkonfliktowy merge (.gitattributes: merge=union)
-#   2. Wdraża natywne hooki cyklu życia (.antigravity/ / .gemini/ / .agents/)
+#   2. Wdraża natywne hooki cyklu życia Antigravity/Gemini (.antigravity/ / .gemini/ / .agents/)
 #   3. Ustawia lokalne parametry gita (pull.rebase true, merge.conflictstyle diff3)
-#   4. Tworzy dowiązania symboliczne dla Claude Code (.claude/skills/om-*)
-#   5. Inicjalizuje silnik pamięci MEMORY.md v0.42.1 i rejestr task.md jeśli brak
-#   6. Synchronizuje najnowsze skille z szablonu Vault
+#   4. Wdraża natywne hooki Claude Code (.claude/settings.json) — OSOBNY format/plik
+#      od punktu 2.; Claude Code nie czyta .agents/hooks.json.
+#   5. Tworzy dowiązania symboliczne dla Claude Code (.claude/skills/om-*)
+#   6. Inicjalizuje silnik pamięci MEMORY.md v0.42.1 i rejestr task.md jeśli brak
+#   7. Synchronizuje najnowsze skille z szablonu Vault
 # ==============================================================================
 
 set -e
@@ -28,7 +30,8 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "Aktualizuje projekt do standardu AGENTS-OS v6.5 Swarm:"
     echo "  • Wdraża bezkonfliktowy merge (.gitattributes)"
     echo "  • Ustawia lokalne parametry Gita (pull.rebase=true, merge.conflictstyle=diff3)"
-    echo "  • Konfiguruje bezpieczne hooki cyklu życia (z ochroną gałęzi main)"
+    echo "  • Konfiguruje bezpieczne hooki cyklu życia Antigravity/Gemini (z ochroną gałęzi main)"
+    echo "  • Konfiguruje natywne hooki Claude Code (.claude/settings.json + .agents/hooks/*.sh)"
     echo "  • Mapuje symlinki .claude/skills/* dla 70+ skilli"
     echo "  • Inicjalizuje silnik pamięci .agents/MEMORY.md"
     exit 0
@@ -61,7 +64,7 @@ fi
 # --------------------------------------------------------------------------- #
 # 2. Bezkonfliktowy Merge (.gitattributes)
 # --------------------------------------------------------------------------- #
-echo -e "\n${BLUE}⚙️ [1/6] Konfiguracja .gitattributes (merge=union)...${NC}"
+echo -e "\n${BLUE}⚙️ [1/7] Konfiguracja .gitattributes (merge=union)...${NC}"
 GITATTR_PATH="$TARGET_DIR/.gitattributes"
 
 mkdir -p "$TARGET_DIR/.agents"
@@ -106,7 +109,7 @@ fi
 # --------------------------------------------------------------------------- #
 # 3. Parametry Git (pull.rebase true, merge.conflictstyle diff3)
 # --------------------------------------------------------------------------- #
-echo -e "\n${BLUE}⚙️ [2/6] Konfiguracja lokalnych parametrów Gita...${NC}"
+echo -e "\n${BLUE}⚙️ [2/7] Konfiguracja lokalnych parametrów Gita...${NC}"
 if [ -d "$TARGET_DIR/.git" ]; then
     git -C "$TARGET_DIR" config --local pull.rebase true 2>/dev/null || true
     git -C "$TARGET_DIR" config --local merge.conflictstyle diff3 2>/dev/null || true
@@ -125,7 +128,7 @@ fi
 # --------------------------------------------------------------------------- #
 # 4. Natywne Hooki Synchronizacji Cyklu Życia
 # --------------------------------------------------------------------------- #
-echo -e "\n${BLUE}⚙️ [3/6] Wdrażanie natywnych hooków cyklu życia...${NC}"
+echo -e "\n${BLUE}⚙️ [3/7] Wdrażanie natywnych hooków cyklu życia...${NC}"
 HOOKS_CONTENT='{
   "distributed-sync": {
     "SessionStart": [
@@ -166,9 +169,181 @@ echo "$HOOKS_CONTENT" > "$TARGET_DIR/.agents/hooks.json"
 echo -e "${GREEN}   ✓ Pliki hooks.json zaktualizowane w .antigravity/, .gemini/ i .agents/.${NC}"
 
 # --------------------------------------------------------------------------- #
+# 4b. Natywne Hooki Claude Code (.claude/settings.json)
+# --------------------------------------------------------------------------- #
+# UWAGA: to jest OSOBNY mechanizm od kroku powyżej. `.agents/hooks.json`
+# (i jego lustra .antigravity/.gemini) to format hooków Antigravity/Gemini
+# Coordinatora. Claude Code hooki czyta WYŁĄCZNIE z `.claude/settings.json`
+# — innego pliku, w innym kształcie. Zapisanie jednego nie podłącza drugiego
+# (ten dokładnie brak spowodował martwe hooki w agents-os-core do 2026-09-16).
+echo -e "\n${BLUE}⚙️ [4/7] Wdrażanie natywnych hooków Claude Code (.claude/settings.json)...${NC}"
+mkdir -p "$TARGET_DIR/.claude" "$TARGET_DIR/.agents/hooks"
+
+SETTINGS_PATH="$TARGET_DIR/.claude/settings.json"
+SETTINGS_MARKER="Swarm: re-grounding"
+
+if [ -f "$SETTINGS_PATH" ] && ! grep -q "$SETTINGS_MARKER" "$SETTINGS_PATH" 2>/dev/null; then
+    echo -e "${YELLOW}   ⚠ $TARGET_DIR/.claude/settings.json już istnieje i nie zawiera hooków swarmu.${NC}"
+    echo -e "${YELLOW}     Pomijam automatyczny zapis — nie nadpisuję nieznanej konfiguracji Claude Code.${NC}"
+    echo -e "${YELLOW}     Dodaj hooki ręcznie, wzorując się na agents-os-core/.claude/settings.json.${NC}"
+else
+    cat << 'SETTINGS_EOF' > "$SETTINGS_PATH"
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
+            "timeout": 30,
+            "statusMessage": "Swarm: rebase pull"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/reground.sh\" 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "Swarm: re-grounding"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/precompact-snapshot.sh\" 2>/dev/null || true",
+            "timeout": 15,
+            "statusMessage": "Swarm: state snapshot"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamieci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"[Auto-Sync] Pomijam push do remote na galezi $CURR (ochrona main/master)\"; fi",
+            "timeout": 30,
+            "statusMessage": "Swarm: state-dump"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamieci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"[Auto-Sync] Pomijam push do remote na galezi $CURR (ochrona main/master)\"; fi",
+            "timeout": 30,
+            "statusMessage": "Swarm: state-dump"
+          }
+        ]
+      }
+    ]
+  }
+}
+SETTINGS_EOF
+    echo -e "${GREEN}   ✓ Zapisano .claude/settings.json (SessionStart/UserPromptSubmit/PreCompact/Stop/SessionEnd).${NC}"
+fi
+
+# Skrypty hookowe wołane przez .claude/settings.json powyżej. Własność swarmu
+# (jak .agents/hooks.json w kroku 3) — zawsze odświeżane, nigdy nie blokują:
+# oba skrypty kończą się exit 0 nawet przy błędzie.
+cat << 'REGROUND_EOF' > "$TARGET_DIR/.agents/hooks/reground.sh"
+#!/usr/bin/env bash
+# UserPromptSubmit hook - cheap swarm re-grounding.
+#
+# Fires ONCE per user turn (not per tool call) and prints a single compact line
+# that Claude Code appends to context. Budget is deliberately ~1 line: the whole
+# point of preferring this over a per-tool-call injector is that it must stay
+# too cheap to argue about. Never blocks: always exits 0.
+set -uo pipefail
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+TASK="$ROOT/.agents/task.md"
+[ -f "$TASK" ] || exit 0
+
+BRANCH=$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')
+DIRTY=$(git -C "$ROOT" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+TITLE=$(grep -m1 '^# ' "$TASK" 2>/dev/null | sed 's/^# //')
+OPEN=$(grep -cE '^[[:space:]]*- \[ \]' "$TASK" 2>/dev/null || true)
+DONE=$(grep -cE '^[[:space:]]*- \[x\]' "$TASK" 2>/dev/null || true)
+
+printf '[SWARM] branch=%s dirty=%s | task: %s | checklist: %s done / %s open | SSOT: .agents/task.md + .agents/MEMORY.md\n' \
+    "$BRANCH" "$DIRTY" "${TITLE:-<none>}" "${DONE:-0}" "${OPEN:-0}"
+exit 0
+REGROUND_EOF
+chmod +x "$TARGET_DIR/.agents/hooks/reground.sh"
+
+cat << 'PRECOMPACT_EOF' > "$TARGET_DIR/.agents/hooks/precompact-snapshot.sh"
+#!/usr/bin/env bash
+# PreCompact hook - persist swarm state to disk BEFORE context is compacted.
+#
+# Compaction summarises the transcript; anything not written down is lost.
+# This writes a single rolling snapshot file (not a growing pile) so a
+# post-compaction session can re-read exact state instead of guessing.
+# Never blocks: always exits 0.
+set -uo pipefail
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+OUT="$ROOT/.agents/swarm/precompact-snapshot.md"
+mkdir -p "$(dirname "$OUT")" 2>/dev/null || exit 0
+
+{
+    echo "# PreCompact Snapshot (auto-generated, not committed)"
+    echo
+    echo "- generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "- branch: $(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null)"
+    echo "- head: $(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null)"
+    echo
+    echo '## git status --short'
+    echo '```'
+    git -C "$ROOT" status --short 2>/dev/null
+    echo '```'
+    echo
+    echo '## .agents/task.md'
+    echo '```markdown'
+    cat "$ROOT/.agents/task.md" 2>/dev/null
+    echo '```'
+    echo
+    echo '## .agents/MEMORY.md (last 30 lines)'
+    echo '```markdown'
+    tail -30 "$ROOT/.agents/MEMORY.md" 2>/dev/null
+    echo '```'
+} > "$OUT" 2>/dev/null
+
+echo "[SWARM] PreCompact snapshot written: .agents/swarm/precompact-snapshot.md"
+exit 0
+PRECOMPACT_EOF
+chmod +x "$TARGET_DIR/.agents/hooks/precompact-snapshot.sh"
+
+echo -e "${GREEN}   ✓ Skrypty hookowe .agents/hooks/{reground,precompact-snapshot}.sh zainstalowane.${NC}"
+
+# .gitignore dla generowanego snapshotu PreCompact — bez tego domyślne
+# `git add -A` z sekcji końcowej tego skryptu scommitowałoby wygenerowany plik.
+GITIGNORE_PATH="$TARGET_DIR/.gitignore"
+GITIGNORE_RULE=".agents/swarm/precompact-snapshot.md"
+touch "$GITIGNORE_PATH"
+if ! grep -Fxq "$GITIGNORE_RULE" "$GITIGNORE_PATH"; then
+    { echo ""; echo "# PreCompact snapshot (regenerated by hook, not state of record)"; echo "$GITIGNORE_RULE"; } >> "$GITIGNORE_PATH"
+    echo -e "${GREEN}   ✓ Dodano $GITIGNORE_RULE do .gitignore.${NC}"
+fi
+
+# --------------------------------------------------------------------------- #
 # 5. Synchronizacja Skilli z Vault i Widoczność dla Claude Code (.claude/skills/*)
 # --------------------------------------------------------------------------- #
-echo -e "\n${BLUE}⚙️ [4/6] Synchronizacja skilli z Vault i mapowanie do .claude/skills/...${NC}"
+echo -e "\n${BLUE}⚙️ [5/7] Synchronizacja skilli z Vault i mapowanie do .claude/skills/...${NC}"
 mkdir -p "$TARGET_DIR/.agents/skills"
 mkdir -p "$TARGET_DIR/.claude/skills"
 mkdir -p "$TARGET_DIR/.claude/commands"
@@ -213,7 +388,7 @@ echo -e "${GREEN}   ✓ Zmapowano ${SKILLS_COUNT} skilli do .claude/skills/ (sym
 # --------------------------------------------------------------------------- #
 # 6. Silnik Pamięci (MEMORY.md v0.42.1) oraz task.md
 # --------------------------------------------------------------------------- #
-echo -e "\n${BLUE}⚙️ [5/6] Sprawdzanie silnika pamięci MEMORY.md oraz task.md...${NC}"
+echo -e "\n${BLUE}⚙️ [6/7] Sprawdzanie silnika pamięci MEMORY.md oraz task.md...${NC}"
 
 if [ ! -f "$TARGET_DIR/.agents/MEMORY.md" ]; then
     cat << 'EOF' > "$TARGET_DIR/.agents/MEMORY.md"
@@ -279,7 +454,7 @@ fi
 # --------------------------------------------------------------------------- #
 # 7. Aktualizacja CLAUDE.md i agents.yaml jeśli istnieją
 # --------------------------------------------------------------------------- #
-echo -e "\n${BLUE}⚙️ [6/6] Aktualizacja manifestów ról...${NC}"
+echo -e "\n${BLUE}⚙️ [7/7] Aktualizacja manifestów ról...${NC}"
 if [ -f "$TARGET_DIR/CLAUDE.md" ] && ! grep -q "state-dump" "$TARGET_DIR/CLAUDE.md"; then
     sed -i '/| Coordinator |/s/$/ |/' "$TARGET_DIR/CLAUDE.md" 2>/dev/null || true
 fi
@@ -287,7 +462,8 @@ fi
 echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}✅ PROJEKT ZAAKTUALIZOWANY DO AGENTS-OS v6.5 SWARM:${NC} $TARGET_DIR"
 echo -e "   • Bezkonfliktowy merge: .gitattributes (merge=union)"
-echo -e "   • Natywne hooki: SessionStart / SessionEnd auto-sync (z ochroną main)"
+echo -e "   • Natywne hooki Antigravity/Gemini: SessionStart / SessionEnd auto-sync (z ochroną main)"
+echo -e "   • Natywne hooki Claude Code: .claude/settings.json (re-grounding + PreCompact snapshot)"
 echo -e "   • Parametry Git: pull.rebase=true, merge.conflictstyle=diff3"
 echo -e "   • Claude Code skille: .claude/skills/* (${SKILLS_COUNT} symlinków)"
 echo -e "   • Pamięć maszynowa: .agents/MEMORY.md"
