@@ -70,3 +70,7 @@ walkthrough.md
 
 # Agent worktrees
 tmp/
+
+# om-* pipeline: generated per run, not source
+.ai/qa/artifacts_*/
+.ai/qa/test-env.json
