@@ -68,17 +68,29 @@ mkdir -p "$TARGET_DIR/.agents"
 
 if [ ! -f "$GITATTR_PATH" ]; then
     cat << 'EOF' > "$GITATTR_PATH"
-# AGENTS-OS v6.5 Swarm Edition - Conflict-Free Distributed Sync
-.agents/MEMORY.md merge=union
-.agents/task.md merge=union
+# AGENTS-OS v6.5 Swarm Edition - Distributed Sync Merge Policy
+#
+# `merge=union` is correct ONLY for append-only logs. It is WRONG for
+# checklist/stateful files: a `- [ ]` -> `- [x]` transition is an UPDATE, and
+# union keeps BOTH lines. task.md is therefore left unspecified on purpose so
+# git surfaces a real conflict instead of silently duplicating state.
+#
+# A pattern without a slash matches the basename at ANY depth, so `MEMORY.md`
+# already covers `.agents/MEMORY.md`.
 MEMORY.md merge=union
-task.md merge=union
+.agents/MEMORY.md merge=union
 EOF
     echo -e "${GREEN}   ✓ Utworzono .gitattributes z regułami merge=union.${NC}"
 else
     # Uzupełnij brakujące reguły
     UPDATED=0
-    for rule in ".agents/MEMORY.md merge=union" ".agents/task.md merge=union" "MEMORY.md merge=union" "task.md merge=union"; do
+    # MIGRACJA: usuń błędne reguły union na plikach checklistowych (task.md).
+    if grep -Eq '^[[:space:]]*(\.agents/)?task\.md[[:space:]]+merge=union[[:space:]]*$' "$GITATTR_PATH"; then
+        sed -i -E '/^[[:space:]]*(\.agents\/)?task\.md[[:space:]]+merge=union[[:space:]]*$/d' "$GITATTR_PATH"
+        echo -e "${YELLOW}   ⚠ Usunięto błędne 'task.md merge=union' (duplikowało pozycje checklisty).${NC}"
+        UPDATED=1
+    fi
+    for rule in ".agents/MEMORY.md merge=union" "MEMORY.md merge=union"; do
         if ! grep -Fxq "$rule" "$GITATTR_PATH"; then
             echo "$rule" >> "$GITATTR_PATH"
             UPDATED=1

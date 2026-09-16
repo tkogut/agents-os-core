@@ -1,5 +1,20 @@
-# AGENTS-OS v6.5 Swarm Edition - Conflict-Free Distributed Sync
-.agents/MEMORY.md merge=union
-.agents/task.md merge=union
+# AGENTS-OS v6.5 Swarm Edition - Distributed Sync Merge Policy
+#
+# RULE: `merge=union` is correct ONLY for append-only logs, where every line is
+# an independent fact and concatenating both sides loses nothing.
+# It is WRONG for stateful/checklist files: a `- [ ]` -> `- [x]` transition is
+# an UPDATE, and union keeps BOTH lines, producing a plan that claims a task is
+# simultaneously open and done. Those files must conflict loudly instead.
+#
+# NOTE ON PATTERN SCOPE: a pattern without a slash matches the basename at ANY
+# directory depth. `MEMORY.md` below therefore already covers `.agents/MEMORY.md`
+# and `vault/.agents/MEMORY.md`; the explicit line is kept for readability only.
+
+# --- Append-only logs: union merge is safe and intended ---
 MEMORY.md merge=union
-task.md merge=union
+.agents/MEMORY.md merge=union
+
+# --- Checklist / stateful plan files: NO union merge ---
+# `task.md` (root, .agents/, vault/) is checklist-shaped. Left unspecified on
+# purpose so git performs a normal 3-way merge and surfaces real conflicts.
+# Do NOT re-add `task.md merge=union` — see AGENTS-OS PWF review, finding K2.
