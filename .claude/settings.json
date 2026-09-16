@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"HEAD\" ]; then git pull origin \"$CURR\" --rebase || true; fi",
+            "timeout": 30,
+            "statusMessage": "Swarm: rebase pull"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/reground.sh\" 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "Swarm: re-grounding"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/.agents/hooks/precompact-snapshot.sh\" 2>/dev/null || true",
+            "timeout": 15,
+            "statusMessage": "Swarm: state snapshot"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamieci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"[Auto-Sync] Pomijam push do remote na galezi $CURR (ochrona main/master)\"; fi",
+            "timeout": 30,
+            "statusMessage": "Swarm: state-dump"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "CURR=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo \"\"); if [ -n \"$CURR\" ] && [ \"$CURR\" != \"main\" ] && [ \"$CURR\" != \"master\" ] && [ \"$CURR\" != \"HEAD\" ]; then git add .agents/MEMORY.md .agents/task.md 2>/dev/null && git commit -m \"chore(sync): automatyczny zrzut pamieci i stanu sesji [skip ci]\" 2>/dev/null && git push origin \"$CURR\" 2>/dev/null || true; else echo \"[Auto-Sync] Pomijam push do remote na galezi $CURR (ochrona main/master)\"; fi",
+            "timeout": 30,
+            "statusMessage": "Swarm: state-dump"
+          }
+        ]
+      }
+    ]
+  }
+}

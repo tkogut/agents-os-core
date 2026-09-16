@@ -57,3 +57,4 @@ Issue → Branch → Worktree → Implementation → Handshake → QA Gate → P
 4. Every PR requires visual proof for UI changes.
 5. HANDOFF.md must exist before phase transition.
 6. Coordinator MUST execute state-dump (`.agents/MEMORY.md`, `.agents/task.md`) before final user report.
+7. Swarm state commits SHOULD be cryptographically signed on every machine — procedure and open decisions in `.agents/specs/commit-signing.md`. A plain SHA-256 written next to the file it hashes is NOT an integrity control.

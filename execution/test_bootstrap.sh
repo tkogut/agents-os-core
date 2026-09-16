@@ -84,11 +84,13 @@ if ! grep -q "\.agents/MEMORY\.md merge=union" "$TEST_DIR/.gitattributes"; then
     echo "❌ [TEST] BŁĄD: Brak reguły merge=union dla .agents/MEMORY.md w .gitattributes!"
     exit 1
 fi
-if ! grep -q "\.agents/task\.md merge=union" "$TEST_DIR/.gitattributes"; then
-    echo "❌ [TEST] BŁĄD: Brak reguły merge=union dla .agents/task.md w .gitattributes!"
+# task.md jest plikiem checklistowym: merge=union duplikowalby przejscia
+# `- [ ]` -> `- [x]` zamiast je rozstrzygac. Regula MUSI byc nieobecna.
+if grep -qE "^[[:space:]]*(\.agents/)?task\.md[[:space:]]+merge=union" "$TEST_DIR/.gitattributes"; then
+    echo "❌ [TEST] BŁĄD: task.md ma merge=union — to duplikuje pozycje checklisty!"
     exit 1
 fi
-echo "   ✅ Reguły merge=union w .gitattributes są poprawne."
+echo "   ✅ Reguły merge w .gitattributes są poprawne (union na MEMORY.md, brak na task.md)."
 
 # Weryfikacja hooków cyklu życia
 echo "🔍 [TEST] Weryfikacja konfiguracji hooków..."
