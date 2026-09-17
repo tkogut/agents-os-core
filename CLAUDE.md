@@ -39,7 +39,7 @@ Reference: `SDLC.md`
 Issue → Branch → Worktree → Implementation → Handshake → QA Gate → PR Merge
 ```
 
-1. **ALWAYS work in a Git Worktree** — never commit directly to `master/main`.
+1. **ALWAYS work in a Git Worktree** — never commit directly to `master/main`. Enforced deterministically by `.agents/hooks/claude-pre-tool-guard.sh` PreToolUse hook.
 2. **Create worktree** at start of every feature session:
    ```bash
    git worktree add tmp/worktrees/feature/<branch-name> -b feature/<branch-name>

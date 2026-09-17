@@ -1,4 +1,18 @@
 {
+  "guard-coordinator": {
+    "PreToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 scripts/guard_coordinator_pretool.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
   "distributed-sync": {
     "SessionStart": [
       {
