@@ -51,10 +51,19 @@ Issue → Branch → Worktree → Implementation → Handshake → QA Gate → P
 - **Post-merge**: `om-auto-update-changelog`, `om-followup-issue-from-pr`
 
 ## Hard Rules
-1. Coordinator NEVER writes code.
-2. Builder ALWAYS operates in worktrees.
+1. Coordinator NEVER writes code — deterministically enforced by PreToolUse gate (`guard_coordinator_pretool.py` / `claude-pre-tool-guard.sh`). Attempts to modify code outside worktrees are blocked by the engine.
+2. Builder ALWAYS operates in worktrees (`tmp/worktrees/*`) — never on `main`/`master` directly.
 3. Auditor can BLOCK any merge.
 4. Every PR requires visual proof for UI changes.
 5. HANDOFF.md must exist before phase transition.
 6. Coordinator MUST execute state-dump (`.agents/MEMORY.md`, `.agents/task.md`) before final user report.
 7. Swarm state commits SHOULD be cryptographically signed on every machine — procedure and open decisions in `.agents/specs/commit-signing.md`. A plain SHA-256 written next to the file it hashes is NOT an integrity control.
+
+## Slash Commands in Swarm Triad
+- **/plan**: An architectural planning phase executed by the Coordinator. The plan MUST explicitly structure execution into:
+  1. *Worktree Allocation* (`tmp/worktrees/feature/<name>`)
+  2. *Subagent Delegation* (`invoke_subagent` -> Builder)
+  3. *Handshake & QA Gate* (`scripts/generate-handshake.py` + `scripts/validate-handshakes.py`)
+  4. *PR & Merge*
+  User approval of the plan is authorization to **dispatch the Builder subagent in an isolated worktree**, NOT permission for the Coordinator to write code directly in the main working tree.
+

@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+"""
+test_guard_coordinator_pretool.py — Unit tests for guard_coordinator_pretool.py
+"""
+
+import unittest
+from scripts.guard_coordinator_pretool import evaluate_tool_call
+
+
+class TestGuardCoordinatorPretool(unittest.TestCase):
+
+    def test_block_direct_src_jsx(self):
+        payload = {
+            "toolCall": {
+                "name": "write_to_file",
+                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/ui_dashboard/src/components/AggregatedPnLCard.jsx"}
+            }
+        }
+        res = evaluate_tool_call(payload)
+        self.assertEqual(res["decision"], "deny")
+        self.assertIn("DIRECT WRITE FORBIDDEN", res["reason"])
+
+    def test_block_direct_python_file(self):
+        payload = {
+            "toolCall": {
+                "name": "replace_file_content",
+                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/src/mms4tk/__init__.py"}
+            }
+        }
+        res = evaluate_tool_call(payload)
+        self.assertEqual(res["decision"], "deny")
+
+    def test_allow_worktree_edits(self):
+        payload = {
+            "toolCall": {
+                "name": "write_to_file",
+                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/tmp/worktrees/feature/dashboard-pnl/src/App.jsx"}
+            }
+        }
+        res = evaluate_tool_call(payload)
+        self.assertEqual(res["decision"], "allow")
+
+    def test_allow_memory_and_task(self):
+        payload_mem = {
+            "toolCall": {
+                "name": "write_to_file",
+                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/.agents/MEMORY.md"}
+            }
+        }
+        res_mem = evaluate_tool_call(payload_mem)
+        self.assertEqual(res_mem["decision"], "allow")
+
+        payload_task = {
+            "toolCall": {
+                "name": "replace_file_content",
+                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/.agents/task.md"}
+            }
+        }
+        res_task = evaluate_tool_call(payload_task)
+        self.assertEqual(res_task["decision"], "allow")
+
+    def test_allow_brain_artifacts(self):
+        payload = {
+            "toolCall": {
+                "name": "write_to_file",
+                "args": {"TargetFile": "/home/tkogut/.gemini/antigravity-cli/brain/9396bb06-1200-4c8d-9686-23acccdf4d5b/plan.md"}
+            }
+        }
+        res = evaluate_tool_call(payload)
+        self.assertEqual(res["decision"], "allow")
+
+    def test_allow_markdown_and_config(self):
+        payload_md = {
+            "toolCall": {
+                "name": "write_to_file",
+                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/docs/ARCHITECTURE.md"}
+            }
+        }
+        self.assertEqual(evaluate_tool_call(payload_md)["decision"], "allow")
+
+        payload_attr = {
+            "toolCall": {
+                "name": "write_to_file",
+                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/.gitattributes"}
+            }
+        }
+        self.assertEqual(evaluate_tool_call(payload_attr)["decision"], "allow")
+
+
+if __name__ == "__main__":
+    unittest.main()
