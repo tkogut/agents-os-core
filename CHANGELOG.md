@@ -7,6 +7,29 @@ Dokumentującą:
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 - Integrację 36 skilli Open-Mercato SDLC oraz architektury Cezar Runtime.
 
+## [6.5.4] - 2026-09-17
+
+### 🛡️ Governance & Swarm Triad Protection (R-ROLE-01 & PreToolUse)
+- ✨ **Hybrydowy Strażnik PreToolUse (`scripts/guard_coordinator_pretool.py`)**: Interaktywna bramka `force_ask` dla Antigravity/Gemini i Claude Code — chroni kod produkcyjny przed edycją w głównym drzewie projektu, umożliwiając 1-klikową akceptację dla szybkich hotfixów oraz wymuszając worktree dla dużych zadań. (#11) *(@tkogut)*
+- 🔒 **Human-in-the-Loop Mandate (`/plan` & `/grill-me`)**: Wprowadzono Hard Rule #8 w `SDLC.md`, `AGENTS.md` oraz `global_skills/grill-me/SKILL.md` — unieważniono automatyczne systemowe sygnały IDE ("Always Proceed"), wymuszając bezpośrednie manualne potwierdzenie człowieka przed wdrożeniem planu. (#11) *(@tkogut)*
+- 🛠️ **Team-wide PR Merge Permissions**: Zezwolono na polecenie `gh pr merge` w `.claude/settings.json`. (#9) *(@tkogut)*
+- 🛠️ **Gitignore Claude Code Local Settings**: Dodano ignorowanie `settings.local.json` do `.gitignore`. (#8) *(@tkogut)*
+
+### 🚀 Agentic Pipeline & Swarm Modernization
+- ✨ **Konfiguracja pipeline'u `om-*` (`.ai/agentic.config.json`)**: Pełna integracja taksonomii etykiet, bramek QA, deskryptora trackera GitHub oraz providera przeglądarki `agent-browser`. (#6) *(@tkogut)*
+- ✨ **Modernizacja Swarmu v6.5**: Wdrożono skill `swarm-onboarding`, wymuszono `core.symlinks true` oraz bezpieczne dowiązania `ln -sfn`. (#10) *(@tkogut)*
+- ✨ **Natywne hooki Claude Code w `os-upgrade-project`**: Automatyczne wdrażanie `.claude/settings.json` z obsługą `reground.sh` i `precompact-snapshot.sh` oraz instalacja pre-commit hooków w projektach potomnych. (#7) *(@tkogut)*
+
+### 🐛 Fixes & Supply Chain Hardening
+- 🐛 **Korekta reguły `merge=union` w `.gitattributes`**: Usunięto union merge z checklisty `task.md` (pozostawiając wyłącznie na append-only `MEMORY.md`), eliminując ryzyko duplikacji wpisów zadań. (#5) *(@tkogut)*
+- 🔒 **Pinning i weryfikacja SHA-256 w `os-add-skill`**: Zabezpieczono łańcuch dostaw skilli poprzez weryfikację sum kontrolnych i pinowanie referencji git. (#5) *(@tkogut)*
+- 📝 **Specyfikacja podpisywania commitów**: Opracowano plan wdrożenia kryptograficznego podpisywania commitów w miejsce nieskutecznej lokalnej atestacji SHA-256 (`.agents/specs/commit-signing.md`). (#5) *(@tkogut)*
+
+### 👥 Contributors
+- @tkogut
+
+---
+
 ## [6.5.3] - 2026-09-09
 
 ### 🛡️ Hardening: Lifecycle Hooks Branch Safety & Main/Master Protection
