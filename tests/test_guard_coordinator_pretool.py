@@ -17,8 +17,8 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
             }
         }
         res = evaluate_tool_call(payload)
-        self.assertEqual(res["decision"], "deny")
-        self.assertIn("DIRECT WRITE FORBIDDEN", res["reason"])
+        self.assertEqual(res["decision"], "force_ask")
+        self.assertIn("Swarm Governance Alert", res["reason"])
 
     def test_block_direct_python_file(self):
         payload = {
@@ -28,7 +28,8 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
             }
         }
         res = evaluate_tool_call(payload)
-        self.assertEqual(res["decision"], "deny")
+        self.assertEqual(res["decision"], "force_ask")
+        self.assertIn("Swarm Governance Alert", res["reason"])
 
     def test_allow_worktree_edits(self):
         payload = {

@@ -111,13 +111,12 @@ def evaluate_tool_call(payload: dict) -> dict:
 
     if is_code_file or is_in_protected_dir:
         return {
-            "decision": "deny",
+            "decision": "force_ask",
             "reason": (
-                f"🛑 [AGENTS-OS Hard Gate R-ROLE-01 / Worktree Enforce] DIRECT WRITE FORBIDDEN: "
-                f"Attempted to edit production code ({norm_path}) outside of an isolated Git Worktree. "
-                f"Under SDLC.md & core-rule.md, all production code modifications MUST be performed "
-                f"inside an isolated worktree (e.g. tmp/worktrees/feature/<name>) by a Builder subagent "
-                f"(via invoke_subagent). Create a worktree and delegate execution."
+                f"⚠️ [Swarm Governance Alert] Koordynator próbuje zmodyfikować kod produkcyjny ({norm_path}) "
+                f"bezpośrednio w głównym drzewie projektu poza worktree.\n"
+                f"• Jeśli to SZYBKI HOTFIX (np. 1 linijka, literówka, debug) -> Kliknij ZEZWÓL (Allow).\n"
+                f"• Jeśli to NOWY FICZER / refaktor -> Kliknij ODRZUĆ (Deny), aby agent utworzył worktree i oddelegował do subagenta Buildera."
             )
         }
 

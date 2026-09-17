@@ -51,7 +51,7 @@ Issue → Branch → Worktree → Implementation → Handshake → QA Gate → P
 - **Post-merge**: `om-auto-update-changelog`, `om-followup-issue-from-pr`
 
 ## Hard Rules
-1. Coordinator NEVER writes code — deterministically enforced by PreToolUse gate (`guard_coordinator_pretool.py` / `claude-pre-tool-guard.sh`). Attempts to modify code outside worktrees are blocked by the engine.
+1. Coordinator NEVER writes code directly in the root workspace unless explicitly authorized by the user via the interactive PreToolUse gate (`guard_coordinator_pretool.py` force_ask dialog). For features and refactors, code changes MUST be delegated to a Builder subagent in an isolated worktree.
 2. Builder ALWAYS operates in worktrees (`tmp/worktrees/*`) — never on `main`/`master` directly.
 3. Auditor can BLOCK any merge.
 4. Every PR requires visual proof for UI changes.
