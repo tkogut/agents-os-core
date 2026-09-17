@@ -39,7 +39,7 @@ Reference: `SDLC.md`
 Issue → Branch → Worktree → Implementation → Handshake → QA Gate → PR Merge
 ```
 
-1. **ALWAYS work in a Git Worktree** — never commit directly to `master/main`.
+1. **ALWAYS work in a Git Worktree** — never commit directly to `master/main`. Enforced deterministically by `.agents/hooks/claude-pre-tool-guard.sh` PreToolUse hook.
 2. **Create worktree** at start of every feature session:
    ```bash
    git worktree add tmp/worktrees/feature/<branch-name> -b feature/<branch-name>
@@ -58,12 +58,15 @@ After completing implementation, generate handshake:
 ```bash
 python3 scripts/generate-handshake.py \
   --role builder \
-  --task "<task-description>" \
-  --branch "feature/<branch-name>" \
-  --status complete
+  --conversation-id "<session-uuid>" \
+  --status SUCCESS \
+  --files "<comma,separated,changed,files>" \
+  --notes "<task-description on branch feature/<branch-name>>"
 ```
 
-Output file: `.agents/swarm/<session-id>_builder_handshake.json`
+`--status` accepts `SUCCESS|FAILURE|PARTIAL` (not `complete`). `--task`/`--branch` do not exist — use `--conversation-id` (the session UUID) and fold the task/branch description into `--notes`. Run `python3 scripts/generate-handshake.py --help` for the current signature if this drifts again.
+
+Output file: `.agents/swarm/<conversation-id>_builder_handshake.json`
 
 Handshake signals Auditor to begin QA Gate (Phase 5 of SDLC).
 

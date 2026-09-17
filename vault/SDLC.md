@@ -1,57 +1,72 @@
-# 🔄 SDLC Lifecycle Standard (v6.5 Swarm Edition)
+# SDLC — Software Development Lifecycle (AGENTS-OS v6.5)
 
-**Status:** Single Source of Truth for Software Development Life Cycle  
-**Governance Model:** AGENTS-OS v6.5 Swarm Triad (Coordinator, Builder, Auditor)
+> Source of Truth for agent-driven development workflows.
 
----
+## Lifecycle Phases
 
-## 📌 The 6-Phase Execution Pipeline
-
-Every code change, bugfix, or feature addition in `mms4tk` strictly adheres to the following 6-phase lifecycle:
-
-```mermaid
-graph TD
-    P1[Phase 1: Issue & Plan Specification] --> P2[Phase 2: Branch & Worktree Allocation]
-    P2 --> P3[Phase 3: Isolated Builder Implementation]
-    P3 --> P4[Phase 4: Handshake & Math Verification]
-    P4 --> P5[Phase 5: Auditor QA Gate Validation]
-    P5 --> P6[Phase 6: Coordinator Merge & Deployment]
+```
+Issue → Branch → Worktree → Implementation → Handshake → QA Gate → PR Merge
 ```
 
----
+### Phase 1: Issue Triage
+- **Trigger**: New issue or `/om-prepare-issue`
+- **Agent**: Coordinator (Gemini)
+- **Output**: Labeled, prioritized issue with acceptance criteria
+- **Skills**: `om-auto-manage-issues`, `om-prepare-issue`
 
-### Phase 1: Issue & Plan Specification
-- Every task must begin with a clear goal statement or structured plan in `.agents/plans/` or tracker issue.
-- The **Coordinator** assigns roles and validates architectural boundaries before execution.
+### Phase 2: Branch & Worktree
+- **Trigger**: Issue assigned to Builder
+- **Agent**: Builder (Claude Opus / Claude Code VS Code)
+- **Output**: Isolated git worktree at `tmp/worktrees/<branch-name>`
+- **Script**: `os-run-builder <branch-name>`
+- **Claude Code**: Use `/worktree-init` slash command or run manually:
+  ```bash
+  git worktree add tmp/worktrees/feature/<branch> -b feature/<branch>
+  ```
 
-### Phase 2: Branch & Worktree Allocation
-- **Isolated Workspace**: Feature work is forbidden directly on `main`.
-- All development takes place in a fresh Git Worktree created via `./os-run-builder <task_name>` in `tmp/worktrees/task_<name>/`.
+### Phase 3: Implementation
+- **Trigger**: Worktree ready
+- **Agent**: Builder (Claude)
+- **Protocol**: `[PLAN → HANDOFF → NOTIFY]`
+- **Commit Policy**: Atomic (1 commit per unit of work)
+- **Skills**: `om-auto-implement-spec`, `om-auto-fix-issue`, `om-fix`
 
-### Phase 3: Isolated Builder Implementation
-- The **Builder** role operates strictly inside the isolated worktree directory.
-- Edits are limited to feature files, unit tests, and source modules.
-- Under Swarm Triad rules, commits must set `SWARM_ROLE=builder`.
+### Phase 4: Handshake
+- **Trigger**: Implementation complete
+- **Agent**: Builder → Auditor
+- **Output**: `<conversation_id>_<role>_handshake.json` in `.agents/swarm/`
+- **Validation**: `python3 scripts/validate-handshakes.py`
 
-### Phase 4: Handshake & Math Verification
-- Prior to completion, code must pass full unit test suites (`pytest`).
-- Output statement:
-  > "Handshake Verified: Plan-Alignment and Math-Consistency checked. Ready for Coordinator Push."
+### Phase 5: QA Gate
+- **Trigger**: PR created with `needs-qa` label
+- **Agent**: Auditor (Gemini-Low)
+- **Gates**: lint → typecheck → test → visual proof
+- **Policy**: NO auto-merge. Requires `qa-approved` flag.
+- **Skills**: `om-auto-qa-pr`, `om-auto-review-pr`, `om-code-review`
 
-### Phase 5: Auditor QA Gate Validation
-- The **Auditor** verifies that:
-  1. No secret leaks or unauthenticated mutating endpoints exist.
-  2. All validation gates defined in `.ai/agentic.config.json` pass (`52/52 PASSED`).
-  3. Pre-commit role hooks are respected.
-
-### Phase 6: Coordinator Merge & Deployment
-- The **Coordinator** merges the worktree branch into `main` using `--no-ff`.
-- The worktree is cleaned up via `git worktree remove`.
-- **State-Dump Obligation**: Coordinator must ensure `.agents/MEMORY.md` and `.agents/task.md` are committed and pushed to remote before concluding the session.
-- Code is pushed to `origin/main` and deployed to target infrastructure.
+### Phase 6: PR Merge
+- **Trigger**: `qa-approved` label set
+- **Agent**: Coordinator (approval) + Builder (merge)
+- **Skills**: `om-approve-merge-pr`, `om-merge-buddy`
+- **Post-merge**: `om-auto-update-changelog`, `om-followup-issue-from-pr`
 
 ## Hard Rules
-1. Coordinator NEVER writes feature code in `/src`.
-2. Builder ALWAYS operates in worktrees.
+1. Coordinator NEVER writes code directly in the root workspace unless explicitly authorized by the user via the interactive PreToolUse gate (`guard_coordinator_pretool.py` force_ask dialog). For features and refactors, code changes MUST be delegated to a Builder subagent in an isolated worktree.
+2. Builder ALWAYS operates in worktrees (`tmp/worktrees/*`) — never on `main`/`master` directly.
 3. Auditor can BLOCK any merge.
-4. Coordinator MUST execute state-dump (`.agents/MEMORY.md`, `.agents/task.md`) before final user report.
+4. Every PR requires visual proof for UI changes.
+5. HANDOFF.md must exist before phase transition.
+6. Coordinator MUST execute state-dump (`.agents/MEMORY.md`, `.agents/task.md`) before final user report.
+7. Swarm state commits SHOULD be cryptographically signed on every machine — procedure and open decisions in `.agents/specs/commit-signing.md`. A plain SHA-256 written next to the file it hashes is NOT an integrity control.
+8. **Human-in-the-Loop Mandate for `/plan` & `/grill-me`**: Automated IDE review policies ("Always Proceed" / auto-approval stop hooks) MUST BE IGNORED for architectural plans and interviews. The Coordinator is strictly forbidden from proceeding to worktree allocation, code changes, or subagent dispatch based on an automated system message. Explicit human confirmation (via `ask_question` modal or typed chat input) is strictly required.
+
+## Slash Commands in Swarm Triad
+- **/plan**: An architectural planning phase executed by the Coordinator. The plan MUST explicitly structure execution into:
+  1. *Worktree Allocation* (`tmp/worktrees/feature/<name>`)
+  2. *Subagent Delegation* (`invoke_subagent` -> Builder)
+  3. *Handshake & QA Gate* (`scripts/generate-handshake.py` + `scripts/validate-handshakes.py`)
+  4. *PR & Merge*
+  **Human-in-the-Loop Enforcement**: The Coordinator MUST use the interactive `ask_question` modal or halt for manual chat confirmation. Automated "Always Proceed" signals are invalid for plan authorization.
+- **/grill-me**: Pre-flight architectural interview. All answers and consensus decisions MUST be directly confirmed by the human operator before moving to implementation. Automatic progression through review policies is strictly blocked.
+
+
