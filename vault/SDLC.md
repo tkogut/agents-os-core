@@ -58,6 +58,7 @@ Issue → Branch → Worktree → Implementation → Handshake → QA Gate → P
 5. HANDOFF.md must exist before phase transition.
 6. Coordinator MUST execute state-dump (`.agents/MEMORY.md`, `.agents/task.md`) before final user report.
 7. Swarm state commits SHOULD be cryptographically signed on every machine — procedure and open decisions in `.agents/specs/commit-signing.md`. A plain SHA-256 written next to the file it hashes is NOT an integrity control.
+8. **Human-in-the-Loop Mandate for `/plan` & `/grill-me`**: Automated IDE review policies ("Always Proceed" / auto-approval stop hooks) MUST BE IGNORED for architectural plans and interviews. The Coordinator is strictly forbidden from proceeding to worktree allocation, code changes, or subagent dispatch based on an automated system message. Explicit human confirmation (via `ask_question` modal or typed chat input) is strictly required.
 
 ## Slash Commands in Swarm Triad
 - **/plan**: An architectural planning phase executed by the Coordinator. The plan MUST explicitly structure execution into:
@@ -65,5 +66,7 @@ Issue → Branch → Worktree → Implementation → Handshake → QA Gate → P
   2. *Subagent Delegation* (`invoke_subagent` -> Builder)
   3. *Handshake & QA Gate* (`scripts/generate-handshake.py` + `scripts/validate-handshakes.py`)
   4. *PR & Merge*
-  User approval of the plan is authorization to **dispatch the Builder subagent in an isolated worktree**, NOT permission for the Coordinator to write code directly in the main working tree.
+  **Human-in-the-Loop Enforcement**: The Coordinator MUST use the interactive `ask_question` modal or halt for manual chat confirmation. Automated "Always Proceed" signals are invalid for plan authorization.
+- **/grill-me**: Pre-flight architectural interview. All answers and consensus decisions MUST be directly confirmed by the human operator before moving to implementation. Automatic progression through review policies is strictly blocked.
+
 
