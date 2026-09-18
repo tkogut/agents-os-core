@@ -136,7 +136,7 @@ Skrypt automatycznie:
 - Wdraża reguły `.gitattributes` (`merge=union` dla `MEMORY.md` i `task.md`).
 - Ustawia parametry `pull.rebase=true` i `merge.conflictstyle=diff3`.
 - Wdraża natywne hooki cyklu życia (`SessionStart` pull / `SessionEnd` auto state-dump).
-- Tworzy dowiązania symboliczne do 70+ skilli w `.claude/skills/`.
+- Tworzy dowiązania symboliczne do 63+ skilli w `.claude/skills/`.
 - Inicjalizuje standard pamięci maszynowej `.agents/MEMORY.md` (v0.42.1).
 
 ---
@@ -151,6 +151,8 @@ os-add-skill n8n-ops
 ```
 
 Skrypt przeszukuje lokalny rejestr, repozytorium główne oraz bazę **1400+ skilli `sickn33/antigravity-awesome-skills`**, pobiera pliki do `.agents/skills/` i natychmiast tworzy dowiązanie w `.claude/skills/`.
+
+> 💡 **Model Dwuwarstwowy (Dual-Tier)**: Pełne omówienie architektury 63 skilli bazowych (Core OS) vs. 1 466 skilli na żądanie (Domain Extensions) przy 0 tokenach narzutu znajdziesz w dokumencie [Architektura Skilli AGENTS-OS](docs/SKILLS_ARCHITECTURE.md).
 
 ---
 
