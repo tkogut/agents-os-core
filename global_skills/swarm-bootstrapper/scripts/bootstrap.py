@@ -67,6 +67,18 @@ if os.path.exists(VAULT_DIR):
         else:
             if not os.path.exists(dst):
                 shutil.copy2(src, dst)
+
+    # Podstawienie nazwy projektu w skopiowanych szablonach
+    agentic_config_dst = os.path.join(TARGET_DIR, ".ai", "agentic.config.json")
+    if os.path.isfile(agentic_config_dst):
+        try:
+            with open(agentic_config_dst, "r", encoding="utf-8") as f:
+                cfg_content = f.read()
+            cfg_content = cfg_content.replace("{{PROJECT_NAME}}", project_name)
+            with open(agentic_config_dst, "w", encoding="utf-8") as f:
+                f.write(cfg_content)
+        except Exception as e:
+            print(f"⚠️  Nie udało się zaktualizować nazwy projektu w .ai/agentic.config.json: {e}")
 else:
     print(f"⚠️  Vault nie znaleziony w {VAULT_DIR}. Tworzę minimalną strukturę...")
     for d in [".agents/plans", ".agents/skills", "execution", "tmp"]:

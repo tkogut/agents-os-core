@@ -1,7 +1,7 @@
 # 🛡️ Cezar Runtime HANDOFF Template (Fault-Tolerance & Session Resumption)
 
-**System:** mms4tk + Hermes Agent Swarm  
-**Purpose:** Fault-tolerance protocol for agent session crashes, server restarts, or context handoffs.
+**System:** AGENTS-OS v6.5 Swarm Edition  
+**Purpose:** Fault-tolerance protocol for agent session crashes, environment resets, or context handoffs.
 
 ---
 
@@ -10,16 +10,16 @@
 In the event of a system interrupt or context reset:
 
 1. **State Recovery**:
-   - Inspect `.agents/swarm/logs.db` for the last recorded daemon cycle and strategy state (`BASE_MODE` vs `SCOUT_MODE`).
-   - Query `/api/v1/state` and `/api/v1/daemon/status`.
+   - Inspect `.agents/MEMORY.md` and `.agents/task.md` for active session context and last completed steps.
+   - Verify uncommitted changes and current branch state.
 
 2. **Active Worktree Audit**:
    - Run `git worktree list` to detect open feature branches under `tmp/worktrees/`.
    - If an active worktree exists, read its latest commit message and `git status`.
 
-3. **Pending Webhook & Kanban Queue**:
-   - Query `kanban.db` tasks in `/docker/hermes-agent/data/kanban.db`.
-   - Resolve any blocked HITL cards via `POST /api/v1/hermes/hitl_resolve`.
+3. **Pending Tasks & Review Queue**:
+   - Check open PRs or issues via tracker (`gh pr list`, `gh issue list`).
+   - Resolve any blocked tasks or human confirmation checkpoints.
 
 ---
 
@@ -28,9 +28,9 @@ In the event of a system interrupt or context reset:
 ```markdown
 ### 📋 Session Handoff Receipt
 - **Timestamp**: {{ TIMESTAMP_ISO }}
-- **Active State**: {{ BASE_MODE | SCOUT_MODE }}
-- **Current Leverage**: {{ LEVERAGE_MULTIPLIER }}
-- **Trading Symbol**: {{ MMS4_SYMBOL }}
-- **Pending Tasks**: {{ PENDING_KANBAN_TASKS }}
+- **Active Role**: {{ COORDINATOR | BUILDER | AUDITOR }}
+- **Active Worktree**: {{ WORKTREE_PATH }}
+- **Branch**: {{ GIT_BRANCH }}
+- **Pending Tasks**: {{ PENDING_TASKS }}
 - **Last Clean Commit**: {{ GIT_COMMIT_SHA }}
 ```

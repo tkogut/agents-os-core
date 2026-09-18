@@ -25,6 +25,7 @@ Dokumentującą:
 - 💎 **Zachowanie kluczowych lokalnych token-saverów**: Utrzymano dwuwarstwowy model agentów — zachowano `cavecrew` (niskokosztowe subagenty zwracające skompresowane odpowiedzi), `caveman-explore` (szybki lokalizator kodu `path:line`) oraz `caveman-review` (jednolinijkowe audyty).
 - 📐 **Format Concise Engineering**: Zastąpiono tryb "jaskiniowca" profesjonalną zwięzłością inżynierską (logic-first Markdown) bez łamanej składni pidgin.
 - ⚙️ **Aktualizacja harnessu**: Zaktualizowano `os-upgrade-project`, `docs/API.md` oraz skrypt `scripts/sync-skills.sh` do stanu 63+ skilli.
+- 🧼 **Sanityzacja szablonu startowego (Vault)**: Zmodernizowano `vault/.ai/agentic.config.json` do uniwersalnego schematu Swarm v6.5 z dynamicznym placeholderem `{{PROJECT_NAME}}` oraz oczyszczono pliki `HANDOFF.md`, `agents.md` i testy z pozostałości projektu źródłowego (`mms4tk`).
 
 ## [6.5.4] - 2026-09-17
 
