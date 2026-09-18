@@ -26,11 +26,11 @@ A. **Zasada "Zero-Click Repo" (Trigger: "github init")**
 2. Ustawia poprawnie upstream dla bazy master/main.
 
 B. **Zasada "Auto-Sync" (Trigger: "github sync" / "zapisz i pushnij")**
-1. Zbuduj krótki commit message korzystając ze standardów skilla `caveman-commit` (≤ 50 znaków, format Conventional Commits).
+1. Zbuduj krótki commit message w standardzie Conventional Commits (≤ 50 znaków).
 2. Wykonaj:
    ```bash
    git add .
-   git commit -m "chore: caveman sync" # Zastąp wygenerowaną wiadomością
+   git commit -m "chore: sync state" # Zastąp wygenerowaną wiadomością
    git push
    ```
 

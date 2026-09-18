@@ -1,9 +1,9 @@
-# /commit — Caveman-style Atomic Commit
+# /commit — Atomic Conventional Commit
 #
 # Usage: /commit
 # Creates a Conventional Commit ≤50 chars with SWARM_ROLE=builder.
 
-Generate and execute an atomic caveman-style commit.
+Generate and execute an atomic Conventional Commit (≤50 chars).
 
 Steps:
 1. Show staged changes:

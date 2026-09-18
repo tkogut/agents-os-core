@@ -9,7 +9,7 @@
 #   3. Ustawia lokalne parametry gita (pull.rebase true, merge.conflictstyle diff3)
 #   4. Wdraża natywne hooki Claude Code (.claude/settings.json) — OSOBNY format/plik
 #      od punktu 2.; Claude Code nie czyta .agents/hooks.json.
-#   5. Tworzy dowiązania symboliczne dla Claude Code (.claude/skills/*, 74+ skilli)
+#   5. Tworzy dowiązania symboliczne dla Claude Code (.claude/skills/*, 63+ skilli)
 #   6. Inicjalizuje silnik pamięci MEMORY.md v0.42.1 i rejestr task.md jeśli brak
 #   7. Synchronizuje najnowsze skille z szablonu Vault
 # ==============================================================================
@@ -37,7 +37,7 @@ for arg in "$@"; do
             echo "  • Ustawia lokalne parametry Gita (pull.rebase=true, merge.conflictstyle=diff3)"
             echo "  • Konfiguruje bezpieczne hooki cyklu życia Antigravity/Gemini (z ochroną gałęzi main)"
             echo "  • Konfiguruje natywne hooki Claude Code (.claude/settings.json + .agents/hooks/*.sh)"
-            echo "  • Mapuje symlinki .claude/skills/* dla 74+ skilli (w tym 41 skilli Open-Mercato)"
+            echo "  • Mapuje symlinki .claude/skills/* dla 63+ skilli (w tym 41 skilli Open-Mercato)"
             echo "  • Inicjalizuje silnik pamięci .agents/MEMORY.md"
             echo ""
             echo "Opcje:"
