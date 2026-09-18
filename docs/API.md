@@ -134,7 +134,8 @@ os-add-skill <skill-name>
 #### Kolejność Wyszukiwania (Fallback Resolution):
 1. **Lokalny Vault**: `~/.antigravity/templates/vault/.agents/skills/<skill-name>`
 2. **Repozytorium Główne**: `tkogut/agents-os-core/global_skills/<skill-name>`
-3. **Rejestr Społeczności**: `sickn33/antigravity-awesome-skills/skills/<skill-name>`
+3. **Upstream Open-Mercato**: `open-mercato/skills/skills/<skill-name>`
+4. **Rejestr Społeczności**: `sickn33/antigravity-awesome-skills/skills/<skill-name>`
 
 #### Automatyczne Linkowanie:
 Po pobraniu skrypt automatycznie tworzy symlink w `.claude/skills/<skill-name>`, zapewniając natychmiastową widoczność w Claude Code i Antigravity.

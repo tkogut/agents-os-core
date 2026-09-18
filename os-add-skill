@@ -33,6 +33,12 @@ SOURCES = [
         "pinned_ref": None,
     },
     {
+        "label": "open-mercato/skills",
+        "api": "https://api.github.com/repos/open-mercato/skills/contents/skills/{skill_name}",
+        "prefix": "skills/{skill_name}/",
+        "pinned_ref": None,
+    },
+    {
         "label": "sickn33/antigravity-awesome-skills",
         "api": "https://api.github.com/repos/sickn33/antigravity-awesome-skills/contents/skills/{skill_name}",
         "prefix": "skills/{skill_name}/",
@@ -189,13 +195,14 @@ def main():
     dest_dir = os.path.abspath(os.path.join(project_root, ".agents", "skills", skill_name))
     previous_agg = compare_previous_lock(dest_dir)
 
+    total_sources = 1 + len(SOURCES)
     # ---------------------------------------------------------------------- #
     # ZRODLO 1: lokalny szablon (offline, brak wektora supply-chain)
     # ---------------------------------------------------------------------- #
     local_template_path = os.path.expanduser(
         "~/.antigravity/templates/v6.5-swarm/.agents/skills/%s" % skill_name)
     if os.path.exists(local_template_path):
-        print("[1/3] Skill '%s' z lokalnego szablonu (v6.5-swarm)..." % skill_name)
+        print("[1/%d] Skill '%s' z lokalnego szablonu (v6.5-swarm)..." % (total_sources, skill_name))
         try:
             if os.path.exists(dest_dir):
                 shutil.rmtree(dest_dir)
@@ -221,8 +228,8 @@ def main():
                 sys.exit(2)
             print(msg)
 
-        print("[%d/3] Szukam '%s' w %s (ref=%s)..."
-              % (idx, skill_name, src["label"], ref or "HEAD"))
+        print("[%d/%d] Szukam '%s' w %s (ref=%s)..."
+              % (idx, total_sources, skill_name, src["label"], ref or "HEAD"))
 
         digests = {}
         staging = dest_dir + ".partial"

@@ -5,7 +5,20 @@ Dokumentującą:
 - Pełną refaktoryzację rdzenia i przejście na model asynchronicznych agentów (Swarm Triad).
 - Usunięcie martwego kodu (dead code) i przestarzałych skryptów.
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
-- Integrację 36 skilli Open-Mercato SDLC oraz architektury Cezar Runtime.
+- Integrację 41 skilli Open-Mercato SDLC & Product Discovery oraz architektury Cezar Runtime.
+
+## [6.5.5] - 2026-09-18
+
+### 🚀 Open-Mercato Product Discovery & Validation Layer
+- ✨ **Nowe skille produktowe z upstreamu (`open-mercato/skills`)**:
+  - `om-discover`: Prowadzenie ustrukturyzowanych rozmów discovery, drzewa szans/rozwiązań oraz generowanie `product-brief.md`.
+  - `om-synthetic-users`: Statystyczne panele syntetycznych person testujące flow i decyzje pod presją z uziemieniem dowodowym.
+  - `om-mockup-prototype`: Generowanie neutralnych, klikalnych prototypów low-fi z symulacją danych przed wejściem w implementację.
+  - `om-backlog`: Dekompozycja zwalidowanego briefu na drzewo epików, user stories i tasków z egzekwowaniem Definition of Ready.
+  - `om-setup-discovery-pipeline`: Konfiguracja warstwy produktowej, ról Product Owner/Designer oraz Definition of Ready w `SDLC.md`.
+- 🔄 **Pełna synchronizacja 36 istniejących skilli `om-*`**: Zaktualizowano wszystkie skille do najnowszej wersji upstream (m.in. śledzenie `QA head: <sha>`, pre-intake bramki Definition of Ready, kontrakt repo-local `.ai/skills/<name>/SKILL.md`).
+- 🛠️ **Rozszerzenie `os-add-skill`**: Dodano `open-mercato/skills` jako bezpośrednie źródło instalacji skilli w CLI oraz zaktualizowano referencję w `docs/API.md`.
+- 🔗 **Dystrybucja i dowiązania**: Zsynchronizowano skille we wszystkich lokalizacjach dystrybucyjnych (`global_skills/`, `.agents/skills/`, `vault/.agents/skills/`, `.claude/skills/`, `vault/.claude/skills/`).
 
 ## [6.5.4] - 2026-09-17
 
