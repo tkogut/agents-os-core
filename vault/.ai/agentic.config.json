@@ -20,9 +20,9 @@
   },
   "swarm": {
     "roles": {
-      "coordinator": { "model": "gemini", "permissions": ["plan", "route", "review"] },
-      "builder": { "model": "claude", "permissions": ["implement", "commit", "test"] },
-      "auditor": { "model": "gemini-low", "permissions": ["lint", "audit", "block"] }
+      "coordinator": { "model": "gemini-3.8-flash-medium", "permissions": ["plan", "route", "review"] },
+      "builder": { "model": "gemini-3.1-pro", "permissions": ["implement", "commit", "test"] },
+      "auditor": { "model": "gemini-3.8-flash-medium", "permissions": ["lint", "audit", "block"] }
     },
     "handshake_dir": ".agents/swarm",
     "heartbeat_interval_s": 300,
