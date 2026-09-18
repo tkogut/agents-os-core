@@ -37,7 +37,7 @@ try:
     # Any code modification on main/master is rejected
     sys.stderr.write(
         f'\n🛑 [AGENTS-OS Swarm Guard] DIRECT WRITE FORBIDDEN ON {norm_path}!\n'
-        f'   You are on branch \'$BRANCH\'. Direct code modification on main/master is prohibited.\n'
+        f'   You are on branch \'\$BRANCH\'. Direct code modification on main/master is prohibited.\n'
         f'   Please initialize a worktree using /worktree-init or switch to a feature branch.\n\n'
     )
     sys.exit(1)
