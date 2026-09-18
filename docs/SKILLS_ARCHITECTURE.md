@@ -46,8 +46,10 @@ Zainstalowana w każdym projekcie zarządzanym przez AGENTS-OS (`os-init`, `os-u
   - *Weryfikacja i QA*: `om-code-review`, `om-auto-review-pr`, `om-auto-qa-pr`, `om-ux-review-pr`.
   - *Release*: `om-check-and-commit`, `om-approve-merge-pr`, `om-auto-update-changelog`.
 - **Swarm Triad Governance**:
-  - `grill-me`: Protokół wywiadu architektonicznego i wymóg Human-in-the-Loop.
-  - `code-reviewer`: Formalny audytor dla roli Auditor.
+  - `grill-me`: Protokół wywiadu architektonicznego i wymóg Human-in-the-Loop (rola Coordinator: Gemini 3.8 Flash Medium).
+  - `code-reviewer`: Formalny audytor kodu i kontraktów (rola Auditor: Gemini 3.8 Flash Medium).
+  - `pr-creator`: Koordynacja i weryfikacja PR.
+  - Implementacja i testy: rola Builder (Gemini 3.1 Pro via Antigravity / Cursor / Claude Code).
   - `swarm-onboarding`: Błyskawiczny briefing kontekstowy dla nowych agentów.
 - **Oszczędne Subagenty (`cavecrew`)**:
   - `cavecrew-investigator`: Zwraca wyłącznie zwięzłe syntetyczne wyniki (~700 tokenów zamiast 2-3k opisu).
@@ -56,7 +58,7 @@ Zainstalowana w każdym projekcie zarządzanym przez AGENTS-OS (`os-init`, `os-u
 
 ### 💰 Ekonomia Tokenowa Warstwy 1:
 - Zajmuje jedynie **~11 500 tokenów** w system prompcie.
-- Dzięki stabilności definicji, nowoczesne modele (Claude 3.5/3.7, Gemini 2.0) korzystają z **Prompt Cachingu** (zniżka 90% kosztu input tokenów).
+- Dzięki stabilności definicji, nowoczesne modele (Gemini 3.1/3.8, Claude 3.5/3.7) korzystają z **Prompt Cachingu** (zniżka 90% kosztu input tokenów).
 
 ---
 
@@ -111,3 +113,13 @@ os-add-skill wcag-audit-patterns
 | **Czas odpowiedzi (TTFT)** | ~8.0s – 12.0s | ~0.9s – 1.4s | **~8x szybciej** |
 | **Precyzja routingu narzędzi** | Niska (kolizje setek triggerów) | Bezbłędna (czysty, zwięzły zestaw) | **Brak halucynacji** |
 | **Dostęp do niszowej wiedzy** | Ograniczony limitami promptu | Pełny (1 400+ skilli pod komendą) | **Nieograniczony** |
+ 
+---
+ 
+## 🔄 Automatyczna Synchronizacja ze Źródłem
+ 
+Katalog Tier 2 oraz biblioteka Tier 1 są stale utrzymywane w stanie aktualnym dzięki dedykowanemu workflow GitHub Actions:
+- [`.github/workflows/om-skills-sync.yml`](file:///home/tkogut/projects/agents-os-core/.github/workflows/om-skills-sync.yml):
+  - Uruchamiany automatycznie w każdą niedzielę o 03:00 UTC (oraz na żądanie `workflow_dispatch`).
+  - Sprawdza aktualizacje w repozytoriach `open-mercato/skills` oraz `sickn33/antigravity-awesome-skills`.
+  - Weryfikuje integralność, generuje PR aktualizacyjny i powiadamia zespół o nowych skillach.

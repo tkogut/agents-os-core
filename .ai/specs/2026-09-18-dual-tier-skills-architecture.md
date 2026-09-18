@@ -53,7 +53,7 @@ flowchart TD
 - **Deployment**: Copied into `.agents/skills/` and symlinked to `.claude/skills/` during project bootstrapping (`os-init`, `os-upgrade-project`).
 - **Composition**:
   - **41 Open-Mercato SDLC skills**: End-to-end autonomous lifecycle (product discovery, specification drafting, task breaking, worktree PR loops, multi-tier reviews, browser QA).
-  - **Swarm Triad Governance**: Coordinator planning (`grill-me`), Auditor verification (`code-reviewer`), Builder orchestration.
+  - **Swarm Triad Governance**: Coordinator planning (`grill-me`, Gemini 3.8 Flash Medium), Auditor verification (`code-reviewer`, Gemini 3.8 Flash Medium), Builder orchestration (Gemini 3.1 Pro via Antigravity / Cursor / Claude Code).
   - **Context-preserving Subagents**: `cavecrew` (`cavecrew-investigator`, `cavecrew-builder`, `cavecrew-reviewer`) emitting compressed summaries, and `caveman-explore` emitting `path:line` pointers.
 - **Budget**: ~10,000–12,000 prompt tokens total, stable and highly compressible via LLM Prompt Caching.
 
@@ -120,5 +120,11 @@ flowchart TD
 - [x] Update references in [`docs/API.md`](file:///home/tkogut/projects/agents-os-core/docs/API.md) and [`README.md`](file:///home/tkogut/projects/agents-os-core/README.md).
 
 ### Phase 2: Autonomous Agent Guidance & Skill Discovery Hook
-- [ ] Add routing recommendation in `.agents/MEMORY.md` and `AGENTS.md` guiding agents to inspect `awesome-skills-catalog.md` before reporting inability to solve domain tasks.
-- [ ] Maintain weekly sync of upstream catalog via `.github/workflows/om-skills-sync.yml`.
+- [x] Add routing recommendation in `.agents/MEMORY.md`, `AGENTS.md`, and `CLAUDE.md` guiding agents to inspect `awesome-skills-catalog.md` before reporting inability to solve domain tasks.
+- [x] Maintain weekly sync of upstream catalog via `.github/workflows/om-skills-sync.yml` (cron schedule every Sunday at 03:00 UTC).
+- [x] Integrate Swarm Triad roles with Gemini 3.1 Pro (Builder) and Gemini 3.8 Flash Medium (Coordinator/Auditor).
+
+### Phase 3: Supply Chain Hardening & Downstream Propagation
+- [ ] Implement local checksum caching in `os-add-skill` for offline / air-gapped agent runs.
+- [ ] Add `.skill-lock.json` supply-chain validation check into `os-upgrade-project` validation gate.
+- [ ] Add interactive catalog search command in `.claude/commands/find-skill.md`.
