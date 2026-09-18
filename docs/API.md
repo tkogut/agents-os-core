@@ -141,6 +141,8 @@ os-add-skill <skill-name>
 #### Automatyczne Linkowanie:
 Po pobraniu skrypt automatycznie tworzy symlink w `.claude/skills/<skill-name>`, zapewniając natychmiastową widoczność w Claude Code i Antigravity.
 
+> 📖 **Szczegółowy przewodnik architektoniczny**: Pełne omówienie modelu dwuwarstwowego (Core OS vs Domain Extensions) oraz tokenowej optymalizacji 1 400+ skilli znajdziesz w dokumencie [Architektura Skilli AGENTS-OS](file:///home/tkogut/projects/agents-os-core/docs/SKILLS_ARCHITECTURE.md).
+
 ---
 
 ### `os-run-builder`
