@@ -13,7 +13,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload = {
             "toolCall": {
                 "name": "write_to_file",
-                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/ui_dashboard/src/components/AggregatedPnLCard.jsx"}
+                "args": {"TargetFile": "/home/user/projects/sample_project/ui_dashboard/src/components/AggregatedPnLCard.jsx"}
             }
         }
         res = evaluate_tool_call(payload)
@@ -24,7 +24,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload = {
             "toolCall": {
                 "name": "replace_file_content",
-                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/src/mms4tk/__init__.py"}
+                "args": {"TargetFile": "/home/user/projects/sample_project/src/sample_project/__init__.py"}
             }
         }
         res = evaluate_tool_call(payload)
@@ -35,7 +35,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload = {
             "toolCall": {
                 "name": "write_to_file",
-                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/tmp/worktrees/feature/dashboard-pnl/src/App.jsx"}
+                "args": {"TargetFile": "/home/user/projects/sample_project/tmp/worktrees/feature/dashboard-pnl/src/App.jsx"}
             }
         }
         res = evaluate_tool_call(payload)
@@ -45,7 +45,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload_mem = {
             "toolCall": {
                 "name": "write_to_file",
-                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/.agents/MEMORY.md"}
+                "args": {"TargetFile": "/home/user/projects/sample_project/.agents/MEMORY.md"}
             }
         }
         res_mem = evaluate_tool_call(payload_mem)
@@ -54,7 +54,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload_task = {
             "toolCall": {
                 "name": "replace_file_content",
-                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/.agents/task.md"}
+                "args": {"TargetFile": "/home/user/projects/sample_project/.agents/task.md"}
             }
         }
         res_task = evaluate_tool_call(payload_task)
@@ -64,7 +64,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload = {
             "toolCall": {
                 "name": "write_to_file",
-                "args": {"TargetFile": "/home/tkogut/.gemini/antigravity-cli/brain/9396bb06-1200-4c8d-9686-23acccdf4d5b/plan.md"}
+                "args": {"TargetFile": "/home/user/.gemini/antigravity-cli/brain/9396bb06-1200-4c8d-9686-23acccdf4d5b/plan.md"}
             }
         }
         res = evaluate_tool_call(payload)
@@ -74,7 +74,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload_md = {
             "toolCall": {
                 "name": "write_to_file",
-                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/docs/ARCHITECTURE.md"}
+                "args": {"TargetFile": "/home/user/projects/sample_project/docs/ARCHITECTURE.md"}
             }
         }
         self.assertEqual(evaluate_tool_call(payload_md)["decision"], "allow")
@@ -82,7 +82,7 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         payload_attr = {
             "toolCall": {
                 "name": "write_to_file",
-                "args": {"TargetFile": "/home/tkogut/projects/mms4tk/.gitattributes"}
+                "args": {"TargetFile": "/home/user/projects/sample_project/.gitattributes"}
             }
         }
         self.assertEqual(evaluate_tool_call(payload_attr)["decision"], "allow")

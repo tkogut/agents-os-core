@@ -4,6 +4,6 @@
   "status": "SUCCESS",
   "files_modified": [],
   "math_consistency_check": "PASSED",
-  "timestamp": "2026-09-18T17:21:48Z",
-  "notes": "Pruned 11 obsolete Caveman skills, retained local token savers (cavecrew, caveman-explore, caveman-review), updated harness metrics to 63+ skills."
+  "timestamp": "2026-09-18T17:49:07Z",
+  "notes": "Sanitized vault template: modernized vault/.ai/agentic.config.json to v6.5 Swarm schema with {{PROJECT_NAME}}, removed mms4tk artifacts from HANDOFF.md, agents.md, and tests."
 }
