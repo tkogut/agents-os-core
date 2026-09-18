@@ -43,13 +43,14 @@ for skill in "${SHARED_SKILLS[@]}"; do
     fi
 done
 
-# 2. Synchronizacja skilli z wtyczki caveman
+# 2. Synchronizacja skilli z wtyczki caveman (tylko zachowane: cavecrew, caveman-explore, caveman-review, caveman)
 CAVEMAN_PLUGIN_DIR="$HOME/.gemini/config/plugins/caveman/skills"
+RETAINED_CAVEMAN=("cavecrew" "caveman-explore" "caveman-review" "caveman")
 if [ -d "$CAVEMAN_PLUGIN_DIR" ]; then
-    echo "🔄 Synchronizacja skilli z wtyczki Caveman..."
-    for skill_path in "$CAVEMAN_PLUGIN_DIR"/*; do
+    echo "🔄 Synchronizacja zachowanych skilli z wtyczki Caveman..."
+    for skill_name in "${RETAINED_CAVEMAN[@]}"; do
+        skill_path="$CAVEMAN_PLUGIN_DIR/$skill_name"
         if [ -d "$skill_path" ]; then
-            skill_name=$(basename "$skill_path")
             dst="$VAULT_SKILLS_DIR/$skill_name"
             echo "   [caveman] -> Synchronizuję: $skill_name"
             if [ -d "$dst" ]; then

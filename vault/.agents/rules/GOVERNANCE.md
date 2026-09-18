@@ -71,10 +71,10 @@ No task is marked `[x] COMPLETE` without the following confirmation:
 
 ---
 
-## 6. CAVEMAN STANDARD (Anti-Split-Brain)
+## 6. CONCISE ENGINEERING STANDARD (Anti-Split-Brain)
 
-- **Auto-Activation**: Caveman mode Ultra+ intensity. Logic-First Speech. Prompt Compaction. Context Caching.
-- **Git Commits**: All commit messages must follow the `caveman-commit` standard (Conventional Commits ≤ 50 chars).
+- **Concise Discipline**: Concise engineering Markdown. Logic-First Output. No fluff, pleasantries, or preamble. Exact technical terms and context caching.
+- **Git Commits**: All commit messages must follow the Conventional Commits standard (≤ 50 chars).
 
 ## 7. FRAMEWORK PRESETS [ALPHA-TRACK]
 

@@ -20,6 +20,12 @@ Dokumentującą:
 - 🛠️ **Rozszerzenie `os-add-skill`**: Dodano `open-mercato/skills` jako bezpośrednie źródło instalacji skilli w CLI oraz zaktualizowano referencję w `docs/API.md`.
 - 🔗 **Dystrybucja i dowiązania**: Zsynchronizowano skille we wszystkich lokalizacjach dystrybucyjnych (`global_skills/`, `.agents/skills/`, `vault/.agents/skills/`, `.claude/skills/`, `vault/.claude/skills/`).
 
+### 🧹 Pruning biblioteki skilli & Optymalizacja Tokenowa (/grill-me)
+- ✂️ **Usunięcie zbędnych skilli Caveman Cloud**: Wyeliminowano 11 skilli zależnych od zewnętrznej bramki Caveman Cloud lub dublujących narzędzia repozytorium (`caveman-setup`, `caveman-stats`, `caveman-manage`, `caveman-optimize`, `caveman-evidence-review`, `caveman-learn`, `caveman-discover`, `caveman-compress`, `caveman-commit`, `caveman-init`, `caveman-help`), redukując narzut system promptu o >1200 tokenów na każdą turę.
+- 💎 **Zachowanie kluczowych lokalnych token-saverów**: Utrzymano dwuwarstwowy model agentów — zachowano `cavecrew` (niskokosztowe subagenty zwracające skompresowane odpowiedzi), `caveman-explore` (szybki lokalizator kodu `path:line`) oraz `caveman-review` (jednolinijkowe audyty).
+- 📐 **Format Concise Engineering**: Zastąpiono tryb "jaskiniowca" profesjonalną zwięzłością inżynierską (logic-first Markdown) bez łamanej składni pidgin.
+- ⚙️ **Aktualizacja harnessu**: Zaktualizowano `os-upgrade-project`, `docs/API.md` oraz skrypt `scripts/sync-skills.sh` do stanu 63+ skilli.
+
 ## [6.5.4] - 2026-09-17
 
 ### 🛡️ Governance & Swarm Triad Protection (R-ROLE-01 & PreToolUse)
