@@ -25,4 +25,4 @@ Select the appropriate domain module based on your current task objective:
 
 ## ⚡ Context Budget Constraints
 - **Rule**: Do not load more than 3 domain specification modules into active context at once.
-- **Priority**: Primary focus must remain on source implementation files in `src/mms4tk/`.
+- **Priority**: Primary focus must remain on source implementation files in the project source tree (e.g. `src/`).

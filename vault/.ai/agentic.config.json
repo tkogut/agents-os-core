@@ -1,38 +1,73 @@
 {
-  "version": "6.5.0",
-  "project_name": "mms4tk",
-  "architecture": "Swarm Triad (Coordinator, Builder, Auditor)",
-  "validation_gates": {
-    "lint": "python3 -m flake8 src/ tests/ || true",
-    "typecheck": "python3 -m mypy src/ || true",
-    "test": "MMS4_API_KEY=test-api-auth-key-unit-test python3 -m pytest tests/ -v",
-    "build": "python3 -m build || true"
+  "$schema": "https://agents-os.dev/schemas/agentic-config/v1",
+  "version": "6.5-swarm",
+  "project": {
+    "name": "{{PROJECT_NAME}}",
+    "type": "generic",
+    "primary_language": "auto"
   },
-  "roles": {
-    "coordinator": {
-      "mandate": "High-level orchestration, git push, plan management (.agents/plans/)",
-      "forbidden_paths": ["src/*", "tests/*"]
+  "pipeline": {
+    "gates": {
+      "lint": { "command": "echo 'No lint command configured' || true", "required": false },
+      "typecheck": { "command": "echo 'No typecheck command configured' || true", "required": false },
+      "test": { "command": "echo 'No test command configured' || true", "required": false },
+      "build": { "command": "echo 'No build command configured' || true", "required": false }
     },
-    "builder": {
-      "mandate": "Atomic feature implementation in isolated Git Worktree",
-      "forbidden_paths": [".agents/plans/*"]
-    },
-    "auditor": {
-      "mandate": "Read-only mathematical consistency, security audit, and QA gate verification",
-      "read_only": true
-    }
+    "commit_policy": "atomic",
+    "pr_auto_merge": false,
+    "qa_required": true,
+    "qa_label": "needs-qa"
   },
-  "heartbeat": {
-    "interval_seconds": 15,
-    "daemon_endpoint": "/api/v1/daemon/status"
+  "swarm": {
+    "roles": {
+      "coordinator": { "model": "gemini", "permissions": ["plan", "route", "review"] },
+      "builder": { "model": "claude", "permissions": ["implement", "commit", "test"] },
+      "auditor": { "model": "gemini-low", "permissions": ["lint", "audit", "block"] }
+    },
+    "handshake_dir": ".agents/swarm",
+    "heartbeat_interval_s": 300,
+    "max_ram_per_instance_gb": 10
+  },
+  "context": {
+    "router_file": ".agents/agents.md",
+    "domain_modules": [
+      ".agents/agents-pipeline.md",
+      ".agents/agents-qa.md",
+      ".agents/agents-ux.md"
+    ],
+    "max_context_files": 3
   },
   "evaluator": {
-    "enabled": true,
-    "manifest": ".agents/eval/evaluator.md",
-    "test_cases": [".agents/eval/tc-001.json"]
+    "enabled": false,
+    "test_cases_dir": ".agents/eval/cases",
+    "downscale_target": "gemini-flash",
+    "validation_interval": "weekly"
   },
-  "context_routing": {
-    "entrypoint": ".agents/agents.md",
-    "max_domain_modules": 3
-  }
+  "baseBranch": "auto",
+  "tracker": "github",
+  "browser": { "provider": "agent-browser" },
+  "validation": {
+    "commands": [
+      "echo 'Configure validation commands in .ai/agentic.config.json'"
+    ]
+  },
+  "labels": {
+    "enabled": true,
+    "pipeline": ["review", "changes-requested", "qa", "qa-failed", "merge-queue", "blocked", "do-not-merge"],
+    "category": ["bug", "feature", "refactor", "security", "dependencies", "documentation"],
+    "meta": ["needs-qa", "skip-qa", "qa-approved", "qa-self-verified", "in-progress", "ci-monitoring"],
+    "priority": ["priority-low", "priority-medium", "priority-high", "priority-extreme"],
+    "risk": ["risk-low", "risk-medium", "risk-high"]
+  },
+  "qaGate": true,
+  "ci": { "maxWaitMinutes": 40 },
+  "engine": { "loopStepThreshold": 20, "executorTier": "standard", "stepReview": "final" },
+  "paths": {
+    "runs": ".ai/runs",
+    "analysis": ".ai/analysis",
+    "specs": ".ai/specs",
+    "scripts": ".ai/scripts",
+    "qa": ".ai/qa"
+  },
+  "reviewChecklist": null
 }
