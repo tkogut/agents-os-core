@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo ..); python3 \"$ROOT/scripts/guard_coordinator_pretool.py\"",
+            "command": "python3 scripts/guard_coordinator_pretool.py",
             "timeout": 5
           }
         ]
