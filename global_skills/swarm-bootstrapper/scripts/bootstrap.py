@@ -109,7 +109,7 @@ gitattributes_path = os.path.join(TARGET_DIR, ".gitattributes")
 if not os.path.exists(gitattributes_path):
     print("📝 Tworzenie .gitattributes (merge=union)...")
     with open(gitattributes_path, "w", encoding="utf-8") as f:
-        f.write("# AGENTS-OS v6.5 Swarm Edition - Distributed Auto-Sync Rules\n.agents/MEMORY.md merge=union\n.agents/task.md merge=union\nMEMORY.md merge=union\ntask.md merge=union\n")
+        f.write("# AGENTS-OS v6.5 Swarm Edition - Distributed Auto-Sync Rules\n# Note: task.md is a checklist and must NOT use merge=union\n.agents/MEMORY.md merge=union\nMEMORY.md merge=union\n")
 
 gitignore_path = os.path.join(TARGET_DIR, ".gitignore")
 if not os.path.exists(gitignore_path):
