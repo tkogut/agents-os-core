@@ -115,7 +115,7 @@ os-upgrade-project [target-directory] [--update-skills]
 1. **`.gitattributes`**: Wstrzykuje reguły `merge=union` dla `.agents/MEMORY.md`, `.agents/task.md`, `MEMORY.md` i `task.md`.
 2. **Konfiguracja Git**: Ustawia lokalnie `pull.rebase=true` oraz `merge.conflictstyle=diff3`.
 3. **Hooki Cyklu Życia**: Generuje pliki `hooks.json` w `.antigravity/`, `.gemini/` i `.agents/` (automatyczny `git pull --rebase` na start i commit/push zrzutu pamięci na stop).
-4. **Symlinki Claude Code**: Tworzy dowiązania `ln -sfn` ze wszystkich `.agents/skills/*` do `.claude/skills/` (75+ skilli, w tym 41 skilli Open-Mercato).
+4. **Symlinki Claude Code**: Tworzy dowiązania `ln -sfn` ze wszystkich `.agents/skills/*` do `.claude/skills/` (74+ skilli, w tym 41 skilli Open-Mercato).
 5. **Silnik Pamięci**: Inicjalizuje `.agents/MEMORY.md` (v0.42.1) oraz `.agents/task.md` jeśli nie istnieją.
 6. **Synchronizacja Skilli**: Kopiuje brakujące (lub aktualizuje wszystkie przy `--update-skills`) skille z szablonu Vault.
 

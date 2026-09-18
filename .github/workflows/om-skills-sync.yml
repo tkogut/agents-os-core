@@ -1,0 +1,107 @@
+name: Weekly Open-Mercato Skills Sync
+
+on:
+  schedule:
+    # Run every Sunday at 03:00 UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync regardless of changes'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-om-skills:
+    name: Sync Open-Mercato Skills & Harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Open-Mercato skills synchronization
+        id: sync
+        run: |
+          python3 scripts/sync_upstream_om_skills.py \
+            --output-summary /tmp/sync-summary.md \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Run Swarm QA Gate & Validation Checks
+        if: steps.sync.outputs.has_changes == 'true' || github.event.inputs.force_sync == 'true'
+        run: |
+          echo "🔍 Running validation gates..."
+          python3 -m py_compile scripts/*.py os-add-skill
+          python3 scripts/validate-handshakes.py
+          bash -n os-upgrade-project
+          bash -n os-init
+          bash -n os-init-claude
+          echo "✅ All validation gates passed."
+
+      - name: Publish Step Summary
+        if: always()
+        run: |
+          if [ -f /tmp/sync-summary.md ]; then
+            cat /tmp/sync-summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### 🟢 OM Skills Sync" >> "$GITHUB_STEP_SUMMARY"
+            echo "All skills are up-to-date with upstream." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Create or Update Pull Request
+        if: steps.sync.outputs.has_changes == 'true' || github.event.inputs.force_sync == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          BRANCH_NAME="automation/om-skills-sync"
+          git checkout -B "$BRANCH_NAME"
+
+          git add -A
+          # Check if there are actual git diffs staged
+          if git diff --cached --quiet; then
+            echo "No git changes to commit."
+            exit 0
+          fi
+
+          COMMIT_DATE=$(date -u '+%Y-%m-%d')
+          git commit -m "chore(skills): weekly sync from open-mercato/skills ($COMMIT_DATE)"
+          git push origin "$BRANCH_NAME" --force
+
+          # Check if PR already exists for this branch
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "Updating existing PR #$EXISTING_PR..."
+            gh pr edit "$EXISTING_PR" \
+              --title "chore(skills): weekly sync from open-mercato/skills ($COMMIT_DATE)" \
+              --body-file /tmp/sync-summary.md
+          else
+            echo "Creating new PR..."
+            gh pr create \
+              --base master \
+              --head "$BRANCH_NAME" \
+              --title "chore(skills): weekly sync from open-mercato/skills ($COMMIT_DATE)" \
+              --body-file /tmp/sync-summary.md \
+              --label "review,documentation,skip-qa,priority-medium,risk-low"
+          fi
+
+      - name: No changes detected
+        if: steps.sync.outputs.has_changes != 'true' && github.event.inputs.force_sync != 'true'
+        run: echo "Repository skills and harness are already in sync with open-mercato/skills."
