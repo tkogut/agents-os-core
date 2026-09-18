@@ -10,9 +10,9 @@ AGENTS-OS is a coordination and containerization framework for AI agent swarms (
 
 ## 👥 Podział Ról w Architekturze Swarm Triad
 
-1. **Coordinator (Gemini / Antigravity):** Planowanie, routing zadań, analiza backlogu `task.md` oraz zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). NIE edytuje kodu aplikacyjnego/produkcyjnego poza `tmp/worktrees/`.
-2. **Builder (Claude Code / Cursor):** Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym środowisku worktree (`tmp/worktrees/`).
-3. **Auditor (Gemini):** Linting, audyt bezpieczeństwa, weryfikacja logów, sprawdzanie kontraktów matematycznych/handshake oraz akceptacja PR przed scaleniem.
+1. **Coordinator (Gemini 3.8 Flash Medium / Antigravity):** Planowanie, routing zadań, analiza backlogu `task.md` oraz zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). NIE edytuje kodu aplikacyjnego/produkcyjnego poza `tmp/worktrees/`.
+2. **Builder (Gemini 3.1 Pro / Antigravity / Cursor / Claude Code):** Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym środowisku worktree (`tmp/worktrees/`).
+3. **Auditor (Gemini 3.8 Flash Medium):** Linting, audyt bezpieczeństwa, weryfikacja logów, sprawdzanie kontraktów matematycznych/handshake oraz akceptacja PR przed scaleniem.
 
 ---
 
