@@ -482,6 +482,19 @@ if [ -f "$VAULT_DIR/.agents/specs/awesome-skills-catalog.md" ]; then
     echo -e "${GREEN}   ✓ Zsynchronizowano pasywny katalog Tier 2 (.agents/specs/awesome-skills-catalog.md).${NC}"
 fi
 
+# Synchronizacja bazy wiedzy eksperckiej z Vault (.agents/specs/knowledge/)
+if [ -d "$VAULT_DIR/.agents/specs/knowledge" ]; then
+    mkdir -p "$TARGET_DIR/.agents/specs/knowledge"
+    cp -rn "$VAULT_DIR/.agents/specs/knowledge/." "$TARGET_DIR/.agents/specs/knowledge/" 2>/dev/null || true
+    echo -e "${GREEN}   ✓ Zsynchronizowano bazę wiedzy eksperckiej (.agents/specs/knowledge/).${NC}"
+fi
+
+# Inicjalizacja grafu wiedzy specs z Vault jeśli brak w projekcie
+if [ -f "$VAULT_DIR/.agents/specs/graph.json" ] && [ ! -f "$TARGET_DIR/.agents/specs/graph.json" ]; then
+    cp -f "$VAULT_DIR/.agents/specs/graph.json" "$TARGET_DIR/.agents/specs/graph.json"
+    echo -e "${GREEN}   ✓ Zainicjalizowano graf wiedzy (.agents/specs/graph.json).${NC}"
+fi
+
 # Czyszczenie wycofanych skilli Caveman Cloud (optymalizacja promptu: oszczędność >1200 tokenów)
 DEPRECATED_SKILLS=(
     "caveman-setup" "caveman-stats" "caveman-manage" "caveman-optimize"
@@ -656,8 +669,9 @@ fi
 echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}✅ PROJEKT ZAAKTUALIZOWANY DO AGENTS-OS v6.5 SWARM:${NC} $TARGET_DIR"
 echo -e "   • Bezkonfliktowy merge: .gitattributes (merge=union na MEMORY.md)"
-echo -e "   • Pasywny katalog Tier 2: .agents/specs/awesome-skills-catalog.md (1466 skilli na żądanie)"
-echo -e "   • Oczyszczone skille: usunięto wycofane proxy Caveman Cloud"
+echo -e "   • Pasywny katalog Tier 2: .agents/specs/awesome-skills-catalog.md (1466 skilli na żądanie)
+   • Baza wiedzy eksperckiej: .agents/specs/knowledge/ (NotebookLM / AI SDLC)
+   • Oczyszczone skille: usunięto wycofane proxy Caveman Cloud"
 echo -e "   • Modele Swarm Triad: Builder (Gemini 3.1 Pro), Coordinator/Auditor (Gemini 3.8 Flash Medium)"
 echo -e "   • Natywne hooki Antigravity/Gemini: SessionStart / SessionEnd auto-sync (z ochroną main)"
 echo -e "   • Natywne hooki Claude Code: .claude/settings.json (re-grounding + PreCompact snapshot)"
