@@ -36,6 +36,7 @@ last_sync: 2026-09-08T22:43:00Z
 - [2026-09-19] Configured Cezar Orchestrator default runner to `pi` with OpenRouter provider and model `openrouter/deepseek/deepseek-v4.1-flash`.
 - [2026-09-25] Initialized dedicated GitHub repository `tkogut/cezar` via `os-init cezar` and migrated full VPS Docker, Traefik, entrypoint (with DeepSeek patches) and deploy stack to GitOps.
 - [2026-09-25] Architectural Standard: CI/CD Zero-Passphrase Deploy via `vps_ci_deploy_key` (ed25519) and Cross-Container Docker Networking (`traefik-proxy` / socket) established across all swarm projects. Closed `linkedin-tracker#4`, opened `tkogut/cezar#1`.
+- [2026-09-19] Synchronized and distilled NotebookLM expert knowledge: "Ewolucja w stronę AI SDLC, Ekosystem Open Mercato i Orkiestrator Cezar" -> .agents/specs/knowledge/ewolucja w strone ai sdlc.md with graph.json update.
 
 ## 🔄 Machine Session Log
 - [2026-09-08 22:40 UTC] [Local] [Builder] Distributed sync core upgrade in progress on worktree feature/distributed-sync-core.
