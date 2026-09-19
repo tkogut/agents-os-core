@@ -7,6 +7,28 @@ Dokumentującą:
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 - Integrację 41 skilli Open-Mercato SDLC & Product Discovery oraz architektury Cezar Runtime.
 
+## [6.5.6] - 2026-09-19
+
+### 🧠 NotebookLM Expert Knowledge & AI SDLC Integration
+- 📖 **Destylacja wiedzy eksperckiej z NotebookLM (`.agents/specs/knowledge/ewolucja w strone ai sdlc.md`)**: Wprowadzono ustrukturyzowany raport strategiczny łączący paradygmat AI SDLC, Task-Driven Context Routing (Single Source of Truth: `AGENTS.md`, `SDLC.md`, `.ai/agentic.config.json`), modularną flotę skilli Open Mercato oraz architekturę asynchronicznego orkiestratora Cezar.
+- 🗺️ **Aktualizacja grafu wiedzy (`.agents/specs/graph.json`)**: Dodano węzeł wiedzy eksperckiej powiązany relacją `governs_knowledge` z konstytucją `AGENTS-OS.md` oraz zaktualizowano znacznik czasu destylacji.
+- 📦 **Propagacja bazy wiedzy do szablonu Vault**: Zsynchronizowano bazę wiedzy (`vault/.agents/specs/knowledge/`) oraz graf (`vault/.agents/specs/graph.json`), zapewniając dostępność zdestylowanej wiedzy dla nowo bootstrapowanych projektów.
+
+### 🛠️ Project Modernizer & Vault Upgrades (`os-upgrade-project`)
+- 🔄 **Automatyczna synchronizacja wiedzy eksperckiej**: Rozszerzono `os-upgrade-project` o automatyczną propagację katalogu `.agents/specs/knowledge/` oraz grafu `graph.json` z Vault do aktualizowanych projektów.
+- ⚙️ **Modernizacja szablonu Vault**: Wdrożono czystą konfigurację startową `vault/.ai/agentic.config.json` z dynamicznym placeholderem projektu oraz wyeliminowano wycofane narzędzia proxy Caveman Cloud. (#23) *(@tkogut)*
+
+### 🏛️ Dual-Tier Skills Architecture & Swarm Modernization
+- 📐 **Specyfikacja architektury dwuwarstwowej (`docs/SKILLS_ARCHITECTURE.md`)**: Zdefiniowano standard podziału skilli na Tier 1 (aktywne w kontekście: 63+ narzędzi) i Tier 2 (pasywne na żądanie: 1466+ skilli w katalogu `.agents/specs/awesome-skills-catalog.md` bez obciążania context window). (#18, #22) *(@tkogut)*
+- 🤖 **Upgrade modeli Swarm Triad**: Zaktualizowano definicję ról w `.ai/agentic.config.json` i `AGENTS.md` do najnowszych modeli: Builder (Gemini 3.1 Pro), Coordinator & Auditor (Gemini 3.8 Flash Medium). (#21) *(@tkogut)*
+- 🧭 **Integracja tabeli routingu Open Mercato w instrukcjach agentów**: Połączono matrycę routingu intencji z regułami Swarm Triad i twardą izolacją worktree w `AGENTS.md` oraz `CLAUDE.md`. (#20) *(@tkogut)*
+- 🔄 **Automatyzacja CI/CD upstream sync**: Wdrożono cotygodniowy przepływ GitHub Actions (`.github/workflows/sync-upstream-om-skills.yml`) automatycznie synchronizujący nowe skille z `open-mercato/skills`. (#16) *(@tkogut)*
+
+### 👥 Contributors
+- @tkogut
+
+---
+
 ## [6.5.5] - 2026-09-18
 
 ### 🚀 Open-Mercato Product Discovery & Validation Layer
