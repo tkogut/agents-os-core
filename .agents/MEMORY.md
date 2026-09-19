@@ -31,6 +31,7 @@ last_sync: 2026-09-08T22:43:00Z
 - [2026-09-08] Verified full E2E test suite (`execution/test_bootstrap.sh`) for `grill-me` skill and `os-upgrade-project`.
 - [2026-09-09] Hardened lifecycle hooks in `hooks.json` and `os-upgrade-project` with branch safety guard (no direct push to main/master).
 - [2026-09-18] Architectural Decision (/grill-me): Hybrid Caveman pruning. Eliminated Caveman Cloud proxy skills (setup, stats, manage, optimize, evidence-review, learn, discover) and redundant/risky tools (compress, commit, init, help) saving >1200 prompt tokens per turn. Retained high-value local token savers: cavecrew (compact subagent returns), caveman-explore (path:line locator), and caveman-review (one-line audits). Mandated concise engineering markdown style over broken pidgin.
+- [2026-09-19] Synchronized and distilled NotebookLM expert knowledge: "Ewolucja w stronę AI SDLC, Ekosystem Open Mercato i Orkiestrator Cezar" -> .agents/specs/knowledge/ewolucja w strone ai sdlc.md with graph.json update.
 
 ## 🔄 Machine Session Log
 - [2026-09-08 22:40 UTC] [Local] [Builder] Distributed sync core upgrade in progress on worktree feature/distributed-sync-core.
