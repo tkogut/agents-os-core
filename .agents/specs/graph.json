@@ -31,6 +31,12 @@
       "label": "Integracja Archotectury Open Mercato",
       "type": "Expert Knowledge",
       "description": "Knowledge base note synchronized from NotebookLM: Integracja Archotectury Open Mercato"
+    },
+    {
+      "id": ".agents/specs/knowledge/ewolucja w strone ai sdlc.md",
+      "label": "Ewolucja w stronę AI SDLC",
+      "type": "Expert Knowledge",
+      "description": "Knowledge base note synchronized from NotebookLM: Ewolucja w stronę AI SDLC, Open Mercato i Orkiestrator Cezar"
     }
   ],
   "edges": [
@@ -53,10 +59,15 @@
       "source": ".agents/specs/AGENTS-OS.md",
       "target": ".agents/specs/knowledge/integracja archotectury open-mercato.md",
       "relation": "governs_knowledge"
+    },
+    {
+      "source": ".agents/specs/AGENTS-OS.md",
+      "target": ".agents/specs/knowledge/ewolucja w strone ai sdlc.md",
+      "relation": "governs_knowledge"
     }
   ],
   "metadata": {
-    "last_distillation": "2026-08-07",
+    "last_distillation": "2026-09-19",
     "source": "Inception Engine"
   }
 }
