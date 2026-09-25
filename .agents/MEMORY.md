@@ -34,9 +34,12 @@ last_sync: 2026-09-08T22:43:00Z
 - [2026-09-19] Synchronized and distilled NotebookLM expert knowledge: "Ewolucja w stronę AI SDLC, Ekosystem Open Mercato i Orkiestrator Cezar" -> .agents/specs/knowledge/ewolucja w strone ai sdlc.md with graph.json update.
 - [2026-09-19] Deployed Cezar Orchestrator on Hostinger VPS (`srv1490214.hstgr.cloud`) in `/docker/cezar` behind Traefik reverse proxy with Let's Encrypt TLS and HTTP BasicAuth.
 - [2026-09-19] Configured Cezar Orchestrator default runner to `pi` with OpenRouter provider and model `openrouter/deepseek/deepseek-v4.1-flash`.
+- [2026-09-25] Initialized dedicated GitHub repository `tkogut/cezar` via `os-init cezar` and migrated full VPS Docker, Traefik, entrypoint (with DeepSeek patches) and deploy stack to GitOps.
+- [2026-09-25] Architectural Standard: CI/CD Zero-Passphrase Deploy via `vps_ci_deploy_key` (ed25519) and Cross-Container Docker Networking (`traefik-proxy` / socket) established across all swarm projects. Closed `linkedin-tracker#4`, opened `tkogut/cezar#1`.
 
 ## 🔄 Machine Session Log
 - [2026-09-08 22:40 UTC] [Local] [Builder] Distributed sync core upgrade in progress on worktree feature/distributed-sync-core.
 - [2026-09-08 22:58 UTC] [Local] [Coordinator] Merged feature branch to master. E2E verification 100% PASSED. State dumped.
 - [2026-09-08 23:10 UTC] [Local] [Builder] Native grill-me skill & universal symlink automation implemented and verified on branch feature/native-grill-me-skill. Handshake generated.
 - [2026-09-09 07:50 UTC] [Local] [Builder] Hardened SessionEnd/Stop hooks against direct main/master pushes on branch fix/hook-branch-protection.
+- [2026-09-25 11:25 UTC] [Local] [Coordinator] Standardized vps_ci_deploy_key across repos, closed linkedin-tracker#4, opened tkogut/cezar#1, documented and pushed v6.5.6 updates.
