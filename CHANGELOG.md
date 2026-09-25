@@ -7,6 +7,19 @@ Dokumentującą:
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 - Integrację 41 skilli Open-Mercato SDLC & Product Discovery oraz architektury Cezar Runtime.
 
+## [6.5.6] - 2026-09-25
+
+### 🛸 Cezar Orchestrator GitOps & CI/CD Zero-Passphrase Standard
+- 🚀 **Repozytorium Cezar Runtime (`tkogut/cezar`)**:
+  - Utworzono dedykowane repozytorium GitHub dla środowiska Cezar Cockpit / Runtime w Złotym Standardzie v6.5 (`os-init cezar`).
+  - Wyeksportowano i zintegrowano konfigurację ze środowiska VPS (`Dockerfile`, `docker-compose.yml`, `entrypoint.sh` z patchami modeli DeepSeek, `update-password.sh`).
+- 🔑 **Standard Bezhasłowego CI/CD Deploy (`vps_ci_deploy_key`)**:
+  - Wprowadzono architektoniczną regułę `Zero-Passphrase` w workflowach GitHub Actions (`deploy.yml`).
+  - Zastąpiono osobiste klucze z passphrase dedykowanym kluczem deploy `vps_ci_deploy_key` (ed25519) w sekretach `VPS_SSH_KEY`, eliminując zależność od sekretu `VPS_PASSPHRASE`.
+  - Zaktualizowano skill `vps-ops` (Krok 0.6) oraz szablony Vault.
+- 🌐 **Architektura Sieciowa Cross-Container (Cezar <-> Aplikacje VPS)**:
+  - Zdefiniowano standard bezpośredniej komunikacji między kontenerami na tym samym VPS po sieci Dockera (`traefik-proxy` -> `http://<container_name>:<port>`) oraz zarządzania kontenerami przez gniazdo `/var/run/docker.sock` zamiast loopback SSH.
+
 ## [6.5.5] - 2026-09-18
 
 ### 🚀 Open-Mercato Product Discovery & Validation Layer
