@@ -113,6 +113,22 @@ Test połączenia (wykonuje Agent CLI automatycznie):
 SSH_AUTH_SOCK=/tmp/ssh-XXXX/agent.YYYY ssh -o StrictHostKeyChecking=no root@srv1490214.hstgr.cloud "echo OK && docker --version"
 ```
 
+---
+
+### KROK 0.6 — ARCHITEKTURA CI/CD (GITHUB ACTIONS) VS CROSS-CONTAINER NETWORKING
+
+> 🛡️ **ŻELAZNE ZASADY ARCHITEKTURY DEPLOY & KOMUNIKACJI NA VPS**:
+> 
+> 1. **GitHub Actions CI/CD (Zero-Passphrase Standard)**:
+>    - W automatycznych workflow (`.github/workflows/deploy.yml`) **KATEGORYCZNIE NIE UŻYWA SIĘ** kluczy z hasłem (passphrase) ani sekretu `VPS_PASSPHRASE`.
+>    - Do GitHub Secrets (`VPS_SSH_KEY`) wgrywany jest wyłącznie **dedykowany klucz deploy bez passphrase** (standard: `vps_ci_deploy_key` / ed25519).
+>    - Żaden agent ani pipeline nie może wymagać dodawania `VPS_PASSPHRASE`.
+> 
+> 2. **Komunikacja między kontenerami na tym samym VPS (np. Cezar <-> LinkedIn Tracker)**:
+>    - Kontenery działające na tym samym serwerze VPS **NIGDY NIE MOGĄ** łączyć się ze sobą przez loopback SSH (`ssh root@srv1490214.hstgr.cloud`).
+>    - **Komunikacja REST / API**: wyłącznie przez wspólną sieć Dockera (`traefik-proxy`) po nazwie usługi/kontenera (np. `http://linkedin_tracker_app:8000/api`) lub przez publiczny routing domeny Traefika.
+>    - **Operacje DevOps / zarządzanie**: wyłącznie przez podmontowane gniazdo `/var/run/docker.sock`, a nie przez SSH.
+
 **Oczekiwany wynik:**
 ```
 OK
