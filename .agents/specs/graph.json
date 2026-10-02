@@ -1,6 +1,6 @@
 {
   "project": "agents-os-core",
-  "version": "5.0",
+  "version": "6.5.6",
   "nodes": [
     {
       "id": ".agents/specs/AGENTS-OS.md",
@@ -34,9 +34,21 @@
     },
     {
       "id": ".agents/specs/knowledge/ewolucja w strone ai sdlc.md",
-      "label": "Ewolucja w stronę AI SDLC",
+      "label": "Ewolucja w stron\u0119 AI SDLC",
       "type": "Expert Knowledge",
-      "description": "Knowledge base note synchronized from NotebookLM: Ewolucja w stronę AI SDLC, Open Mercato i Orkiestrator Cezar"
+      "description": "Knowledge base note synchronized from NotebookLM: Ewolucja w stron\u0119 AI SDLC, Open Mercato i Orkiestrator Cezar"
+    },
+    {
+      "id": ".agents/specs/knowledge/kompendium_skilli_open_mercato.md",
+      "label": "Kompendium Skilli Open Mercato",
+      "type": "Expert Knowledge",
+      "description": "Full NotebookLM distillation and knowledge base covering all 36 Open-Mercato SDLC skills."
+    },
+    {
+      "id": ".agents/skills/notebooklm-sync",
+      "label": "notebooklm-sync",
+      "type": "System Skill",
+      "description": "Skill for synchronization and distillation of expert knowledge from NotebookLM to AGENTS-OS."
     }
   ],
   "edges": [
@@ -64,10 +76,20 @@
       "source": ".agents/specs/AGENTS-OS.md",
       "target": ".agents/specs/knowledge/ewolucja w strone ai sdlc.md",
       "relation": "governs_knowledge"
+    },
+    {
+      "source": ".agents/specs/AGENTS-OS.md",
+      "target": ".agents/specs/knowledge/kompendium_skilli_open_mercato.md",
+      "relation": "governs_knowledge"
+    },
+    {
+      "source": ".agents/skills/notebooklm-sync",
+      "target": ".agents/specs/knowledge/kompendium_skilli_open_mercato.md",
+      "relation": "synchronizes_to"
     }
   ],
   "metadata": {
-    "last_distillation": "2026-09-19",
+    "last_distillation": "2026-10-02",
     "source": "Inception Engine"
   }
 }
