@@ -119,10 +119,12 @@ SSH_AUTH_SOCK=/tmp/ssh-XXXX/agent.YYYY ssh -o StrictHostKeyChecking=no root@srv1
 
 > 🛡️ **ŻELAZNE ZASADY ARCHITEKTURY DEPLOY & KOMUNIKACJI NA VPS**:
 > 
-> 1. **GitHub Actions CI/CD (Zero-Passphrase Standard)**:
+> 1. **GitHub Actions CI/CD (Zero-Passphrase Standard & Kanoniczny Wzorzec)**:
 >    - W automatycznych workflow (`.github/workflows/deploy.yml`) **KATEGORYCZNIE NIE UŻYWA SIĘ** kluczy z hasłem (passphrase) ani sekretu `VPS_PASSPHRASE`.
->    - Do GitHub Secrets (`VPS_SSH_KEY`) wgrywany jest wyłącznie **dedykowany klucz deploy bez passphrase** (standard: `vps_ci_deploy_key` / ed25519).
+>    - Do GitHub Secrets (`VPS_SSH_KEY`) wgrywany jest wyłącznie **dedykowany klucz deploy bez passphrase** (standard: `vps_ci_deploy_key` / ed25519 per projekt).
 >    - Żaden agent ani pipeline nie może wymagać dodawania `VPS_PASSPHRASE`.
+>    - **Kanoniczny wzorzec deployu**: Używaj skilla `deploy-to-vps` (`assets/deploy.yml` + `scripts/setup-deploy-secrets.sh`).
+>    - **Pułapka uprawnień wolumenów (SQLite/appuser)**: Bind mount hosta (`./data:/app/data`) nadpisuje właściciela katalogu na roota hosta. Nieuprawniony użytkownik kontenera (`USER` w Dockerfile, np. UID 1001 / `__DATA_UID__`) nie może wtedy zapisać bazy SQLite. Wzorzec `deploy-to-vps` po `mkdir -p data` automatycznie wykonuje `chown -R <uid>:<uid> data` oraz `chmod -R 777 data`.
 > 
 > 2. **Komunikacja między kontenerami na tym samym VPS (np. Cezar <-> LinkedIn Tracker)**:
 >    - Kontenery działające na tym samym serwerze VPS **NIGDY NIE MOGĄ** łączyć się ze sobą przez loopback SSH (`ssh root@srv1490214.hstgr.cloud`).
@@ -529,31 +531,28 @@ Agent MUSI wiedzieć co resetuje się po `docker compose up --build`:
 
 ---
 
-## 10. CI/CD bez SSH (GitHub Actions)
+## 10. CI/CD bez SSH (GitHub Actions — Kanoniczny Wzorzec `deploy-to-vps`)
 
-Najlepszy pattern dla agenta — push kodu → automatyczny deploy:
+Kanonicznym, produkcyjnie utwardzonym wzorcem auto-deployu w AGENTS-OS jest dedykowany skill **`deploy-to-vps`** (`.agents/skills/deploy-to-vps/`).
+Zawiera on gotowy szablon workflow (`assets/deploy.yml`) oraz skrypt automatycznej konfiguracji sekretów i kluczy (`scripts/setup-deploy-secrets.sh`).
 
-```yaml
-# .github/workflows/deploy.yml
-on:
-  push:
-    branches: [master]
+### Kluczowe elementy wzorca `deploy-to-vps`
+1. **Dedykowany klucz bez passphrase per projekt**: Generowany przez `scripts/setup-deploy-secrets.sh` (np. `~/.ssh/<projekt>_deploy`), wgrywany jako `VPS_SSH_KEY` do GitHub Secrets.
+2. **Synchronizacja plików przez SCP**: Wyklucza `.git` i `.github`, zachowuje istniejący `.env` na serwerze.
+3. **Pułapka uprawnień bind-mountowanego wolumenu (SQLite / UID kontenera)**:
+   - Bind mount hosta (`./data:/app/data`) nadpisuje właściciela `/app/data` z obrazu roota na hoście.
+   - Gdy kontener uruchamiany jest przez nieuprzywilejowanego użytkownika (`USER` w Dockerfile, np. UID 1001 / `__DATA_UID__`), SQLite rzuca błąd zapisu (`attempt to write a readonly database`).
+   - Poprawka w `deploy-to-vps`: Po `mkdir -p data` szablon natychmiast wykonuje `chown -R <uid>:<uid> data` oraz `chmod -R 777 data`.
+4. **Weryfikacja Healthcheck**: Pętla odpytująca `docker inspect` (do 30 × 5s) weryfikuje stan kontenera przed zakończeniem pipeline'u.
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: root
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /root/{project}
-            git pull origin master
-            docker compose up -d --build
-            docker system prune -f
+### Szybka konfiguracja w projekcie:
+```bash
+# 1. Skopiuj szablon workflow
+cp .agents/skills/deploy-to-vps/assets/deploy.yml .github/workflows/deploy.yml
+# Dostosuj placeholdery: __PROJECT__, __CONTAINER__, __DEFAULT_DEPLOY_PATH__, __DATA_UID__
+
+# 2. Skonfiguruj sekrety i autoryzację SSH
+bash .agents/skills/deploy-to-vps/scripts/setup-deploy-secrets.sh <owner>/<repo>
 ```
 
 Agent push → CI/CD deploy → Agent weryfikuje przez `/api/version` czy nowy SHA wdrożony.
