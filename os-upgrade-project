@@ -666,6 +666,37 @@ if [ ! -f "$TARGET_DIR/.ai/agentic.config.json" ] && [ -f "$VAULT_DIR/.ai/agenti
     echo -e "${GREEN}   ✓ Zainicjalizowano .ai/agentic.config.json z szablonu Vault.${NC}"
 fi
 
+# .ai/trackers/ i .ai/browsers/ (deskryptory om-* pipeline — tracker/przeglądarka)
+# Kopiowane niezależnie od .ai/agentic.config.json, żeby projekt, który już ma
+# własny (zcustomizowany) config, nadal dostał brakujące deskryptory operacji —
+# bez nich skille om-* (np. create-pr, comment-pr) nie mają jak wykonać żadnej
+# operacji na trackerze/przeglądarce.
+if [ -d "$VAULT_DIR/.ai/trackers" ]; then
+    mkdir -p "$TARGET_DIR/.ai/trackers"
+    for descriptor in "$VAULT_DIR"/.ai/trackers/*; do
+        # Guard against an empty trackers/ dir: an unmatched glob leaves $descriptor
+        # as the literal pattern, which cp (under set -e) would then fail on and
+        # abort the whole script.
+        [ -f "$descriptor" ] || continue
+        name=$(basename "$descriptor")
+        if [ ! -f "$TARGET_DIR/.ai/trackers/$name" ]; then
+            cp "$descriptor" "$TARGET_DIR/.ai/trackers/$name"
+            echo -e "${GREEN}   ✓ Zainicjalizowano .ai/trackers/$name z szablonu Vault.${NC}"
+        fi
+    done
+fi
+if [ -d "$VAULT_DIR/.ai/browsers" ]; then
+    mkdir -p "$TARGET_DIR/.ai/browsers"
+    for descriptor in "$VAULT_DIR"/.ai/browsers/*; do
+        [ -f "$descriptor" ] || continue
+        name=$(basename "$descriptor")
+        if [ ! -f "$TARGET_DIR/.ai/browsers/$name" ]; then
+            cp "$descriptor" "$TARGET_DIR/.ai/browsers/$name"
+            echo -e "${GREEN}   ✓ Zainicjalizowano .ai/browsers/$name z szablonu Vault.${NC}"
+        fi
+    done
+fi
+
 echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}✅ PROJEKT ZAAKTUALIZOWANY DO AGENTS-OS v6.5 SWARM:${NC} $TARGET_DIR"
 echo -e "   • Bezkonfliktowy merge: .gitattributes (merge=union na MEMORY.md)"

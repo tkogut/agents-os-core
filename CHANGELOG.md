@@ -9,6 +9,12 @@ Dokumentującą:
 
 ## [Unreleased]
 
+### 🔗 Pełna dystrybucja deskryptorów om-* pipeline (`.ai/trackers`, `.ai/browsers`)
+- ✨ **Vault zyskuje `vault/.ai/trackers/github.md` i `vault/.ai/browsers/agent-browser.md`** — dotąd `vault/.ai/agentic.config.json` był jedynym elementem pipeline'u om-* w Złotym Standardzie; same deskryptory operacji (tracker/przeglądarka), bez których żaden skill om-* nie ma jak wykonać operacji typu `create-pr`/`comment-pr`, nigdy nie trafiały do nowych/aktualizowanych projektów automatycznie.
+- 🔧 **`os-upgrade-project`**: nowy, niezależny od `.ai/agentic.config.json` blok kopiujący brakujące pliki z `.ai/trackers/` i `.ai/browsers/` — projekt z już zcustomizowanym configiem (jak `mms4tk`) nadal dostaje brakujące deskryptory, zamiast zostać pominięty przez istniejący `[ ! -f .ai/agentic.config.json ]` guard.
+- 🆕 **`os-init` (przez `bootstrap.py`)**: nowe projekty dostają oba katalogi automatycznie, bez zmiany kodu — generyczna pętla `copytree` całego `vault/` już obejmuje nowe podkatalogi `.ai/trackers`/`.ai/browsers`, o ile `target/.ai` jeszcze nie istnieje (typowy przypadek świeżego projektu). Znane ograniczenie: jeśli `target/.ai` już istnieje przed inicjalizacją, generyczna kopia całego poddrzewa jest pomijana — nowy, granularny blok w `os-upgrade-project` jest wtedy właściwą ścieżką naprawczą.
+- 📚 Zweryfikowane na żywym przypadku: audyt 6 projektów podłączonych do Cezara wykazał, że `mms4tk` miał kompletną, ale niestandardową konfigurację (`validation_gates`/`commands` zamiast kanonicznego `validation.commands`) i brak obu deskryptorów — naprawione ręcznie w mms4tk#104, ten commit zamyka lukę u źródła dla przyszłych projektów.
+
 ### 🚀 Auto-Deploy Standard & Distribution (`deploy-to-vps`)
 - ✨ **Nowy standard auto-deployu na VPS (`deploy-to-vps`)**:
   - Dystrybucja skilla przez Złoty Standard Vault (`global_skills/deploy-to-vps/`, `vault/.agents/skills/deploy-to-vps/`, `vault/.claude/skills/deploy-to-vps`).
