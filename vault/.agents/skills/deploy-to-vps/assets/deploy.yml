@@ -1,0 +1,142 @@
+# ============================================================
+# .github/workflows/deploy.yml — automatic deploy to the VPS
+#
+# Template maintained by the `deploy-to-vps` skill
+# (.agents/skills/deploy-to-vps/SKILL.md). Copy to
+# .github/workflows/deploy.yml and replace the placeholders:
+#
+#   __PROJECT__              repository / project name (e.g. osint-lead-tracker)
+#   __CONTAINER__            docker-compose.yml `container_name`
+#   __DEFAULT_DEPLOY_PATH__  default target dir on the VPS (e.g. /opt/__PROJECT__)
+#   __DATA_UID__             UID:GID of the container's non-root user (Dockerfile `USER`), e.g. 1001
+#
+# Required repository secret:
+#   VPS_SSH_KEY  — private SSH key authorized for VPS_USER@VPS_HOST
+#
+# Optional repository secret:
+#   VPS_SSH_PASSPHRASE — passphrase of VPS_SSH_KEY, only when the key is
+#                        passphrase-protected (leave unset otherwise)
+#
+# Optional repository variables (defaults below):
+#   VPS_HOST  VPS_USER  VPS_PORT  DEPLOY_PATH
+# ============================================================
+
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Never let two deploys rebuild the host at the same time; queue them instead.
+concurrency:
+  group: deploy-vps-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build & deploy on VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      VPS_HOST: ${{ vars.VPS_HOST || 'srv1490214.hstgr.cloud' }}
+      VPS_USER: ${{ vars.VPS_USER || 'root' }}
+      VPS_PORT: ${{ vars.VPS_PORT || '22' }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '__DEFAULT_DEPLOY_PATH__' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # The deployment only needs the working tree: dropping .git keeps the
+      # runner's git metadata from being tarred over the server checkout, and
+      # .github is not needed at runtime on the VPS.
+      - name: Prepare workspace for upload
+        run: rm -rf .git .github
+
+      - name: Copy repository to VPS via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.VPS_HOST }}
+          username: ${{ env.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          port: ${{ env.VPS_PORT }}
+          source: "**"
+          target: ${{ env.DEPLOY_PATH }}
+          overwrite: true
+          timeout: 60s
+          command_timeout: 10m
+
+      - name: Rebuild and restart the stack on the VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.VPS_HOST }}
+          username: ${{ env.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          port: ${{ env.VPS_PORT }}
+          command_timeout: 20m
+          script: |
+            # POSIX sh only: `set -o pipefail` is a bash-ism that dash rejects,
+            # which would abort the deploy before it starts.
+            set -eu
+            cd "${{ env.DEPLOY_PATH }}"
+
+            # Persistent volume directory, bind-mounted by docker-compose.yml.
+            # A bind mount replaces the image's /app/data ownership, so a host
+            # directory created by root is NOT writable by the container's
+            # non-root user (Dockerfile `USER`) and SQLite fails to open the DB.
+            # Give the directory to that user and make it writable.
+            mkdir -p data
+            chown -R __DATA_UID__:__DATA_UID__ data 2>/dev/null || true
+            chmod -R 777 data 2>/dev/null || true
+
+            # .env is gitignored, so it is never shipped by the SCP step: the
+            # server copy stays untouched. Only when it is missing do we try to
+            # recover the values from the already-running container, falling
+            # back to the example as a last resort.
+            if [ ! -f .env ]; then
+              docker inspect __CONTAINER__ \
+                --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null \
+                | grep -E '^[A-Z][A-Z0-9_]*=' \
+                | grep -vE '^(PATH|HOSTNAME|HOME|LANG|LC_[A-Z]+|PYTHON[A-Z_]*|GPG_KEY|GPG_KEYS)=' \
+                > .env || true
+              if [ ! -s .env ]; then
+                cp .env.example .env
+                echo "::warning::No .env on the VPS and no running container to recover it from — deployed with .env.example placeholders. Fill in .env and redeploy."
+              fi
+            fi
+
+            docker compose up -d --build
+
+            # Wait for the rebuilt container's own Docker HEALTHCHECK to report
+            # healthy — this needs no tooling on the host.
+            for i in $(seq 1 30); do
+              status="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' __CONTAINER__ 2>/dev/null || echo missing)"
+              case "$status" in
+                healthy|none)
+                  echo "Container health: ${status} after ${i} attempt(s)."
+                  break
+                  ;;
+                unhealthy)
+                  echo "Container reported unhealthy — recent logs:"
+                  docker compose logs --tail=50
+                  exit 1
+                  ;;
+              esac
+              if [ "$i" -eq 30 ]; then
+                echo "Container never became healthy after 30 attempts — recent logs:"
+                docker compose logs --tail=50
+                exit 1
+              fi
+              sleep 5
+            done
+
+            docker compose ps
+            docker system prune -f

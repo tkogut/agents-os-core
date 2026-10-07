@@ -37,6 +37,7 @@ last_sync: 2026-09-08T22:43:00Z
 - [2026-09-25] Initialized dedicated GitHub repository `tkogut/cezar` via `os-init cezar` and migrated full VPS Docker, Traefik, entrypoint (with DeepSeek patches) and deploy stack to GitOps.
 - [2026-09-25] Architectural Standard: CI/CD Zero-Passphrase Deploy via `vps_ci_deploy_key` (ed25519) and Cross-Container Docker Networking (`traefik-proxy` / socket) established across all swarm projects. Closed `linkedin-tracker#4`, opened `tkogut/cezar#1`.
 - [2026-09-19] Synchronized and distilled NotebookLM expert knowledge: "Ewolucja w stronę AI SDLC, Ekosystem Open Mercato i Orkiestrator Cezar" -> .agents/specs/knowledge/ewolucja w strone ai sdlc.md with graph.json update.
+- [2026-10-07] Standardized and distributed deploy-to-vps skill via Vault, INSTALL.sh, and os-upgrade-project with SQLite volume permission hardening.
 
 ## 🔄 Machine Session Log
 - [2026-09-08 22:40 UTC] [Local] [Builder] Distributed sync core upgrade in progress on worktree feature/distributed-sync-core.

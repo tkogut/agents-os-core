@@ -155,6 +155,9 @@ cp -ra "$SCRIPT_DIR/global_skills/logic-auditor/." "$AGY_DIR/skills/logic-audito
 mkdir -p "$AGY_DIR/skills/skill-rebuild"
 cp -ra "$SCRIPT_DIR/global_skills/skill-rebuild/." "$AGY_DIR/skills/skill-rebuild/"
 
+mkdir -p "$AGY_DIR/skills/deploy-to-vps"
+cp -ra "$SCRIPT_DIR/global_skills/deploy-to-vps/." "$AGY_DIR/skills/deploy-to-vps/"
+
 echo "⚙️ Pobieranie katalogu skilli RAG..."
 mkdir -p "$VAULT_DIR/.agents/specs"
 curl -fsSL -o "$VAULT_DIR/.agents/specs/awesome-skills-catalog.md" "https://raw.githubusercontent.com/sickn33/antigravity-awesome-skills/main/CATALOG.md" || echo "⚠️  Nie udało się pobrać katalogu skilli."
@@ -442,9 +445,10 @@ echo "     • /grill-me                      → Pre-flight wywiad architektoni
      • /swarm-onboarding              → Automatyczny onboarding i zrzut kontekstu dla nowego agenta"
 echo ""
 echo "📦 Co dzieje się automatycznie przy tworzeniu/upgrade projektu:"
-echo "   ✓ Kopiuje Złoty Standard (Vault) wraz z 80+ skillami (w tym 36 skilli OM)"
+echo "   ✓ Kopiuje Złoty Standard (Vault) wraz z 80+ skillami (w tym 36 skilli OM, deploy-to-vps)"
 echo "   ✓ Wdraża bezkonfliktowy auto-sync (.gitattributes merge=union dla MEMORY/task)"
 echo "   ✓ Bezpieczne hooki cyklu życia (automatyczny pull/push z ochroną gałęzi main)"
 echo "   ✓ Automatyczne dowiązania symboliczne skilli (.claude/skills/* dla Claude Code)"
+echo "   ✓ Gotowy wzorzec auto-deployu na VPS (deploy-to-vps: GitHub Actions + Docker + volume permissions)"
 echo "   ✓ Tworzy repozytorium GitHub, robi initial commit i otwiera właściwe IDE"
 echo "===================================================================="

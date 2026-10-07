@@ -676,7 +676,7 @@ echo -e "   • Modele Swarm Triad: Builder (Gemini 3.1 Pro), Coordinator/Audito
 echo -e "   • Natywne hooki Antigravity/Gemini: SessionStart / SessionEnd auto-sync (z ochroną main)"
 echo -e "   • Natywne hooki Claude Code: .claude/settings.json (re-grounding + PreCompact snapshot)"
 echo -e "   • Parametry Git: pull.rebase=true, merge.conflictstyle=diff3"
-echo -e "   • Claude Code skille: .claude/skills/* (${SKILLS_COUNT} aktywnych symlinków)"
+echo -e "   • Claude Code skille: .claude/skills/* (${SKILLS_COUNT} aktywnych symlinków, w tym deploy-to-vps)"
 echo -e "   • Pamięć maszynowa: .agents/MEMORY.md"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}📋 CO ZROBIĆ TERAZ (ZATWIERDZENIE ZMIAN W GIT):${NC}"
