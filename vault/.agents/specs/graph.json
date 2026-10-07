@@ -1,17 +1,40 @@
 {
   "project": "AGENTS-OS Project",
-  "version": "5.0",
+  "version": "6.5-Swarm",
   "nodes": [
     {
       "id": ".agents/specs/AGENTS-OS.md",
       "label": "AGENTS-OS.md",
       "type": "Ultimate Source of Truth",
-      "description": "Constitution of AGENTS-OS v6.0 governing all Swarm rules and system operations."
+      "description": "Constitution of AGENTS-OS v6.5 governing all Swarm rules and system operations."
+    },
+    {
+      "id": ".agents/specs/knowledge/integracja archotectury open-mercato.md",
+      "label": "Integracja Archotectury Open Mercato",
+      "type": "Expert Knowledge",
+      "description": "Knowledge base note synchronized from NotebookLM: Integracja Archotectury Open Mercato"
+    },
+    {
+      "id": ".agents/specs/knowledge/ewolucja w strone ai sdlc.md",
+      "label": "Ewolucja w stronę AI SDLC",
+      "type": "Expert Knowledge",
+      "description": "Knowledge base note synchronized from NotebookLM: Ewolucja w stronę AI SDLC, Open Mercato i Orkiestrator Cezar"
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "source": ".agents/specs/AGENTS-OS.md",
+      "target": ".agents/specs/knowledge/integracja archotectury open-mercato.md",
+      "relation": "governs_knowledge"
+    },
+    {
+      "source": ".agents/specs/AGENTS-OS.md",
+      "target": ".agents/specs/knowledge/ewolucja w strone ai sdlc.md",
+      "relation": "governs_knowledge"
+    }
+  ],
   "metadata": {
-    "last_distillation": "2026-05-22",
+    "last_distillation": "2026-09-19",
     "source": "Inception Engine"
   }
 }
