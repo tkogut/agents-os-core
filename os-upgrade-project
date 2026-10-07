@@ -674,6 +674,10 @@ fi
 if [ -d "$VAULT_DIR/.ai/trackers" ]; then
     mkdir -p "$TARGET_DIR/.ai/trackers"
     for descriptor in "$VAULT_DIR"/.ai/trackers/*; do
+        # Guard against an empty trackers/ dir: an unmatched glob leaves $descriptor
+        # as the literal pattern, which cp (under set -e) would then fail on and
+        # abort the whole script.
+        [ -f "$descriptor" ] || continue
         name=$(basename "$descriptor")
         if [ ! -f "$TARGET_DIR/.ai/trackers/$name" ]; then
             cp "$descriptor" "$TARGET_DIR/.ai/trackers/$name"
@@ -684,6 +688,7 @@ fi
 if [ -d "$VAULT_DIR/.ai/browsers" ]; then
     mkdir -p "$TARGET_DIR/.ai/browsers"
     for descriptor in "$VAULT_DIR"/.ai/browsers/*; do
+        [ -f "$descriptor" ] || continue
         name=$(basename "$descriptor")
         if [ ! -f "$TARGET_DIR/.ai/browsers/$name" ]; then
             cp "$descriptor" "$TARGET_DIR/.ai/browsers/$name"
