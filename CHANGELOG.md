@@ -7,6 +7,24 @@ Dokumentującą:
 - Pełną integrację z bazą 1400+ skilli z repozytorium sickn33.
 - Integrację 41 skilli Open-Mercato SDLC & Product Discovery oraz architektury Cezar Runtime.
 
+## [Unreleased]
+
+### 🚀 Auto-Deploy Standard & Distribution (`deploy-to-vps`)
+- ✨ **Nowy standard auto-deployu na VPS (`deploy-to-vps`)**:
+  - Dystrybucja skilla przez Złoty Standard Vault (`global_skills/deploy-to-vps/`, `vault/.agents/skills/deploy-to-vps/`, `vault/.claude/skills/deploy-to-vps`).
+  - Gotowy szablon GitHub Actions workflow (`assets/deploy.yml`) z synchronizacją przez SCP, automatycznym `docker compose up -d --build` i weryfikacją `docker inspect` healthcheck loop.
+  - Skrypt automatyzacji konfiguracji sekretów i dedykowanych kluczy per-projekt (`scripts/setup-deploy-secrets.sh`).
+- 🛡️ **Rozwiązanie pułapki uprawnień wolumenów (SQLite / Docker non-root appuser)**:
+  - Zamknięto problem nadpisywania uprawnień katalogu `./data:/app/data` przez bind mount na hoście z poziomu roota, który uniemożliwiał nieuprzywilejowanemu użytkownikowi kontenera (`USER` UID 1001 / `__DATA_UID__`) zapisywanie bazy SQLite (`attempt to write a readonly database`).
+  - Szablon wymusza automatyczne `chown -R <uid>:<uid> data` i `chmod -R 777 data` bezpośrednio po `mkdir -p data`.
+- 📦 **Integracja z instalatorem i modernizatorem projektów**:
+  - `INSTALL.sh`: dodano instalację globalną do `~/.antigravity/skills/deploy-to-vps` oraz wpis w podsumowaniu instalatora.
+  - `os-upgrade-project`: zweryfikowano i dodano wzmiankę w podsumowaniu modernizatora.
+  - `scripts/sync-skills.sh`: zarejestrowano `deploy-to-vps` w `SHARED_SKILLS`.
+  - `global_skills/vps-ops/SKILL.md`: wskazano `deploy-to-vps` jako kanoniczny wzorzec CI/CD w sekcjach 0.6 i 10.
+
+---
+
 ## [6.5.6] - 2026-09-25
 
 ### 🛸 Cezar Orchestrator GitOps & CI/CD Zero-Passphrase Standard
