@@ -7,7 +7,7 @@
 #
 #   __PROJECT__              repository / project name (e.g. osint-lead-tracker)
 #   __CONTAINER__            docker-compose.yml `container_name`
-#   __DEFAULT_DEPLOY_PATH__  default target dir on the VPS (e.g. /opt/__PROJECT__)
+#   __DEFAULT_DEPLOY_PATH__  default target dir on the VPS (e.g. /docker/__PROJECT__)
 #   __DATA_UID__             UID:GID of the container's non-root user (Dockerfile `USER`), e.g. 1001
 #
 # Required repository secret:

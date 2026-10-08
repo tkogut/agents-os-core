@@ -47,13 +47,13 @@ Workflow `.github/workflows/deploy.yml`:
 | `VPS_HOST` | `srv1490214.hstgr.cloud` | Host VPS. |
 | `VPS_USER` | `root` | Użytkownik SSH. |
 | `VPS_PORT` | `22` | Port SSH. |
-| `DEPLOY_PATH` | `/opt/<projekt>` | Katalog docelowy na VPS. |
+| `DEPLOY_PATH` | `/docker/<projekt>` | Katalog docelowy na VPS. |
 
 ## Jak dodać deploy do projektu
 
 1. Skopiuj `assets/deploy.yml` → `.github/workflows/deploy.yml` i podmień placeholdery:
    `__PROJECT__` (nazwa repo), `__CONTAINER__` (`container_name` z `docker-compose.yml`),
-   `__DEFAULT_DEPLOY_PATH__` (domyślny katalog, np. `/opt/<projekt>`),
+   `__DEFAULT_DEPLOY_PATH__` (domyślny katalog, np. `/docker/<projekt>`),
    `__DATA_UID__` (UID:GID użytkownika kontenera z `USER` w `Dockerfile`, np. `1001`;
    gdy nie wiesz, zostaw `1001` + `chmod 777` i tak rozwiązuje problem).
 2. Ustaw sekrety (najlepiej skryptem — patrz niżej):
@@ -91,7 +91,7 @@ gh secret list --repo <owner>/${PROJECT}
 
 # 5. Opcjonalne zmienne repo
 gh variable set VPS_HOST    --repo <owner>/${PROJECT} --body "${HOST}"
-gh variable set DEPLOY_PATH --repo <owner>/${PROJECT} --body "/opt/${PROJECT}"
+gh variable set DEPLOY_PATH --repo <owner>/${PROJECT} --body "/docker/${PROJECT}"
 ```
 
 Gdy używasz istniejącego klucza z passphrase: dodatkowo
