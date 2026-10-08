@@ -12,7 +12,7 @@
 #   --port PORT          port SSH            (default: 22)
 #   --user USER          użytkownik SSH      (default: root)
 #   --key PATH           ścieżka klucza      (default: ~/.ssh/<repo>_deploy)
-#   --deploy-path PATH   DEPLOY_PATH na VPS  (default: /opt/<repo>)
+#   --deploy-path PATH   DEPLOY_PATH na VPS  (default: /docker/<repo>)
 #   --passphrase         klucz z hasłem (bez tego generowany jest bez hasła)
 #   --yes                nie pytaj o potwierdzenie (tryb nieinteraktywny)
 #   -h|--help            pomoc
@@ -61,7 +61,7 @@ done
 
 PROJECT="${REPO##*/}"
 [ -n "$KEY_PATH" ]     || KEY_PATH="$HOME/.ssh/${PROJECT}_deploy"
-[ -n "$DEPLOY_PATH" ]  || DEPLOY_PATH="/opt/${PROJECT}"
+[ -n "$DEPLOY_PATH" ]  || DEPLOY_PATH="/docker/${PROJECT}"
 
 command -v ssh-keygen  >/dev/null || { echo "BŁĄD: brak ssh-keygen." >&2; exit 1; }
 command -v ssh-copy-id >/dev/null || { echo "BŁĄD: brak ssh-copy-id." >&2; exit 1; }
