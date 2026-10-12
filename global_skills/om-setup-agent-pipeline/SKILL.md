@@ -39,6 +39,7 @@ Every skill in this collection reads its repository-specific settings from `.ai/
     "runs": ".ai/runs",
     "analysis": ".ai/analysis",
     "specs": ".ai/specs",
+    "dataModel": ".ai/data-model",
     "prototypes": ".ai/prototypes",
     "scripts": ".ai/scripts",
     "qa": ".ai/qa"
@@ -51,7 +52,7 @@ Every skill in this collection reads its repository-specific settings from `.ai/
 Field reference:
 
 - `baseBranch` — the branch PRs target. `"auto"` means resolve at runtime from the repository's default branch; set an explicit name only when PRs target something else.
-- `tracker` — selects `.ai/trackers/<tracker>.md`. Shipped values are `"github"`, `"linear"` (Linear issues + GitHub PRs/CI), and `"jira"` (Jira Cloud issues + GitHub PRs/CI); see Tracker providers below.
+- `tracker` — selects `.ai/trackers/<tracker>.md`. Shipped values are `"github"`, `"gitlab"`, `"linear"` (Linear issues + GitHub PRs/CI), and `"jira"` (Jira Cloud issues + GitHub PRs/CI); see Tracker providers below.
 - `browser.provider` — the browser-automation provider used by QA and integration-test skills. Selects `.ai/browsers/<provider>.md`. Fresh setups default to `"agent-browser"`; configs without this key keep legacy Playwright behavior (see Browser providers).
 - `validation.commands` — ordered list of shell commands that constitute the full validation gate. Skills run them in order and treat any non-zero exit as a gate failure. Keep the list complete: typecheck, lint, tests, build — whatever proves the repo is healthy.
 - `labels.enabled` — when `false`, skills skip every label operation and note that in their PR summaries. Use this for repos that do not want the label workflow.
@@ -67,8 +68,9 @@ Field reference:
 - `engine.stepReview` — optional; how often the loop skills code-review landed work mid-run: `final` (default — only the authoritative end-of-run review), `checkpoint` (review the diff at every checkpoint pass), or `per-step` (review each Step's commit as it lands). Blocker/major findings are fixed immediately as `X.Y-review-fix` Steps; minors defer to the final review, which runs in every mode.
 - `paths.runs` — where execution plans of autonomous runs are stored.
 - `paths.analysis` — where generated reports are stored.
-- `paths.specs` — where feature specifications live (default `.ai/specs`). Spec filenames follow `{YYYY-MM-DD}-{kebab-case-title}.md`. `om-spec-writing` writes here, `om-prepare-issue` links from here, `om-followup-issue-from-pr` checks here first in design-doc mode, and `om-brainstorm` writes handoff briefs under `<paths.specs>/briefs/`.
-- `paths.prototypes` — optional repository-relative root for local prototypes (default `.ai/prototypes`). Discovery prototypes live under `discovery/<slug>/`. Preserve a configured value; use the default silently when absent and do not add a setup question. Prototype skills create their own output directories when needed.
+- `paths.specs` — feature specifications and briefs (default `.ai/specs`); spec filenames use `{YYYY-MM-DD}-{kebab-case-title}.md`.
+- `paths.dataModel` — interactive data-model HTML views (default `.ai/data-model`); autonomous spec runs keep only the embedded Mermaid diagram.
+- `paths.prototypes` — local prototypes (default `.ai/prototypes`); use the default silently and do not add a setup question. Discovery prototypes use `discovery/<slug>/`, and producer skills create directories as needed.
 - `paths.scripts` — where reusable environment scripts are generated (default `.ai/scripts`); `om-prepare-test-env` writes the env bring-up/teardown scripts here.
 - `paths.qa` — where QA working state and artifacts live (default `.ai/qa`): the shared `test-env.json` descriptor, and QA reports/screenshots under `<paths.qa>/artifacts_<runId>/`.
 - `reviewChecklist` — optional path to a repo-local review checklist file. When set, the `om-code-review` skill reads it in addition to its built-in checklist. A root `CODE_REVIEW.md` (see Project docs) is always picked up regardless.
@@ -79,7 +81,7 @@ Field reference:
 
 Skills name the operations in `references/trackers/TEMPLATE.md`; the selected `.ai/trackers/<tracker>.md` says how to execute them and is the team's committed override point. This skill installs shipped descriptors from its own `references/trackers/` directory.
 
-The collection ships `github.md`, `linear.md`, and `jira.md`. Linear and Jira own issues but delegate repository/PR/review/CI/PR-label operations to a required `github.md` companion, so setup installs both. Scaffold any other provider from `TEMPLATE.md`.
+The collection ships `github.md`, `gitlab.md`, `linear.md`, and `jira.md`. GitHub and GitLab are stand-alone. Linear and Jira own issues but delegate repository/PR/review/CI/PR-label operations to a required `github.md` companion, so setup installs both. Scaffold any other provider from `TEMPLATE.md`.
 
 ## Browser providers
 
@@ -101,7 +103,7 @@ Every skill in this collection checks, right after loading the config, for a rep
 
 1. **Refuse to clobber silently.** If `.ai/agentic.config.json` already exists, show the current content and ask whether to update it. Preserve any custom values the user does not ask to change.
 
-2. **Detect the repository shape.** Resolve the default branch via the tracker **default-branch** operation (for a fresh setup with no descriptor installed yet, use the shipped `references/trackers/github.md` — or the descriptor matching the tracker the user names — and fall back to `git symbolic-ref refs/remotes/origin/HEAD`). Detect candidate validation commands, in this order of evidence:
+2. **Detect the repository shape.** Resolve the default branch via the tracker **default-branch** operation (for a fresh setup with no descriptor installed yet, use the shipped `references/trackers/github.md` — or the descriptor matching the tracker the user names — and fall back to `git symbolic-ref refs/remotes/origin/HEAD`). An `origin` on a GitLab host makes `gitlab` the default tracker. Detect candidate validation commands, in this order of evidence:
 
    1. `package.json` scripts — look for `typecheck`, `lint`, `test`, `build` (and close variants). Choose the runner from the lockfile: `pnpm-lock.yaml` → `pnpm <script>`, `package-lock.json` → `npm run <script>`, `yarn.lock` → the equivalent for that runner, `bun.lockb` → `bun run <script>`.
    2. A `Makefile` — look for `test`, `lint`, `build` targets.
@@ -109,7 +111,7 @@ Every skill in this collection checks, right after loading the config, for a rep
 
    Prefer commands mirroring what CI already runs (`.github/workflows/*.yml`).
 
-3. **Ask the user (skip with `--defaults`).** Confirm validation, tracker (`github`, `linear`, `jira`, or custom; default `github`), browser provider, label mode, QA gate, spec path, optional review checklist, and missing project docs. Full guidance: `references/interview-questions.md`.
+3. **Ask the user (skip with `--defaults`).** Confirm validation, tracker (`github`, `linear`, `jira`, `gitlab`, or custom; default per step 2), browser provider, label mode, QA gate, spec path, optional review checklist, and missing project docs. Full guidance: `references/interview-questions.md`.
 
 4. **Install the tracker descriptor.** Copy the shipped descriptor for the chosen tracker from this skill's `references/trackers/<tracker>.md` to `.ai/trackers/<tracker>.md` (create the directory). Rules:
 
