@@ -197,6 +197,12 @@ def main():
         update_harness_counts(repo_root, total_vault_skills, total_om_skills)
         print(f"📊 Updated harness counts: {total_vault_skills} total skills ({total_om_skills} OM skills).")
 
+        # Regenerate slash commands for Claude Code and Gemini
+        gen_cmd_script = os.path.join(repo_root, "scripts", "generate_commands.py")
+        if os.path.exists(gen_cmd_script):
+            subprocess.run([sys.executable, gen_cmd_script], check=False)
+            print("⚙️ Regenerated slash commands.")
+
         # Prepare summary
         today = datetime.date.today().isoformat()
         summary_lines = [

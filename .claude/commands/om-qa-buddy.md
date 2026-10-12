@@ -1,0 +1,9 @@
+---
+description: Runs a manual QA session for a PR, issue, or branch — publishes an interactive runbook the tester works through in parallel from the moment a plan exists, updated with AI verdicts and bugs at the end. Never touches the tracker itself. Unlike `om-auto-qa-pr`'s automated sign-off, this is human-in-the-loop and grows a local QA knowledge base. Use when the user says \"test this for me\", \"QA this PR\", \"find bugs in this change\", \"walk through this issue for bugs\".
+---
+
+Przeczytaj instrukcje ze skilla `om-qa-buddy` z pliku `.claude/skills/om-qa-buddy/SKILL.md` (lub `.agents/skills/om-qa-buddy/SKILL.md`) i wykonaj zadanie zgodnie z jego procedurą.
+Trigger context: @om-qa-buddy
+
+Dodatkowe argumenty/kontekst od użytkownika:
+$ARGUMENTS
