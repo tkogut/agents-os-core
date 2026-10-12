@@ -134,7 +134,8 @@ jobs:
             echo "Updating existing PR #$EXISTING_PR..."
             gh pr edit "$EXISTING_PR" \
               --title "chore(mcp): auto-refresh Antigravity docs ($COMMIT_DATE)" \
-              --body "$PR_BODY"
+              --body "$PR_BODY" \
+              --add-assignee "${{ github.repository_owner }}"
           else
             echo "Creating new PR..."
             gh pr create \
@@ -142,7 +143,8 @@ jobs:
               --head "$BRANCH_NAME" \
               --title "chore(mcp): auto-refresh Antigravity docs ($COMMIT_DATE)" \
               --body "$PR_BODY" \
-              --label "documentation,skip-qa,priority-low,risk-low"
+              --label "documentation,skip-qa,priority-low,risk-low" \
+              --assignee "${{ github.repository_owner }}"
           fi
 
       - name: No changes detected

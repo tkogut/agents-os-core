@@ -91,7 +91,8 @@ jobs:
             echo "Updating existing PR #$EXISTING_PR..."
             gh pr edit "$EXISTING_PR" \
               --title "chore(skills): weekly sync from open-mercato/skills ($COMMIT_DATE)" \
-              --body-file /tmp/sync-summary.md
+              --body-file /tmp/sync-summary.md \
+              --add-assignee "${{ github.repository_owner }}"
           else
             echo "Creating new PR..."
             gh pr create \
@@ -99,7 +100,8 @@ jobs:
               --head "$BRANCH_NAME" \
               --title "chore(skills): weekly sync from open-mercato/skills ($COMMIT_DATE)" \
               --body-file /tmp/sync-summary.md \
-              --label "review,documentation,skip-qa,priority-medium,risk-low"
+              --label "review,documentation,skip-qa,priority-medium,risk-low" \
+              --assignee "${{ github.repository_owner }}"
           fi
 
       - name: No changes detected
