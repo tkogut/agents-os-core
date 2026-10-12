@@ -1,1 +1,330 @@
-[]
+[
+    {
+        "title": "Get Started",
+        "url": "https://antigravity.google/docs/getting-started"
+    },
+    {
+        "title": "Features",
+        "url": "https://antigravity.google/docs/features"
+    },
+    {
+        "title": "SDK",
+        "url": "https://antigravity.google/docs/sdk/overview"
+    },
+    {
+        "title": "Changelog",
+        "url": "https://antigravity.google/docs/changelog"
+    },
+    {
+        "title": "Home",
+        "url": "https://antigravity.google/docs/home"
+    },
+    {
+        "title": "Overview",
+        "url": "https://antigravity.google/docs/overview"
+    },
+    {
+        "title": "Build with Google",
+        "url": "https://antigravity.google/docs/build-with-google"
+    },
+    {
+        "title": "Models",
+        "url": "https://antigravity.google/docs/models"
+    },
+    {
+        "title": "CLI overview",
+        "url": "https://antigravity.google/docs/cli/overview"
+    },
+    {
+        "title": "Installation and auth",
+        "url": "https://antigravity.google/docs/cli/install"
+    },
+    {
+        "title": "Tutorial",
+        "url": "https://antigravity.google/docs/cli/tutorial"
+    },
+    {
+        "title": "Using Antigravity CLI",
+        "url": "https://antigravity.google/docs/cli/using"
+    },
+    {
+        "title": "Features",
+        "url": "https://antigravity.google/docs/cli/features"
+    },
+    {
+        "title": "Best practices",
+        "url": "https://antigravity.google/docs/cli/best-practices"
+    },
+    {
+        "title": "Troubleshooting",
+        "url": "https://antigravity.google/docs/cli/troubleshooting"
+    },
+    {
+        "title": "CLI reference",
+        "url": "https://antigravity.google/docs/cli/reference"
+    },
+    {
+        "title": "Antigravity IDE",
+        "url": "https://antigravity.google/docs/ide/overview"
+    },
+    {
+        "title": "FAQ",
+        "url": "https://antigravity.google/docs/faq"
+    },
+    {
+        "title": "Plans and AI credits",
+        "url": "https://antigravity.google/docs/plans"
+    },
+    {
+        "title": "Enterprise overview",
+        "url": "https://antigravity.google/docs/enterprise"
+    },
+    {
+        "title": "Remote Control",
+        "url": "https://antigravity.google/docs/remote-control"
+    },
+    {
+        "title": "Marketplace",
+        "url": "https://antigravity.google/docs/marketplace"
+    },
+    {
+        "title": "Plugins",
+        "url": "https://antigravity.google/docs/plugins"
+    },
+    {
+        "title": "Terminal sandbox",
+        "url": "https://antigravity.google/docs/sandbox"
+    },
+    {
+        "title": "Review changes",
+        "url": "https://antigravity.google/docs/ide/review-changes-editor"
+    },
+    {
+        "title": "Execution modes",
+        "url": "https://antigravity.google/docs/cli/modes"
+    },
+    {
+        "title": "Headless mode",
+        "url": "https://antigravity.google/docs/cli/headless"
+    },
+    {
+        "title": "Status line customization",
+        "url": "https://antigravity.google/docs/cli/statusline"
+    },
+    {
+        "title": "Terminal title customization",
+        "url": "https://antigravity.google/docs/cli/title"
+    },
+    {
+        "title": "Overview",
+        "url": "https://antigravity.google/docs/ide/browser"
+    },
+    {
+        "title": "Browser recordings",
+        "url": "https://antigravity.google/docs/ide/browser-recordings"
+    },
+    {
+        "title": "Allowlist and denylist",
+        "url": "https://antigravity.google/docs/ide/allowlist-denylist"
+    },
+    {
+        "title": "Separate Chrome profile",
+        "url": "https://antigravity.google/docs/ide/separate-chrome-profile"
+    },
+    {
+        "title": "Overview",
+        "url": "https://antigravity.google/docs/artifacts"
+    },
+    {
+        "title": "Implementation plan",
+        "url": "https://antigravity.google/docs/implementation-plan"
+    },
+    {
+        "title": "Walkthrough",
+        "url": "https://antigravity.google/docs/walkthrough"
+    },
+    {
+        "title": "Visual screenshots",
+        "url": "https://antigravity.google/docs/screenshots"
+    },
+    {
+        "title": "Reviewing artifacts (CLI)",
+        "url": "https://antigravity.google/docs/cli/artifacts"
+    },
+    {
+        "title": "Overview",
+        "url": "https://antigravity.google/docs/projects"
+    },
+    {
+        "title": "Prompting and interaction",
+        "url": "https://antigravity.google/docs/cli/prompting"
+    },
+    {
+        "title": "Managing conversations",
+        "url": "https://antigravity.google/docs/cli/conversations"
+    },
+    {
+        "title": "Overview",
+        "url": "https://antigravity.google/docs/permissions"
+    },
+    {
+        "title": "AI credits",
+        "url": "https://antigravity.google/docs/cli/credits"
+    },
+    {
+        "title": "Tab completion",
+        "url": "https://antigravity.google/docs/ide/tab"
+    },
+    {
+        "title": "Agent side panel",
+        "url": "https://antigravity.google/docs/ide/agent-side-panel"
+    },
+    {
+        "title": "Agent overview",
+        "url": "https://antigravity.google/docs/agent"
+    },
+    {
+        "title": "Task groups",
+        "url": "https://antigravity.google/docs/tools"
+    },
+    {
+        "title": "Overview",
+        "url": "https://antigravity.google/docs/settings"
+    },
+    {
+        "title": "Agent settings",
+        "url": "https://antigravity.google/docs/agent-settings"
+    },
+    {
+        "title": "Artifact review",
+        "url": "https://antigravity.google/docs/artifact-review"
+    },
+    {
+        "title": "Vim editor mode",
+        "url": "https://antigravity.google/docs/cli/vim-editor-mode"
+    },
+    {
+        "title": "Overview",
+        "url": "https://antigravity.google/docs/slash-commands"
+    },
+    {
+        "title": "Boost (/boost)",
+        "url": "https://antigravity.google/docs/boost"
+    },
+    {
+        "title": "Plan (/plan)",
+        "url": "https://antigravity.google/docs/plan"
+    },
+    {
+        "title": "Teamwork (/teamwork-preview)",
+        "url": "https://antigravity.google/docs/teamwork"
+    },
+    {
+        "title": "Agents (/agents)",
+        "url": "https://antigravity.google/docs/cli/commands/agents"
+    },
+    {
+        "title": "Code search (/codesearch)",
+        "url": "https://antigravity.google/docs/cli/commands/codesearch"
+    },
+    {
+        "title": "AI credits (/credits)",
+        "url": "https://antigravity.google/docs/cli/commands/credits"
+    },
+    {
+        "title": "Diff (/diff)",
+        "url": "https://antigravity.google/docs/cli/commands/diff"
+    },
+    {
+        "title": "Permissions (/permissions)",
+        "url": "https://antigravity.google/docs/cli/commands/permissions"
+    },
+    {
+        "title": "Resume (/resume)",
+        "url": "https://antigravity.google/docs/cli/commands/resume"
+    },
+    {
+        "title": "Status line (/statusline)",
+        "url": "https://antigravity.google/docs/cli/commands/statusline"
+    },
+    {
+        "title": "Window title (/title)",
+        "url": "https://antigravity.google/docs/cli/commands/title"
+    },
+    {
+        "title": "Model quotas (/usage)",
+        "url": "https://antigravity.google/docs/cli/commands/usage"
+    },
+    {
+        "title": "Voice dictation (/voice)",
+        "url": "https://antigravity.google/docs/cli/commands/voice"
+    },
+    {
+        "title": "MCP",
+        "url": "https://antigravity.google/docs/mcp"
+    },
+    {
+        "title": "Agent skills",
+        "url": "https://antigravity.google/docs/skills"
+    },
+    {
+        "title": "Rules",
+        "url": "https://antigravity.google/docs/rules"
+    },
+    {
+        "title": "IDE workflows",
+        "url": "https://antigravity.google/docs/ide/workflows"
+    },
+    {
+        "title": "Custom subagents",
+        "url": "https://antigravity.google/docs/subagents"
+    },
+    {
+        "title": "Lifecycle hooks",
+        "url": "https://antigravity.google/docs/hooks"
+    },
+    {
+        "title": "Sidecars",
+        "url": "https://antigravity.google/docs/sidecars"
+    },
+    {
+        "title": "Local models",
+        "url": "https://antigravity.google/docs/sdk/local-models"
+    },
+    {
+        "title": "Personas",
+        "url": "https://antigravity.google/docs/sdk/personas"
+    },
+    {
+        "title": "Tools and skills",
+        "url": "https://antigravity.google/docs/sdk/tools"
+    },
+    {
+        "title": "MCP",
+        "url": "https://antigravity.google/docs/sdk/mcp"
+    },
+    {
+        "title": "Policies",
+        "url": "https://antigravity.google/docs/sdk/policies"
+    },
+    {
+        "title": "Subagents",
+        "url": "https://antigravity.google/docs/sdk/subagents"
+    },
+    {
+        "title": "Structured output",
+        "url": "https://antigravity.google/docs/sdk/structured-output"
+    },
+    {
+        "title": "Lifecycle and hooks",
+        "url": "https://antigravity.google/docs/sdk/lifecycle"
+    },
+    {
+        "title": "View Markdown",
+        "url": "https://antigravity.google/docs/getting-started.md"
+    },
+    {
+        "title": "IDE extensions",
+        "url": "https://antigravity.google/docs/ide/extensions"
+    }
+]
