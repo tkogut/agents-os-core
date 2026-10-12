@@ -6,17 +6,19 @@ on:
     - cron: '0 3 1 * *'
   workflow_dispatch:
     inputs:
-      reason:
-        description: 'Reason for manual trigger'
+      force_sync:
+        description: 'Force sync regardless of changes'
+        type: boolean
         required: false
-        default: 'Manual knowledge base refresh'
+        default: false
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   refresh-knowledge-base:
-    name: Scrape & Commit Antigravity Docs
+    name: Scrape & Sync Antigravity Docs
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -25,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -65,21 +67,84 @@ jobs:
         working-directory: .agents/mcp-servers/antigravity-docs
         run: |
           git diff --quiet knowledge_base/ links.json || echo "changed=true" >> "$GITHUB_OUTPUT"
+          PAGES_COUNT=$(ls -1 knowledge_base/*.md 2>/dev/null | wc -l)
+          echo "pages_count=$PAGES_COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Configure git identity
-        if: steps.diff.outputs.changed == 'true'
+      - name: Run Swarm QA Gate & Validation Checks
+        if: steps.diff.outputs.changed == 'true' || github.event.inputs.force_sync == 'true'
         run: |
-          git config user.name  "github-actions[bot]"
+          echo "🔍 Running validation gates..."
+          python3 -m py_compile scripts/*.py os-add-skill
+          python3 scripts/validate-handshakes.py
+          bash -n os-upgrade-project
+          bash -n os-init
+          bash -n os-init-claude
+          echo "✅ All validation gates passed."
+
+      - name: Publish Step Summary
+        if: always()
+        run: |
+          TODAY=$(date -u '+%Y-%m-%d')
+          PAGES="${{ steps.diff.outputs.pages_count }}"
+          if [ "${{ steps.diff.outputs.changed }}" = "true" ] || [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
+            cat << SUMMARY > "$GITHUB_STEP_SUMMARY"
+          ## 📚 Antigravity MCP Docs Updater ($TODAY)
+          - **Status**: Updated knowledge base
+          - **Total Documentation Pages**: $PAGES
+          - **Destination**: \`.agents/mcp-servers/antigravity-docs/knowledge_base/\`
+          SUMMARY
+          else
+            cat << SUMMARY > "$GITHUB_STEP_SUMMARY"
+          ## 📚 Antigravity MCP Docs Updater ($TODAY)
+          - **Status**: Knowledge base is up-to-date. No changes detected.
+          SUMMARY
+          fi
+
+      - name: Create or Update Pull Request
+        if: steps.diff.outputs.changed == 'true' || github.event.inputs.force_sync == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit updated knowledge base
-        if: steps.diff.outputs.changed == 'true'
-        run: |
+          BRANCH_NAME="automation/mcp-docs-sync"
+          git checkout -B "$BRANCH_NAME"
+
           git add .agents/mcp-servers/antigravity-docs/knowledge_base/ \
-                   .agents/mcp-servers/antigravity-docs/links.json
-          git commit -m "chore(mcp): auto-refresh Antigravity docs $(date -u '+%Y-%m-%d')"
-          git push origin HEAD
+                  .agents/mcp-servers/antigravity-docs/links.json
+
+          if git diff --cached --quiet; then
+            echo "No git changes to commit."
+            exit 0
+          fi
+
+          COMMIT_DATE=$(date -u '+%Y-%m-%d')
+          PAGES="${{ steps.diff.outputs.pages_count }}"
+          git commit -m "chore(mcp): auto-refresh Antigravity docs ($COMMIT_DATE)"
+          git push origin "$BRANCH_NAME" --force
+
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number')
+          PR_BODY="## 📚 Antigravity MCP Docs Updater ($COMMIT_DATE)
+          - **Total Documentation Pages**: $PAGES
+          - **MCP Server**: \`antigravity-docs\`
+          - **Changes**: Refreshed knowledge base documents from https://antigravity.google/docs/getting-started"
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "Updating existing PR #$EXISTING_PR..."
+            gh pr edit "$EXISTING_PR" \
+              --title "chore(mcp): auto-refresh Antigravity docs ($COMMIT_DATE)" \
+              --body "$PR_BODY"
+          else
+            echo "Creating new PR..."
+            gh pr create \
+              --base master \
+              --head "$BRANCH_NAME" \
+              --title "chore(mcp): auto-refresh Antigravity docs ($COMMIT_DATE)" \
+              --body "$PR_BODY" \
+              --label "documentation,skip-qa,priority-low,risk-low"
+          fi
 
       - name: No changes detected
-        if: steps.diff.outputs.changed != 'true'
+        if: steps.diff.outputs.changed != 'true' && github.event.inputs.force_sync != 'true'
         run: echo "Knowledge base is up-to-date. No commit needed."
