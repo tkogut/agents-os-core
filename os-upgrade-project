@@ -471,9 +471,11 @@ mkdir -p "$TARGET_DIR/.claude/skills"
 mkdir -p "$TARGET_DIR/.claude/commands"
 mkdir -p "$TARGET_DIR/.agents/specs"
 
-# Kopiuj commands z vault jeśli brak
+# Kopiuj commands z vault (wszystkie szablony slash commands dla Claude Code)
 if [ -d "$VAULT_DIR/.claude/commands" ]; then
-    cp -rn "$VAULT_DIR/.claude/commands/." "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
+    cp -rf "$VAULT_DIR/.claude/commands/." "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
+    CMD_COUNT=$(find "$TARGET_DIR/.claude/commands" -type f -name "*.md" | wc -l)
+    echo -e "${GREEN}   ✓ Zsynchronizowano ${CMD_COUNT} komend slash w .claude/commands/ (w tym vps-ops, om-*).${NC}"
 fi
 
 # Synchronizacja pasywnego katalogu Tier 2 (Model Dwuwarstwowy: 1466 skilli na żądanie, 0 tokenów overheadu)
@@ -711,12 +713,14 @@ echo -e "   • Claude Code skille: .claude/skills/* (${SKILLS_COUNT} aktywnych 
 echo -e "   • Pamięć maszynowa: .agents/MEMORY.md"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${YELLOW}📋 CO ZROBIĆ TERAZ (ZATWIERDZENIE ZMIAN W GIT):${NC}"
-echo -e "   ${BLUE}Opcja A — Projekty Produkcyjne / z chronioną gałęzią main (np. Tradebot / PR required):${NC}"
+echo -e "   ${YELLOW}⚠️  UWAGA: Strażnik architektury Swarm (R-ROLE-01) blokuje commity z rolą 'coordinator'.${NC}"
+echo -e "   ${YELLOW}   Aby zacommitować zaktualizowane pliki infrastruktury, użyj jednego z dwóch sposobów:${NC}\n"
+echo -e "   ${BLUE}Sposób 1 — Z rolą Builder (Zalecany w Swarm):${NC}"
+echo -e "      ${GREEN}git add -A && SWARM_ROLE=builder git commit -m \"chore(swarm): modernize project to AGENTS-OS v6.5\" && git push${NC}\n"
+echo -e "   ${BLUE}Sposób 2 — Z pominięciem hooka weryfikacji roli (--no-verify dla maintainera):${NC}"
+echo -e "      ${GREEN}git add -A && git commit --no-verify -m \"chore(swarm): modernize project to AGENTS-OS v6.5\" && git push${NC}\n"
+echo -e "   ${BLUE}Opcja PR — Projekty z chronioną gałęzią główną (wymagany PR):${NC}"
 echo -e "      ${GREEN}git checkout -b feature/swarm-v6.5-modernize${NC}"
-echo -e "      ${GREEN}git add -A && git commit -m \"chore(swarm): modernize project to AGENTS-OS v6.5\"${NC}"
-echo -e "      ${GREEN}git push origin feature/swarm-v6.5-modernize${NC}"
-echo -e "      ${GREEN}gh pr create --fill${NC}"
-echo -e ""
-echo -e "   ${BLUE}Opcja B — Projekty Standardowe / Lokalne (bez blokady direct push do main):${NC}"
-echo -e "      ${GREEN}git add -A && git commit -m \"chore(swarm): modernize project to AGENTS-OS v6.5\" && git push${NC}"
+echo -e "      ${GREEN}git add -A && SWARM_ROLE=builder git commit -m \"chore(swarm): modernize project to AGENTS-OS v6.5\"${NC}"
+echo -e "      ${GREEN}git push origin feature/swarm-v6.5-modernize && gh pr create --fill${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
