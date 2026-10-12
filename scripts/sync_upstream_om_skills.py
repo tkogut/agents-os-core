@@ -184,6 +184,21 @@ def main():
 
             print(f"   ✓ Synced {s}")
 
+        # Synchronize vault/.ai descriptors from om-setup-agent-pipeline references (#27)
+        pipeline_refs = os.path.join(global_dir, "om-setup-agent-pipeline", "references")
+        vault_ai_dir = os.path.join(vault_dir, ".ai")
+        if os.path.exists(pipeline_refs) and os.path.exists(vault_ai_dir):
+            for sub, target_sub in [("trackers", "trackers"), ("browsers", "browsers")]:
+                src_sub_dir = os.path.join(pipeline_refs, sub)
+                dst_sub_dir = os.path.join(vault_ai_dir, target_sub)
+                if os.path.exists(src_sub_dir) and os.path.exists(dst_sub_dir):
+                    for fname in os.listdir(dst_sub_dir):
+                        src_file = os.path.join(src_sub_dir, fname)
+                        dst_file = os.path.join(dst_sub_dir, fname)
+                        if os.path.isfile(src_file) and os.path.isfile(dst_file):
+                            shutil.copy2(src_file, dst_file)
+            print("   ✓ Synced vault/.ai/trackers and vault/.ai/browsers descriptors.")
+
         # Update metrics & counts
         total_vault_skills = len([
             d for d in os.listdir(vault_agent_dir)
