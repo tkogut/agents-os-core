@@ -25,6 +25,12 @@ try:
 
     norm_path = os.path.normpath(file_path)
     base_name = os.path.basename(norm_path)
+
+    # 0. Immutable Security Infrastructure (hooks.json and safety guards cannot be modified)
+    IMMUTABLE_SECURITY_FILES = {'hooks.json', 'guard_confidential_gemini.py', 'guard_coordinator_pretool.py', 'claude-pre-tool-guard.sh'}
+    if base_name in IMMUTABLE_SECURITY_FILES:
+        sys.stderr.write(f'\n🛑 [SECURITY GUARD INTEGRITY] Modification of {base_name} is prohibited.\n\n')
+        sys.exit(1)
     _, ext = os.path.splitext(norm_path)
 
     if base_name in ALLOWED_BASENAMES or ext.lower() in ALLOWED_EXTENSIONS:
