@@ -78,6 +78,20 @@ def evaluate_tool_call(payload: dict) -> dict:
         return {"decision": "allow"}
 
     norm_path = os.path.normpath(target_file)
+    base_name = os.path.basename(norm_path)
+
+    # 0. Immutable Security Infrastructure (hooks.json and safety guards cannot be modified by agents)
+    IMMUTABLE_SECURITY_FILES = {
+        "hooks.json",
+        "guard_confidential_gemini.py",
+        "guard_coordinator_pretool.py",
+        "claude-pre-tool-guard.sh",
+    }
+    if base_name in IMMUTABLE_SECURITY_FILES:
+        return {
+            "decision": "deny",
+            "reason": f"🛑 [SECURITY GUARD INTEGRITY] Modyfikacja pliku '{base_name}' przez agenta jest kategorycznie zabroniona."
+        }
 
     # 1. Check Artifact Directory if specified in payload
     artifact_dir = payload.get("artifactDirectoryPath", "")
