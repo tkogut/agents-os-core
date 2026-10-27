@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# os-publish-knowledge — AGENTS-OS v7.0 Swarm Knowledge Publisher & INGEST Scaffolder
+# Architekt: Antigravity Swarm & User tkogut
+# ==============================================================================
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Find publish_knowledge_to_vault.py in local scripts/ or repo
+if [ -f "$SCRIPT_DIR/scripts/publish_knowledge_to_vault.py" ]; then
+    CORE_SCRIPT="$SCRIPT_DIR/scripts/publish_knowledge_to_vault.py"
+elif [ -f "./scripts/publish_knowledge_to_vault.py" ]; then
+    CORE_SCRIPT="./scripts/publish_knowledge_to_vault.py"
+elif [ -f "$HOME/projects/agents-os-core/scripts/publish_knowledge_to_vault.py" ]; then
+    CORE_SCRIPT="$HOME/projects/agents-os-core/scripts/publish_knowledge_to_vault.py"
+else
+    echo "❌ Błąd: Nie znaleziono skryptu publish_knowledge_to_vault.py."
+    exit 1
+fi
+
+HAS_SOURCE=0
+for arg in "$@"; do
+    if [ "$arg" = "--source" ] || [[ "$arg" == --source=* ]]; then
+        HAS_SOURCE=1
+        break
+    fi
+done
+
+if [ $HAS_SOURCE -eq 1 ]; then
+    python3 "$CORE_SCRIPT" "$@"
+else
+    if [ -d ".agents/specs/knowledge" ]; then
+        python3 "$CORE_SCRIPT" --source ".agents/specs/knowledge" "$@"
+    else
+        python3 "$CORE_SCRIPT" "$@"
+    fi
+fi
