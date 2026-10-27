@@ -142,8 +142,15 @@ flowchart TD
 
 ## 🔧 Component Specifications
 
-### 1. Unified Configuration Schema (`.ai/agentic.config.json`)
-Version bumped to `7.0-swarm`. Added top-level keys for `second_brain` and `data_protection`:
+### 1. Unified Configuration Schema & Path Resolution
+Version bumped to `7.0-swarm`. Added top-level keys for `second_brain` and `data_protection`.
+
+#### Zero Full-Disk Scanning Mandate (Ścieżka Domyślna i Hierarchia)
+System **nigdy** nie skanuje całego dysku ani partycji w poszukiwaniu vaulta. Ścieżka rozwiązywana jest w ściśle zdefiniowanej hierarchii:
+1. **Lokalna konfiguracja projektu**: `.ai/agentic.config.json` → `context.second_brain.local_path`.
+2. **Zmienna środowiskowa**: `OBSIDIAN_VAULT_PATH`.
+3. **Domyślna ścieżka systemowa (Default Fallback)**: `C:\Users\tkogut\Documents\sejf_tk` (automatycznie mapowana w WSL na `/mnt/c/Users/tkogut/Documents/sejf_tk`).
+4. **Interaktywne zapytanie usera (Setup Wizard)**: Jeśli powyższe źródła nie wskażą istniejącego katalogu, kreator `os-init` pyta operatora o ścieżkę, podpowiadając domyślnie `C:\Users\tkogut\Documents\sejf_tk`.
 
 ```json
 {
@@ -154,6 +161,7 @@ Version bumped to `7.0-swarm`. Added top-level keys for `second_brain` and `data
       "enabled": true,
       "mode": "hybrid",
       "local_path": "/mnt/c/Users/tkogut/Documents/sejf_tk",
+      "windows_default_path": "C:\\Users\\tkogut\\Documents\\sejf_tk",
       "remote_repo": "github.com/tkogut/sejf-tk",
       "read_only": true,
       "cache_ttl_seconds": 60,
@@ -267,9 +275,10 @@ SHARED_SKILLS=(
 ## 📋 Resolved Assumptions (Autonomous Defaults)
 
 1. **Storage Decoupling**: Downstream code projects will NOT clone `sejf-tk` into their git tree; access is strictly via external absolute path or environment variable `OBSIDIAN_VAULT_PATH`.
-2. **Default Tier**: All Gemini models default to `consumer` (untrusted for confidential data) until an operator formally switches configuration to `enterprise_dpa`.
-3. **Cache Invalidation**: Cache expiration is fixed at 60 seconds, which balances fresh frontmatter discovery with instantaneous tool responsiveness.
-4. **Symlink Redundancy**: Both direct `scripts/` path and `.agents/scripts/` symlink are provisioned in templates to guarantee zero path errors regardless of Antigravity version.
+2. **Zero Full-Disk Probing**: Nie ma skanowania całego dysku w poszukiwaniu vaulta. Ścieżka pobierana jest z configu/env lub domyślnej `C:\Users\tkogut\Documents\sejf_tk` (`/mnt/c/Users/tkogut/Documents/sejf_tk`). W razie braku kreator pyta usera.
+3. **Default Tier**: All Gemini models default to `consumer` (untrusted for confidential data) until an operator formally switches configuration to `enterprise_dpa`.
+4. **Cache Invalidation**: Cache expiration is fixed at 60 seconds, which balances fresh frontmatter discovery with instantaneous tool responsiveness.
+5. **Symlink Redundancy**: Both direct `scripts/` path and `.agents/scripts/` symlink are provisioned in templates to guarantee zero path errors regardless of Antigravity version.
 
 ---
 
