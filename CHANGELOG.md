@@ -11,6 +11,15 @@ Dokumentującą:
 
 ## [7.0.0-swarm] - 2026-10-27
 
+### 📚 Automated INGEST Scaffolding & `/os-publish-knowledge` Skill
+- **`scripts/publish_knowledge_to_vault.py`**: Dodano flagę `--ingest` realizującą automatyczny scaffolding procedury INGEST (wzorzec Karpathy LLM Wiki):
+  - Tworzenie strony źródłowej `wiki/sources/src-<slug>.md` (kebab-case, ekstrakcja tytułu, tagów, podsumowania i nagłówków sekcji, powiązania z `raw/notes`).
+  - Automatyczna rejestracja w `index.md` pod `## Źródła (sources)` oraz wpis do dziennika `log.md` (`## [YYYY-MM-DD] ingest | ...`).
+  - Aktualizacja stanu notatki w `raw/notes/` (`status: processed`, znacznik daty).
+  - Ochrona integralności: pomijanie istniejących stron źródłowych bez nadpisywania (`EXISTS_KEPT`).
+- **Skill `/os-publish-knowledge`**: Utworzono skill w `global_skills/os-publish-knowledge/SKILL.md` (zsynchronizowany do `vault/` i `.claude/skills/`).
+- **CLI `os-publish-knowledge`**: Nowe narzędzie CLI w repozytorium i instalatorze `INSTALL.sh` z automatycznym wykrywaniem `.agents/specs/knowledge`.
+
 ### 🧹 CLI & Template Version Alignment (`v7.0`)
 - **`os-upgrade-project`**: Zaktualizowano wszystkie komunikaty końcowe, instrukcje zatwierdzenia zmian w Git (`chore(swarm): modernize project to AGENTS-OS v7.0`, gałąź `feature/swarm-v7.0-modernize`) oraz nagłówki generowanych plików `MEMORY.md` i `task.md` (`version: 7.0-swarm`).
 - **`INSTALL.sh` & Initializers (`bootstrap.py`, `bootstrap-claude.py`, `os-init-claude`)**: Wdrożono szablon docelowy `~/.antigravity/templates/v7.0-swarm`, zaktualizowano wersję początkowych commitów do v7.0 oraz naprawiono regułę `.gitattributes` w bootstrap-claude (usunięto błędny `merge=union` z `task.md`).

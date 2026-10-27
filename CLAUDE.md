@@ -24,7 +24,7 @@ You are **The Builder** in the Swarm Triad:
 **Second Brain & ISO 27001 Protocol:**
 - Vault `sejf_tk` jest zasobem zewnętrznym (jedna instancja, brak klonowania do projektów).
 - Gemini Consumer podlega twardej blokadzie PreToolUse (`scripts/guard_confidential_gemini.py`) dla stron `confidential: true`, `Firma/` i `raw/notes/`.
-- Publikacja notatek z `.agents/specs/knowledge` do `<vault>/raw/notes` odbywa się wyłącznie skryptem `scripts/publish_knowledge_to_vault.py` (skan PII/sekretów, tryb dry-run, brak commitów git w vaulcie).
+- Publikacja notatek z `.agents/specs/knowledge` do `<vault>/raw/notes` odbywa się wyłącznie skryptem `scripts/publish_knowledge_to_vault.py` lub skillem `/os-publish-knowledge` (skan PII/sekretów, tryb dry-run, automatyczny scaffolding INGEST, brak commitów git w vaulcie).
 - W vaulcie zabrania się tworzenia symlinków — pliki muszą być zwykłymi plikami.
 
 

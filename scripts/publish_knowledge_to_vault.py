@@ -157,8 +157,216 @@ def compute_body_hash(content: str) -> str:
     return hashlib.sha256(clean.encode("utf-8")).hexdigest()
 
 # ==============================================================================
-# 3. Publisher Engine
+# 3. Publisher Engine & INGEST Scaffolder
 # ==============================================================================
+
+def to_kebab_slug(name: str) -> str:
+    """Converts a filename or title into a kebab-case ascii slug without polish chars."""
+    if name.lower().endswith(".md"):
+        name = name[:-3]
+    pol_map = {
+        'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
+        'Ą': 'a', 'Ć': 'c', 'Ę': 'e', 'Ł': 'l', 'Ń': 'n', 'Ó': 'o', 'Ś': 's', 'Ź': 'z', 'Ż': 'z'
+    }
+    for k, v in pol_map.items():
+        name = name.replace(k, v)
+    name = re.sub(r'[^a-zA-Z0-9]+', '-', name)
+    name = name.strip('-').lower()
+    return name or "notatka"
+
+def detect_vault_root(dest_dir: str) -> str:
+    """Detects the vault root from dest_dir (usually <vault>/raw/notes)."""
+    norm = os.path.normpath(dest_dir)
+    parent = os.path.dirname(norm)
+    grandparent = os.path.dirname(parent)
+    if os.path.exists(os.path.join(grandparent, "index.md")):
+        return grandparent
+    if os.path.exists(os.path.join(parent, "index.md")):
+        return parent
+    if os.path.basename(parent) == "raw":
+        return grandparent
+    env_vault = os.environ.get("OBSIDIAN_VAULT_PATH")
+    if env_vault and os.path.isdir(env_vault):
+        return env_vault
+    if os.path.isdir(VAULT_DEFAULT_PATH):
+        return VAULT_DEFAULT_PATH
+    return grandparent
+
+def mark_raw_note_processed(raw_note_path: str, today_str: str):
+    """Marks a raw note in raw/notes as processed in YAML frontmatter."""
+    try:
+        with open(raw_note_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        if "status: processed" in content:
+            return
+        if "status: new" in content:
+            content = re.sub(r'status:\s*new', f'status: processed\nprocessed: {today_str}', content, count=1)
+        else:
+            fm, body = split_frontmatter(content)
+            if fm:
+                lines = fm.splitlines()
+                lines.insert(-1, f"status: processed\nprocessed: {today_str}")
+                content = "\n".join(lines) + "\n" + body
+            else:
+                content = f"---\nstatus: processed\nprocessed: {today_str}\n---\n" + content
+        with open(raw_note_path, "w", encoding="utf-8") as f:
+            f.write(content)
+    except Exception:
+        pass
+
+def scaffold_ingest_source(vault_root: str, target_file_name: str, note_content: str, today_str: str, apply: bool = False) -> dict:
+    """
+    Scaffolds wiki/sources/src-<slug>.md, updates index.md and log.md.
+    Returns status dict.
+    """
+    slug = to_kebab_slug(target_file_name)
+    if not slug.startswith("src-"):
+        src_filename = f"src-{slug}.md"
+    else:
+        src_filename = f"{slug}.md"
+
+    # Extract title
+    m_h1 = re.search(r'^#\s+(.+)$', note_content, re.MULTILINE)
+    if m_h1:
+        title = m_h1.group(1).strip()
+    else:
+        m_title = re.search(r'^title:\s*["\']?(.*?)["\']?\s*$', note_content, re.MULTILINE)
+        title = m_title.group(1).strip() if m_title else os.path.splitext(target_file_name)[0]
+    clean_title = re.sub(r'[*_`]', '', title).strip()
+
+    # Extract tags
+    m_tags = re.search(r'^tags:\s*\[(.*?)\]', note_content, re.MULTILINE)
+    tags = []
+    if m_tags:
+        raw_tags = m_tags.group(1).split(",")
+        tags = [t.strip().strip("'\"# ") for t in raw_tags if t.strip().strip("'\"# ")]
+    if not tags:
+        tags = ["źródło", "agents-os"]
+
+    # Extract lead summary
+    body = re.sub(r'^---\s*[\s\S]*?---\s*', '', note_content).strip()
+    lead_lines = []
+    capturing = False
+    for line in body.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            if capturing:
+                break
+            continue
+        if stripped.startswith("#") or stripped.startswith(">") or stripped.startswith("---"):
+            continue
+        capturing = True
+        lead_lines.append(stripped)
+    lead_summary = " ".join(lead_lines) if lead_lines else f"Notatka wiedzy inżynieryjnej przetransferowana z projektu agents-os: {clean_title}."
+
+    # Extract H2 sections
+    h2_matches = re.findall(r'^##\s+(.+)$', body, re.MULTILINE)
+    if h2_matches:
+        details_bullets = "\n".join(f"- **{re.sub(r'[*_`]', '', h).strip()}**" for h in h2_matches[:10])
+    else:
+        details_bullets = f"- Szczegółowa treść w załączonym pliku źródłowym `raw/notes/{target_file_name}`."
+
+    src_page_content = f"""---
+title: "Źródło: {clean_title}"
+type: source
+domain: programowanie
+tags: [{", ".join(tags)}]
+sources: ["raw/notes/{target_file_name}"]
+created: {today_str}
+updated: {today_str}
+status: draft
+created_by: os-publish-knowledge
+raw_path: raw/notes/{target_file_name}
+---
+
+## Podsumowanie
+
+{lead_summary}
+
+## Szczegóły
+
+{details_bullets}
+
+## Sprzeczności / otwarte pytania
+
+- Wstępny scaffolding wygenerowany automatycznie przez narzędzie `os-publish-knowledge`. Wymaga dekompozycji pojęciowej i semantycznej przez agenta LLM lub człowieka.
+
+## Powiązania
+
+- [[overview]]
+- [[index]]
+
+## Źródła
+
+- Oryginał: `raw/notes/{target_file_name}`
+"""
+
+    if not apply:
+        return {
+            "raw_note": target_file_name,
+            "source_page": src_filename,
+            "slug": slug,
+            "title": clean_title,
+            "status": "DRY-RUN (ready to scaffold)"
+        }
+
+    sources_dir = os.path.join(vault_root, "wiki", "sources")
+    os.makedirs(sources_dir, exist_ok=True)
+    src_page_path = os.path.join(sources_dir, src_filename)
+
+    status = "SCAFFOLDED"
+    if os.path.exists(src_page_path):
+        status = "EXISTS_KEPT"
+    else:
+        try:
+            with open(src_page_path, "w", encoding="utf-8") as f:
+                f.write(src_page_content)
+        except Exception as e:
+            return {
+                "raw_note": target_file_name,
+                "source_page": src_filename,
+                "slug": slug,
+                "title": clean_title,
+                "status": f"ERROR_WRITE_SOURCE ({e})"
+            }
+
+    # Update index.md
+    index_path = os.path.join(vault_root, "index.md")
+    if os.path.exists(index_path):
+        try:
+            with open(index_path, "r", encoding="utf-8") as f:
+                idx_content = f.read()
+            wiki_link = f"[[{os.path.splitext(src_filename)[0]}]]"
+            if wiki_link not in idx_content:
+                entry_line = f"- {wiki_link} – {clean_title}\n"
+                if "## Źródła (sources)\n" in idx_content:
+                    idx_content = idx_content.replace("## Źródła (sources)\n", f"## Źródła (sources)\n{entry_line}")
+                elif "## Źródła\n" in idx_content:
+                    idx_content = idx_content.replace("## Źródła\n", f"## Źródła\n{entry_line}")
+                else:
+                    idx_content += f"\n## Źródła (sources)\n{entry_line}"
+                with open(index_path, "w", encoding="utf-8") as f:
+                    f.write(idx_content)
+        except Exception:
+            pass
+
+    # Update log.md
+    log_path = os.path.join(vault_root, "log.md")
+    if os.path.exists(log_path):
+        try:
+            log_entry = f"\n\n## [{today_str}] ingest | {clean_title}\nAutomatyczny scaffolding INGEST dla notatki `raw/notes/{target_file_name}` (os-publish-knowledge).\nZmienione pliki: wiki/sources/{src_filename}, index.md, raw/notes/{target_file_name}, log.md."
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(log_entry)
+        except Exception:
+            pass
+
+    return {
+        "raw_note": target_file_name,
+        "source_page": src_filename,
+        "slug": slug,
+        "title": clean_title,
+        "status": status
+    }
 
 def resolve_default_dest() -> str:
     env_vault = os.environ.get("OBSIDIAN_VAULT_PATH")
@@ -166,9 +374,9 @@ def resolve_default_dest() -> str:
         return os.path.join(env_vault, "raw", "notes")
     return os.path.join(VAULT_DEFAULT_PATH, "raw", "notes")
 
-def publish_notes(source_dir: str, dest_dir: str, apply: bool = False) -> dict:
+def publish_notes(source_dir: str, dest_dir: str, apply: bool = False, ingest: bool = False) -> dict:
     """
-    Main publish workflow.
+    Main publish workflow with optional INGEST scaffolding.
     Returns result summary dict.
     """
     summary = {
@@ -176,6 +384,7 @@ def publish_notes(source_dir: str, dest_dir: str, apply: bool = False) -> dict:
         "dest_dir": dest_dir,
         "mode": "APPLY" if apply else "DRY-RUN",
         "published": [],
+        "ingested": [],
         "skipped": [],
         "blocked": [],
         "conflicts": [],
@@ -194,6 +403,7 @@ def publish_notes(source_dir: str, dest_dir: str, apply: bool = False) -> dict:
             return summary
 
     today_str = date.today().isoformat()
+    vault_root = detect_vault_root(dest_dir)
 
     # Walk source directory
     for root, dirs, files in os.walk(source_dir):
@@ -253,6 +463,12 @@ def publish_notes(source_dir: str, dest_dir: str, apply: bool = False) -> dict:
                             "target": target_file_name,
                             "reason": "IDENTICAL_CONTENT"
                         })
+                        if ingest:
+                            if "status: processed" not in target_content:
+                                ing_res = scaffold_ingest_source(vault_root, target_file_name, target_content, today_str, apply=apply)
+                                if apply and ing_res["status"] in ("SCAFFOLDED", "EXISTS_KEPT"):
+                                    mark_raw_note_processed(target_path, today_str)
+                                summary["ingested"].append(ing_res)
                         continue
                     else:
                         summary["conflicts"].append({
@@ -281,6 +497,11 @@ def publish_notes(source_dir: str, dest_dir: str, apply: bool = False) -> dict:
                         "target": target_file_name,
                         "sha256": src_sha256
                     })
+                    if ingest:
+                        ing_res = scaffold_ingest_source(vault_root, target_file_name, enriched_content, today_str, apply=True)
+                        if ing_res["status"] in ("SCAFFOLDED", "EXISTS_KEPT"):
+                            mark_raw_note_processed(target_path, today_str)
+                        summary["ingested"].append(ing_res)
                 except Exception as e:
                     summary["errors"].append(f"Błąd zapisu '{target_path}': {e}")
             else:
@@ -290,6 +511,9 @@ def publish_notes(source_dir: str, dest_dir: str, apply: bool = False) -> dict:
                     "sha256": src_sha256,
                     "note": "DRY-RUN (ready to write)"
                 })
+                if ingest:
+                    ing_res = scaffold_ingest_source(vault_root, target_file_name, enriched_content, today_str, apply=False)
+                    summary["ingested"].append(ing_res)
 
     return summary
 
@@ -300,6 +524,8 @@ def main():
     parser.add_argument("--dest", default=resolve_default_dest(),
                         help="Katalog docelowy w vaulcie (<vault>/raw/notes)")
     parser.add_argument("--apply", action="store_true", help="Wykonaj faktyczny zapis (domyślnie dry-run)")
+    parser.add_argument("--ingest", action="store_true",
+                        help="Wykonaj automatyczny scaffolding INGEST (wiki/sources/src-*, index.md, log.md)")
     parser.add_argument("--json", action="store_true", help="Wyświetl raport w formacie JSON")
 
     args = parser.parse_args()
@@ -307,7 +533,7 @@ def main():
     source_dir = os.path.abspath(args.source)
     dest_dir = os.path.abspath(args.dest)
 
-    res = publish_notes(source_dir, dest_dir, apply=args.apply)
+    res = publish_notes(source_dir, dest_dir, apply=args.apply, ingest=args.ingest)
 
     if args.json:
         print(json.dumps(res, indent=2, ensure_ascii=False))
@@ -320,6 +546,10 @@ def main():
         print(f"✅ Do publikacji / opublikowano : {len(res['published'])}")
         for item in res["published"]:
             print(f"   • {item['file']} -> {item['target']}")
+        if res.get("ingested"):
+            print(f"📄 Scaffolding INGEST (wiki/)  : {len(res['ingested'])}")
+            for item in res["ingested"]:
+                print(f"   • {item['raw_note']} -> wiki/sources/{item['source_page']} [{item['status']}]")
         print(f"⏭️  Pominięto                    : {len(res['skipped'])}")
         for item in res["skipped"]:
             print(f"   • {item['file']} ({item['reason']})")
