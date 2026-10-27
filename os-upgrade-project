@@ -171,6 +171,20 @@ if [ -f "$TARGET_DIR/scripts/install-git-hooks.sh" ]; then
 fi
 
 HOOKS_CONTENT='{
+  "guard-confidential-gemini": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 scripts/guard_confidential_gemini.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
   "guard-coordinator": {
     "PreToolUse": [
       {
@@ -221,7 +235,9 @@ mkdir -p "$TARGET_DIR/.antigravity" "$TARGET_DIR/.gemini" "$TARGET_DIR/.agents"
 echo "$HOOKS_CONTENT" > "$TARGET_DIR/.antigravity/hooks.json"
 echo "$HOOKS_CONTENT" > "$TARGET_DIR/.gemini/hooks.json"
 echo "$HOOKS_CONTENT" > "$TARGET_DIR/.agents/hooks.json"
-echo -e "${GREEN}   ✓ Pliki hooks.json zaktualizowane w .antigravity/, .gemini/ i .agents/ (w tym bramka PreToolUse).${NC}"
+mkdir -p "$TARGET_DIR/.agents/scripts"
+ln -sf "../../scripts/guard_confidential_gemini.py" "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
+echo -e "${GREEN}   ✓ Pliki hooks.json zaktualizowane w .antigravity/, .gemini/ i .agents/ (w tym bramka PreToolUse i strażnik DPA Gemini).${NC}"
 
 # --------------------------------------------------------------------------- #
 # 4b. Natywne Hooki Claude Code (.claude/settings.json)

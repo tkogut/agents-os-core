@@ -9,6 +9,21 @@ Dokumentującą:
 
 ## [Unreleased]
 
+## [7.0.0-swarm] - 2026-10-27
+
+### 🧠 Decoupled Second Brain Integration (`sejf-tk`) & DPA Governance
+- 🛡️ **Hardware PreToolUse Security Gate (`guard_confidential_gemini.py`)**:
+  - Twarda blokada fail-closed dla modeli Gemini w konsumenckim planie (brak DPA).
+  - Automatyczne przechwytywanie prób odczytu plików `confidential: true`, `raw/notes/*` oraz strefy `Firma/*` z przekierowaniem do Claude Code.
+  - Ochrona przed wyciekiem w wyszukiwaniu: blokada poleceń rekurencyjnych (`grep -r`, `find -exec`) nad katalogami z poufną zawartością.
+  - Zero Full-Disk Probing: hierarchiczne rozwiązywanie ścieżki (config -> env -> domyślna `C:\Users\tkogut\Documents\sejf_tk`). Brak skanowania całego dysku.
+  - Sub-millisecond Performance: Fast-Bypass (<0.1ms) dla operacji poza sejfem oraz 60-sekundowy cache frontmattera w `/tmp/`, eliminujący błędy `signal: killed` na WSL 9p.
+- 📦 **Harness & Distribution Engine**:
+  - Szablon `vault/`: dodano `vault/scripts/guard_confidential_gemini.py`, `vault/.agents/hooks.json` i redundantny symlink `vault/.agents/scripts/`.
+  - Nowy skill `second-brain`: dodany do `global_skills/`, `vault/.agents/skills/` oraz do listy `SHARED_SKILLS` w `scripts/sync-skills.sh`.
+  - `os-upgrade-project`: zaktualizowano o automatyczne wdrażanie hooka PreToolUse strażnika poufności i symlinka w modernizowanych repozytoriach.
+  - `.ai/agentic.config.json`: podbicie wersji do `7.0-swarm`, dodanie bloków `context.second_brain` i `data_protection`.
+
 ### 🔗 Pełna dystrybucja deskryptorów om-* pipeline (`.ai/trackers`, `.ai/browsers`)
 - ✨ **Vault zyskuje `vault/.ai/trackers/github.md` i `vault/.ai/browsers/agent-browser.md`** — dotąd `vault/.ai/agentic.config.json` był jedynym elementem pipeline'u om-* w Złotym Standardzie; same deskryptory operacji (tracker/przeglądarka), bez których żaden skill om-* nie ma jak wykonać operacji typu `create-pr`/`comment-pr`, nigdy nie trafiały do nowych/aktualizowanych projektów automatycznie.
 - 🔧 **`os-upgrade-project`**: nowy, niezależny od `.ai/agentic.config.json` blok kopiujący brakujące pliki z `.ai/trackers/` i `.ai/browsers/` — projekt z już zcustomizowanym configiem (jak `mms4tk`) nadal dostaje brakujące deskryptory, zamiast zostać pominięty przez istniejący `[ ! -f .ai/agentic.config.json ]` guard.

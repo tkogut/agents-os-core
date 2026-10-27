@@ -1,7 +1,7 @@
 ---
 trigger: always_on
 role: builder
-version: 6.5-swarm
+version: 7.0-swarm
 ide: vscode-claude-code
 ---
 

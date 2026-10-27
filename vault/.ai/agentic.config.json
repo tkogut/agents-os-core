@@ -1,6 +1,6 @@
 {
   "$schema": "https://agents-os.dev/schemas/agentic-config/v1",
-  "version": "6.5-swarm",
+  "version": "7.0-swarm",
   "project": {
     "name": "{{PROJECT_NAME}}",
     "type": "generic",
@@ -35,7 +35,30 @@
       ".agents/agents-qa.md",
       ".agents/agents-ux.md"
     ],
-    "max_context_files": 3
+    "max_context_files": 3,
+    "second_brain": {
+      "enabled": true,
+      "mode": "hybrid",
+      "local_path": "/mnt/c/Users/tkogut/Documents/sejf_tk",
+      "windows_default_path": "C:\\Users\\tkogut\\Documents\\sejf_tk",
+      "remote_repo": "github.com/tkogut/sejf-tk",
+      "read_only": true,
+      "cache_ttl_seconds": 60,
+      "index_file": "index.md",
+      "confidential_tag": "confidential: true"
+    }
+  },
+  "data_protection": {
+    "gemini": {
+      "plan": "google_ai_pro_consumer",
+      "dpa_signed": false,
+      "allow_confidential": false,
+      "redirect_to": "claude-code"
+    },
+    "claude": {
+      "dpa_signed": true,
+      "require_human_confirmation": true
+    }
   },
   "evaluator": {
     "enabled": false,

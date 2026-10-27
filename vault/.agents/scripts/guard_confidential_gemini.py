@@ -1,0 +1,1 @@
+../../scripts/guard_confidential_gemini.py
