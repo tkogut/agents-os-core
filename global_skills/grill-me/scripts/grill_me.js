@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 🛸 AGENTS-OS v6.5 — Grill-Me Architectural Pre-Flight Protocol
+ * 🛸 AGENTS-OS v7.0 — Grill-Me Architectural Pre-Flight Protocol
  */
 
 const cyan = '\x1b[36m';
@@ -12,7 +12,7 @@ const bold = '\x1b[1m';
 const reset = '\x1b[0m';
 
 console.log(`${magenta}${bold}====================================================================${reset}`);
-console.log(`${cyan}${bold}🛸 [AGENTS-OS v6.5] INICJALIZACJA PROTOKOŁU /grill-me${reset}`);
+console.log(`${cyan}${bold}🛸 [AGENTS-OS v7.0] INICJALIZACJA PROTOKOŁU /grill-me${reset}`);
 console.log(`${yellow}Protokół Rygoru Architektonicznego przed Fazą Implementacji (Builder)${reset}`);
 console.log(`${magenta}${bold}====================================================================${reset}\n`);
 

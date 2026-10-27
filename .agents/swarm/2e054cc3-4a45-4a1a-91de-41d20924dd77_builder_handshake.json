@@ -4,6 +4,6 @@
   "status": "SUCCESS",
   "files_modified": [],
   "math_consistency_check": "PASSED",
-  "timestamp": "2026-10-27T16:55:29Z",
-  "notes": "feat(v7): iso 27001 cache hardening and knowledge publisher to vault"
+  "timestamp": "2026-10-27T18:17:03Z",
+  "notes": "chore: bump version references across os-upgrade-project, installer, initializers and vault templates to v7.0"
 }
