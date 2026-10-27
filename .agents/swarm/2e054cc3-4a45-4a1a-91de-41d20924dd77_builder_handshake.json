@@ -4,6 +4,6 @@
   "status": "SUCCESS",
   "files_modified": [],
   "math_consistency_check": "PASSED",
-  "timestamp": "2026-10-27T18:17:03Z",
-  "notes": "chore: bump version references across os-upgrade-project, installer, initializers and vault templates to v7.0"
+  "timestamp": "2026-10-27T19:07:58Z",
+  "notes": "feat(knowledge): add automated INGEST scaffolding with --ingest and /os-publish-knowledge skill"
 }

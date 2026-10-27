@@ -135,5 +135,115 @@ class TestPublishKnowledgeToVault(unittest.TestCase):
         self.assertEqual(len(res["errors"]), 1)
         self.assertIn("Katalog źródłowy nie istnieje", res["errors"][0])
 
+    def test_07_ingest_scaffolding_dry_run_and_apply(self):
+        # Create vault structure
+        index_path = os.path.join(self.test_dir, "index.md")
+        with open(index_path, "w", encoding="utf-8") as fp:
+            fp.write("# Centralny Indeks\n\n## Źródła (sources)\n- [[src-istniejace]] – Istniejące źródło\n")
+
+        log_path = os.path.join(self.test_dir, "log.md")
+        with open(log_path, "w", encoding="utf-8") as fp:
+            fp.write("# Log\n\n## [2026-10-26] init | Start\n")
+
+        # Create source note
+        note_name = "nowa_architektura.md"
+        src_note = os.path.join(self.source_dir, note_name)
+        with open(src_note, "w", encoding="utf-8") as fp:
+            fp.write("---\ntags: [ai-sdlc, open-mercato]\n---\n# Nowa Architektura Roju\nTo jest akapit wprowadzający opisujący architekturę roju.\n\n## Główne Składowe\n- Opis modułów.")
+
+        # 1. Dry run with ingest
+        res_dry = publish_knowledge_to_vault.publish_notes(self.source_dir, self.dest_dir, apply=False, ingest=True)
+        self.assertEqual(len(res_dry["published"]), 1)
+        self.assertEqual(len(res_dry["ingested"]), 1)
+        self.assertEqual(res_dry["ingested"][0]["status"], "DRY-RUN (ready to scaffold)")
+        # Verify source page not created yet
+        expected_src_page = os.path.join(self.test_dir, "wiki", "sources", "src-nowa-architektura.md")
+        self.assertFalse(os.path.exists(expected_src_page))
+
+        # 2. Apply with ingest
+        res_apply = publish_knowledge_to_vault.publish_notes(self.source_dir, self.dest_dir, apply=True, ingest=True)
+        self.assertEqual(len(res_apply["published"]), 1)
+        self.assertEqual(len(res_apply["ingested"]), 1)
+        self.assertEqual(res_apply["ingested"][0]["status"], "SCAFFOLDED")
+
+        # Verify source page created with correct structure
+        self.assertTrue(os.path.exists(expected_src_page))
+        with open(expected_src_page, "r", encoding="utf-8") as fp:
+            src_content = fp.read()
+        self.assertIn('title: "Źródło: Nowa Architektura Roju"', src_content)
+        self.assertIn("type: source", src_content)
+        self.assertIn("## Podsumowanie", src_content)
+        self.assertIn("To jest akapit wprowadzający opisujący architekturę roju.", src_content)
+        self.assertIn("## Szczegóły", src_content)
+        self.assertIn("**Główne Składowe**", src_content)
+        self.assertIn("## Powiązania", src_content)
+        self.assertIn("[[overview]]", src_content)
+        self.assertIn("[[index]]", src_content)
+
+        # Verify index.md updated
+        with open(index_path, "r", encoding="utf-8") as fp:
+            idx_content = fp.read()
+        self.assertIn("[[src-nowa-architektura]] – Nowa Architektura Roju", idx_content)
+
+        # Verify log.md updated
+        with open(log_path, "r", encoding="utf-8") as fp:
+            log_content = fp.read()
+        self.assertIn("ingest | Nowa Architektura Roju", log_content)
+
+        # Verify raw note marked processed
+        raw_note_path = os.path.join(self.dest_dir, note_name)
+        with open(raw_note_path, "r", encoding="utf-8") as fp:
+            raw_content = fp.read()
+        self.assertIn("status: processed", raw_content)
+        self.assertIn("processed: ", raw_content)
+
+    def test_08_ingest_skips_existing_source_page_without_overwriting(self):
+        # Create existing source page
+        sources_dir = os.path.join(self.test_dir, "wiki", "sources")
+        os.makedirs(sources_dir, exist_ok=True)
+        existing_src_page = os.path.join(sources_dir, "src-istniejaca-notatka.md")
+        with open(existing_src_page, "w", encoding="utf-8") as fp:
+            fp.write("# Ręcznie napisana strona źródłowa — NIE NADPISYWAĆ!")
+
+        # Create note
+        note_name = "istniejaca_notatka.md"
+        src_note = os.path.join(self.source_dir, note_name)
+        with open(src_note, "w", encoding="utf-8") as fp:
+            fp.write("# Istniejąca Notatka\nNowa treść.")
+
+        res = publish_knowledge_to_vault.publish_notes(self.source_dir, self.dest_dir, apply=True, ingest=True)
+        self.assertEqual(len(res["published"]), 1)
+        self.assertEqual(len(res["ingested"]), 1)
+        self.assertEqual(res["ingested"][0]["status"], "EXISTS_KEPT")
+
+        # Verify existing file preserved
+        with open(existing_src_page, "r", encoding="utf-8") as fp:
+            content = fp.read()
+        self.assertIn("NIE NADPISYWAĆ!", content)
+
+    def test_09_ingest_on_already_published_raw_note(self):
+        # Note already published in raw/notes with status: new
+        note_name = "publikacja_wczesniejsza.md"
+        target_path = os.path.join(self.dest_dir, note_name)
+        with open(target_path, "w", encoding="utf-8") as fp:
+            fp.write("---\nsource: agents-os-core\nstatus: new\n---\n# Wcześniejsza Publikacja\nTreść notatki.")
+
+        # Note also in source dir
+        src_note = os.path.join(self.source_dir, note_name)
+        with open(src_note, "w", encoding="utf-8") as fp:
+            fp.write("# Wcześniejsza Publikacja\nTreść notatki.")
+
+        # Running with ingest=True should detect raw note and perform ingest
+        res = publish_knowledge_to_vault.publish_notes(self.source_dir, self.dest_dir, apply=True, ingest=True)
+        self.assertEqual(len(res["skipped"]), 1)
+        self.assertEqual(res["skipped"][0]["reason"], "IDENTICAL_CONTENT")
+        self.assertEqual(len(res["ingested"]), 1)
+        self.assertEqual(res["ingested"][0]["status"], "SCAFFOLDED")
+
+        # Verify raw note now marked processed
+        with open(target_path, "r", encoding="utf-8") as fp:
+            content = fp.read()
+        self.assertIn("status: processed", content)
+
 if __name__ == "__main__":
     unittest.main()

@@ -243,6 +243,18 @@ if [ -f "$SCRIPT_DIR/os-upgrade-project" ]; then
     fi
 fi
 
+if [ -f "$SCRIPT_DIR/os-publish-knowledge" ]; then
+    if sudo -n cp "$SCRIPT_DIR/os-publish-knowledge" /usr/local/bin/os-publish-knowledge 2>/dev/null; then
+        sudo -n chmod +x /usr/local/bin/os-publish-knowledge
+        echo "✓ os-publish-knowledge zainstalowany w /usr/local/bin/os-publish-knowledge"
+    else
+        mkdir -p "$HOME/.local/bin"
+        cp "$SCRIPT_DIR/os-publish-knowledge" "$HOME/.local/bin/os-publish-knowledge"
+        chmod +x "$HOME/.local/bin/os-publish-knowledge"
+        echo "✓ os-publish-knowledge zainstalowany w $HOME/.local/bin/os-publish-knowledge"
+    fi
+fi
+
 echo "⚙️ Automatyczna generacja skrótów komend ukośnika (/) dla skilli..."
 python3 "$SCRIPT_DIR/scripts/generate_commands.py"
 
@@ -440,6 +452,7 @@ echo "     • os-upgrade-project [ścieżka]   → Migracja do v7.0 (auto-sync,
 echo ""
 echo "  4. Zarządzanie skillami i pracą agentów:"
 echo "     • os-add-skill nazwa-skilla      → Pobiera skill z bazy 1400+ skilli RAG (sickn33)"
+echo "     • os-publish-knowledge [--ingest]→ Publikacja wiedzy z projektu do Sejfu z opcjonalnym INGEST"
 echo "     • os-run-builder nazwa-gałęzi    → Przygotowuje odizolowane Git Worktree (tmp/worktrees/)"
 echo "     • /grill-me                      → Pre-flight wywiad architektoniczny w czacie agenta
      • /swarm-onboarding              → Automatyczny onboarding i zrzut kontekstu dla nowego agenta"
