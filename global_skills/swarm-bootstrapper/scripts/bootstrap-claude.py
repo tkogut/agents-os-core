@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AGENTS-OS v6.5 SWARM - Claude Code Project Bootstrapper
+AGENTS-OS v7.0 SWARM - Claude Code Project Bootstrapper
 Wariant bootstrap.py dedykowany dla VS Code + Claude Code Extension.
 
 Dodatkowe kroki (vs bootstrap.py):
@@ -22,6 +22,8 @@ from github import Github, GithubException
 local_vault = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "vault")
 if os.path.exists(local_vault):
     VAULT_DIR = local_vault
+elif os.path.exists(os.path.expanduser("~/.antigravity/templates/v7.0-swarm")):
+    VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v7.0-swarm")
 else:
     VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v6.5-swarm")
 
@@ -107,15 +109,15 @@ if not os.path.exists(claude_md_dst):
             f.write(f"""---
 trigger: always_on
 role: builder
-version: 6.5-swarm
+version: 7.0-swarm
 ide: vscode-claude-code
 ---
 
-# AGENTS-OS v6.5 — Claude Code Builder Manifest
+# AGENTS-OS v7.0 — Claude Code Builder Manifest
 
 **Project:** {project_name}  
 **Role:** Builder (VS Code Claude Code Extension)  
-**Swarm Protocol:** AGENTS-OS v6.5 Swarm Edition  
+**Swarm Protocol:** AGENTS-OS v7.0 Swarm Edition  
 
 ## Mandatory Rules
 
@@ -189,19 +191,19 @@ gitattributes_path = os.path.join(TARGET_DIR, ".gitattributes")
 if not os.path.exists(gitattributes_path):
     print("📝 Tworzenie .gitattributes (merge=union)...")
     with open(gitattributes_path, "w", encoding="utf-8") as f:
-        f.write("# AGENTS-OS v6.5 Swarm Edition - Distributed Auto-Sync Rules\n.agents/MEMORY.md merge=union\n.agents/task.md merge=union\nMEMORY.md merge=union\ntask.md merge=union\n")
+        f.write("# AGENTS-OS v7.0 Swarm Edition - Distributed Auto-Sync Rules\n# Note: task.md is a checklist and must NOT use merge=union\n.agents/MEMORY.md merge=union\nMEMORY.md merge=union\n")
 
 gitignore_path = os.path.join(TARGET_DIR, ".gitignore")
 if not os.path.exists(gitignore_path):
     print("📝 Tworzenie .gitignore...")
     with open(gitignore_path, "w") as f:
-        f.write("# AGENTS-OS v6.0\ntmp/\n*.log\n__pycache__/\n.DS_Store\nnode_modules/\n.env\n")
+        f.write("# AGENTS-OS v7.0\ntmp/\n*.log\n__pycache__/\n.DS_Store\nnode_modules/\n.env\n")
 
 # Tworzymy README.md jeśli brak (potrzebny do commita)
 readme_path = os.path.join(TARGET_DIR, "README.md")
 if not os.path.exists(readme_path):
     with open(readme_path, "w") as f:
-        f.write(f"# {project_name}\n\nAGENTS-OS v6.0 Swarm Edition\n")
+        f.write(f"# {project_name}\n\nAGENTS-OS v7.0 Swarm Edition\n")
 
 # --------------------------------------------------------------------------- #
 # 4. Pozyskanie tokena GitHub i określenie użytkownika
@@ -272,7 +274,7 @@ try:
     else:
         hook_content = """#!/bin/bash
 # Swarm Triad Role Enforcement pre-commit hook
-# Version: 6.5-swarm
+# Version: 7.0-swarm
 
 ROLE=${SWARM_ROLE:-"coordinator"}
 
@@ -340,7 +342,7 @@ if repo.is_dirty(untracked_files=True):
         repo.git.add(A=True)
         env = os.environ.copy()
         env["SWARM_ROLE"] = "builder"
-        repo.git.commit("-m", "init: agents-os v6.5 swarm claude-code bootstrap", env=env)
+        repo.git.commit("-m", "init: agents-os v7.0 swarm claude-code bootstrap", env=env)
         print("   ✅ Commit gotowy.")
     except Exception as e:
         print(f"❌ Commit failed: {e}")
@@ -375,7 +377,7 @@ if not repo_exists and token:
         gh_repo = user.create_repo(
             name=project_name,
             private=False,
-            description=f"AGENTS-OS v6.5 Swarm (Claude Code) — {project_name}"
+            description=f"AGENTS-OS v7.0 Swarm (Claude Code) — {project_name}"
         )
         print(f"   ✅ Repo utworzone: {gh_repo.html_url}")
     except Exception as e:
@@ -404,7 +406,7 @@ except Exception as e:
     print(f"   ⚠️  Push failed: {e}")
     print(f"      Możesz pushować ręcznie: git push -u origin {repo.active_branch.name}")
 
-print(f"\n✨ AGENTS-OS v6.5 Swarm (Claude Code) — projekt GOTOWY.")
+print(f"\n✨ AGENTS-OS v7.0 Swarm (Claude Code) — projekt GOTOWY.")
 print(f"   GitHub: https://github.com/{gh_user}/{project_name}")
 
 # WAŻNE: ostatnia linia = sygnał dla os-init (shell function) do cd

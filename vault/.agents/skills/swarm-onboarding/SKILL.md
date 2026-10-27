@@ -4,7 +4,7 @@ description: Automatyczny protokół onboardingu i synchronizacji kontekstu dla 
 trigger: /swarm-onboarding
 ---
 
-# 🐝 Swarm Agent Onboarding Protocol (AGENTS-OS v6.5)
+# 🐝 Swarm Agent Onboarding Protocol (AGENTS-OS v7.0)
 
 Uruchom ten skill za każdym razem, gdy nowy agent (lub nowa sesja agenta) dołącza do projektu lub zmienia rolę w Swarmie.
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# AGENTS-OS v6.5 SWARM EDITION - UNIVERSAL INSTALLER
+# AGENTS-OS v7.0 SWARM EDITION - UNIVERSAL INSTALLER
 # Architekt: Antigravity Orchestrator & User tkogut
 # ==============================================================================
 
@@ -9,7 +9,7 @@ set -e
 # Ustalenie absolutnej ścieżki do katalogu instalatora
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🚀 Rozpoczynam instalację AGENTS-OS v6.5 Swarm Edition z katalogu: $SCRIPT_DIR..."
+echo "🚀 Rozpoczynam instalację AGENTS-OS v7.0 Swarm Edition z katalogu: $SCRIPT_DIR..."
 
 # 1. Zależności systemu
 
@@ -109,7 +109,7 @@ fi
 
 # 3. Kopiowanie The Vault
 AGY_DIR="$HOME/.antigravity"
-VAULT_DIR="$AGY_DIR/templates/v6.5-swarm"
+VAULT_DIR="$AGY_DIR/templates/v7.0-swarm"
 
 # Czyszczenie starych wersji szablonów w celu zachowania czystości systemu
 echo "🧹 Czyszczenie starych szablonów..."
@@ -425,7 +425,7 @@ else
 fi
 
 echo "===================================================================="
-echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: AGENTS-OS v6.5 SWARM GOTOWY."
+echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: AGENTS-OS v7.0 SWARM GOTOWY."
 echo ""
 echo "🚀 NAJWAŻNIEJSZE KOMENDY SYSTEMOWE:"
 echo "  1. Aktywacja powłoki w bieżącym terminalu:"
@@ -436,7 +436,7 @@ echo "     • os-init nazwa-projektu         → Tworzy projekt i otwiera Antig
 echo "     • os-init-claude nazwa-projektu  → Tworzy projekt zoptymalizowany pod VS Code / Claude Code"
 echo ""
 echo "  3. Modernizacja istniejących projektów:"
-echo "     • os-upgrade-project [ścieżka]   → Migracja do v6.5 (auto-sync, union-merge, hooki, 80+ skilli)"
+echo "     • os-upgrade-project [ścieżka]   → Migracja do v7.0 (auto-sync, union-merge, hooki, 80+ skilli)"
 echo ""
 echo "  4. Zarządzanie skillami i pracą agentów:"
 echo "     • os-add-skill nazwa-skilla      → Pobiera skill z bazy 1400+ skilli RAG (sickn33)"

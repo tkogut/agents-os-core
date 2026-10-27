@@ -1,9 +1,9 @@
 #!/bin/bash
 # ==============================================================================
 # os-upgrade-project [ścieżka-do-projektu]
-# AGENTS-OS v6.5 Swarm Edition — Project Modernizer & Auto-Sync Migration Tool
+# AGENTS-OS v7.0 Swarm Edition — Project Modernizer & Auto-Sync Migration Tool
 #
-# Aktualizuje istniejące projekty do standardu v6.5 Swarm:
+# Aktualizuje istniejące projekty do standardu v7.0 Swarm:
 #   1. Konfiguruje bezkonfliktowy merge (.gitattributes: merge=union)
 #   2. Wdraża natywne hooki cyklu życia Antigravity/Gemini (.antigravity/ / .gemini/ / .agents/)
 #   3. Ustawia lokalne parametry gita (pull.rebase true, merge.conflictstyle diff3)
@@ -11,7 +11,7 @@
 #      od punktu 2.; Claude Code nie czyta .agents/hooks.json.
 #   5. Tworzy dowiązania symboliczne dla Claude Code (.claude/skills/*, 65+ skilli)
 #   6. Inicjalizuje silnik pamięci MEMORY.md v0.42.1 i rejestr task.md jeśli brak
-#   7. Synchronizuje najnowsze skille z szablonu Vault
+#   7. Synchronizuje najnowsze skille z szablonu Vault oraz strażnika Second Brain (guard_confidential_gemini.py)
 # ==============================================================================
 
 set -e
@@ -29,13 +29,13 @@ TARGET_DIR=""
 for arg in "$@"; do
     case "$arg" in
         -h|--help)
-            echo -e "${BLUE}🛸 AGENTS-OS v6.5 — Upgrade & Distributed Sync Modernizer${NC}"
+            echo -e "${BLUE}🛸 AGENTS-OS v7.0 — Upgrade & Distributed Sync Modernizer${NC}"
             echo "Użycie: os-upgrade-project [ścieżka-do-projektu] [--update-skills]"
             echo ""
-            echo "Aktualizuje projekt do standardu AGENTS-OS v6.5 Swarm:"
+            echo "Aktualizuje projekt do standardu AGENTS-OS v7.0 Swarm:"
             echo "  • Wdraża bezkonfliktowy merge (.gitattributes)"
             echo "  • Ustawia lokalne parametry Gita (pull.rebase=true, merge.conflictstyle=diff3)"
-            echo "  • Konfiguruje bezpieczne hooki cyklu życia Antigravity/Gemini (z ochroną gałęzi main)"
+            echo "  • Konfiguruje bezpieczne hooki cyklu życia Antigravity/Gemini (z ochroną gałęzi main i strażnikiem Second Brain)"
             echo "  • Konfiguruje natywne hooki Claude Code (.claude/settings.json + .agents/hooks/*.sh)"
             echo "  • Mapuje symlinki .claude/skills/* dla 65+ skilli (w tym 42 skilli Open-Mercato)"
             echo "  • Inicjalizuje silnik pamięci .agents/MEMORY.md"
@@ -59,7 +59,7 @@ done
 TARGET_DIR="${TARGET_DIR:-$(pwd)}"
 TARGET_DIR="$(realpath "$TARGET_DIR")"
 
-echo -e "${BLUE}🛸 AGENTS-OS v6.5 — Upgrade & Distributed Sync Modernizer${NC}"
+echo -e "${BLUE}🛸 AGENTS-OS v7.0 — Upgrade & Distributed Sync Modernizer${NC}"
 echo -e "📁 Ścieżka projektu: ${TARGET_DIR}"
 if [ "$UPDATE_SKILLS" = "true" ]; then
     echo -e "🔄 Tryb aktualizacji skilli: WŁĄCZONY (--update-skills)"
@@ -75,12 +75,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Wykrywanie szablonu Vault: preferuj lokalny katalog vault repozytorium jeśli istnieje
 if [ -d "$SCRIPT_DIR/vault" ]; then
     VAULT_DIR="$SCRIPT_DIR/vault"
+elif [ -d "$HOME/.antigravity/templates/v7.0-swarm" ]; then
+    VAULT_DIR="$HOME/.antigravity/templates/v7.0-swarm"
 elif [ -d "$HOME/.antigravity/templates/v6.5-swarm" ]; then
     VAULT_DIR="$HOME/.antigravity/templates/v6.5-swarm"
 elif [ -d "$HOME/projects/agents-os-core/vault" ]; then
     VAULT_DIR="$HOME/projects/agents-os-core/vault"
 else
-    VAULT_DIR="$HOME/.antigravity/templates/v6.5-swarm"
+    VAULT_DIR="$HOME/.antigravity/templates/v7.0-swarm"
 fi
 
 
@@ -94,7 +96,7 @@ mkdir -p "$TARGET_DIR/.agents"
 
 if [ ! -f "$GITATTR_PATH" ]; then
     cat << 'EOF' > "$GITATTR_PATH"
-# AGENTS-OS v6.5 Swarm Edition - Distributed Sync Merge Policy
+# AGENTS-OS v7.0 Swarm Edition - Distributed Sync Merge Policy
 #
 # `merge=union` is correct ONLY for append-only logs. It is WRONG for
 # checklist/stateful files: a `- [ ]` -> `- [x]` transition is an UPDATE, and
@@ -350,7 +352,7 @@ fi
 cat << 'GUARD_EOF' > "$TARGET_DIR/.agents/hooks/claude-pre-tool-guard.sh"
 #!/usr/bin/env bash
 # claude-pre-tool-guard.sh — Claude Code PreToolUse Safety Hook
-# Part of AGENTS-OS v6.5 Swarm Governance (R-ROLE-01)
+# Part of AGENTS-OS v7.0 Swarm Governance (R-ROLE-01)
 # Blocks direct code writes on main/master branches.
 
 set -e
@@ -588,7 +590,7 @@ echo -e "\n${BLUE}⚙️ [6/7] Sprawdzanie silnika pamięci MEMORY.md oraz task.
 
 if [ ! -f "$TARGET_DIR/.agents/MEMORY.md" ]; then
     cat << 'EOF' > "$TARGET_DIR/.agents/MEMORY.md"
-# 🧠 AGENTS-OS v6.5 SWARM MEMORY ENGINE (v0.42.1)
+# 🧠 AGENTS-OS v7.0 SWARM MEMORY ENGINE (v0.42.1)
 
 ---
 version: 0.42.1
@@ -610,7 +612,7 @@ last_sync: init
   - No direct pushes to main/master by execution roles
 
 ## 📝 Decisions & Key Milestones
-- [INIT] Project upgraded to AGENTS-OS v6.5 Swarm Edition.
+- [INIT] Project upgraded to AGENTS-OS v7.0 Swarm Edition.
 - [SYNC] Conflict-free distributed auto-sync enabled for `MEMORY.md` (union merge).
 
 ## 🔄 Machine Session Log
@@ -624,10 +626,10 @@ fi
 
 if [ ! -f "$TARGET_DIR/.agents/task.md" ]; then
     cat << 'EOF' > "$TARGET_DIR/.agents/task.md"
-# 📋 AGENTS-OS v6.5 Swarm Task Backlog
+# 📋 AGENTS-OS v7.0 Swarm Task Backlog
 
 ---
-version: 6.5-swarm
+version: 7.0-swarm
 sync_mode: manual-checklist
 ---
 
@@ -722,7 +724,7 @@ if [ -d "$VAULT_DIR/.ai/browsers" ]; then
 fi
 
 echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}✅ PROJEKT ZAAKTUALIZOWANY DO AGENTS-OS v6.5 SWARM:${NC} $TARGET_DIR"
+echo -e "${GREEN}✅ PROJEKT ZAAKTUALIZOWANY DO AGENTS-OS v7.0 SWARM:${NC} $TARGET_DIR"
 echo -e "   • Bezkonfliktowy merge: .gitattributes (merge=union na MEMORY.md)"
 echo -e "   • Pasywny katalog Tier 2: .agents/specs/awesome-skills-catalog.md (1466 skilli na żądanie)
    • Baza wiedzy eksperckiej: .agents/specs/knowledge/ (NotebookLM / AI SDLC)
@@ -738,11 +740,11 @@ echo -e "${YELLOW}📋 CO ZROBIĆ TERAZ (ZATWIERDZENIE ZMIAN W GIT):${NC}"
 echo -e "   ${YELLOW}⚠️  UWAGA: Strażnik architektury Swarm (R-ROLE-01) blokuje commity z rolą 'coordinator'.${NC}"
 echo -e "   ${YELLOW}   Aby zacommitować zaktualizowane pliki infrastruktury, użyj jednego z dwóch sposobów:${NC}\n"
 echo -e "   ${BLUE}Sposób 1 — Z rolą Builder (Zalecany w Swarm):${NC}"
-echo -e "      ${GREEN}git add -A && SWARM_ROLE=builder git commit -m \"chore(swarm): modernize project to AGENTS-OS v6.5\" && git push${NC}\n"
+echo -e "      ${GREEN}git add -A && SWARM_ROLE=builder git commit -m \"chore(swarm): modernize project to AGENTS-OS v7.0\" && git push${NC}\n"
 echo -e "   ${BLUE}Sposób 2 — Z pominięciem hooka weryfikacji roli (--no-verify dla maintainera):${NC}"
-echo -e "      ${GREEN}git add -A && git commit --no-verify -m \"chore(swarm): modernize project to AGENTS-OS v6.5\" && git push${NC}\n"
+echo -e "      ${GREEN}git add -A && git commit --no-verify -m \"chore(swarm): modernize project to AGENTS-OS v7.0\" && git push${NC}\n"
 echo -e "   ${BLUE}Opcja PR — Projekty z chronioną gałęzią główną (wymagany PR):${NC}"
-echo -e "      ${GREEN}git checkout -b feature/swarm-v6.5-modernize${NC}"
-echo -e "      ${GREEN}git add -A && SWARM_ROLE=builder git commit -m \"chore(swarm): modernize project to AGENTS-OS v6.5\"${NC}"
-echo -e "      ${GREEN}git push origin feature/swarm-v6.5-modernize && gh pr create --fill${NC}"
+echo -e "      ${GREEN}git checkout -b feature/swarm-v7.0-modernize${NC}"
+echo -e "      ${GREEN}git add -A && SWARM_ROLE=builder git commit -m \"chore(swarm): modernize project to AGENTS-OS v7.0\"${NC}"
+echo -e "      ${GREEN}git push origin feature/swarm-v7.0-modernize && gh pr create --fill${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"

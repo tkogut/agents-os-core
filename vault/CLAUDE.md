@@ -134,4 +134,4 @@ bash execution/test_bootstrap.sh
 
 ---
 
-*AGENTS-OS v6.5 Swarm Edition | Builder Role Active*
+*AGENTS-OS v7.0 Swarm Edition | Builder Role Active*

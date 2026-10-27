@@ -1,8 +1,8 @@
-# 📋 AGENTS-OS v6.5 Swarm Task Backlog
+# 📋 AGENTS-OS v7.0 Swarm Task Backlog
 
 ---
-version: 6.5-swarm
-sync_mode: distributed-union
+version: 7.0-swarm
+sync_mode: manual-checklist
 ---
 
 ## 🚀 Active Epics & Tickets
@@ -11,7 +11,7 @@ sync_mode: distributed-union
   - **Status**: READY
 
 ## 📦 Backlog
-<!-- Add new tasks below. Conflict-free union merge enabled. -->
+<!-- Add new tasks below. Manual conflict resolution (no union merge on checklists). -->
 
 ## ✅ Completed Tasks
 <!-- Completed tasks move here with timestamp -->
