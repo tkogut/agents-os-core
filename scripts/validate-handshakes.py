@@ -12,10 +12,11 @@ Użycie:
 """
 
 import argparse
+import hashlib
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import timezone
 
 
 SWARM_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".agents", "swarm")
@@ -63,6 +64,38 @@ def validate_handshake(entry):
     entry["errors"] = errors
     entry["valid"] = len(errors) == 0
     return entry["valid"]
+
+
+def check_security_guards_integrity():
+    """Verify that guard_confidential_gemini.py copies in scripts/ and .agents/scripts/ exist and are in sync."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    canon_path = os.path.join(repo_root, "scripts", "guard_confidential_gemini.py")
+    agents_path = os.path.join(repo_root, ".agents", "scripts", "guard_confidential_gemini.py")
+    vault_path = os.path.join(repo_root, "vault", "scripts", "guard_confidential_gemini.py")
+
+    errors = []
+    if not os.path.isfile(canon_path):
+        errors.append(f"Brak kanonicznego pliku strażnika: {canon_path}")
+        return errors
+
+    with open(canon_path, "rb") as f:
+        canon_hash = hashlib.sha256(f.read()).hexdigest()
+
+    if not os.path.exists(agents_path):
+        errors.append(f"Brak pliku strażnika na ścieżce hooka: {agents_path}")
+    else:
+        with open(agents_path, "rb") as f:
+            agents_hash = hashlib.sha256(f.read()).hexdigest()
+        if agents_hash != canon_hash:
+            errors.append(f"Rozbieżność hash (drift) między {canon_path} a {agents_path}")
+
+    if os.path.exists(vault_path):
+        with open(vault_path, "rb") as f:
+            vault_hash = hashlib.sha256(f.read()).hexdigest()
+        if vault_hash != canon_hash:
+            errors.append(f"Rozbieżność hash (drift) w szablonie vault: {vault_path}")
+
+    return errors
 
 
 def main():
@@ -132,6 +165,16 @@ def main():
                     all_valid = False
                     self_signed_violation = True
     # -----------------------------------------------------------------------
+
+    # --- Security Guard Integrity Check ---
+    guard_errors = check_security_guards_integrity()
+    if guard_errors:
+        print("🛡️ [SECURITY GUARD INTEGRITY ERROR]:")
+        for gerr in guard_errors:
+            print(f"   ❌ {gerr}")
+        all_valid = False
+    else:
+        print("🛡️ [SECURITY GUARD INTEGRITY]: Pliki strażnika (scripts/ i .agents/scripts/) są spójne (SHA-256 MATCH).")
 
     if all_valid:
         print("\n✅ WALIDACJA ZAKOŃCZONA: Wszystkie pliki handshake są poprawne.")

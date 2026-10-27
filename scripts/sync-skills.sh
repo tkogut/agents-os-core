@@ -24,6 +24,7 @@ SHARED_SKILLS=(
     "grill-me"
     "swarm-onboarding"
     "deploy-to-vps"
+    "second-brain"
 )
 
 echo "🔄 Rozpoczynam synchronizację skilli Agents-OS..."
