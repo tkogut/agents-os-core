@@ -236,7 +236,13 @@ echo "$HOOKS_CONTENT" > "$TARGET_DIR/.antigravity/hooks.json"
 echo "$HOOKS_CONTENT" > "$TARGET_DIR/.gemini/hooks.json"
 echo "$HOOKS_CONTENT" > "$TARGET_DIR/.agents/hooks.json"
 mkdir -p "$TARGET_DIR/.agents/scripts"
-ln -sf "../../scripts/guard_confidential_gemini.py" "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
+if [ -f "$SCRIPT_DIR/scripts/guard_confidential_gemini.py" ]; then
+    cp -p "$SCRIPT_DIR/scripts/guard_confidential_gemini.py" "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
+    chmod 755 "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
+elif [ -f "$TARGET_DIR/scripts/guard_confidential_gemini.py" ]; then
+    cp -p "$TARGET_DIR/scripts/guard_confidential_gemini.py" "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
+    chmod 755 "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
+fi
 echo -e "${GREEN}   ✓ Pliki hooks.json zaktualizowane w .antigravity/, .gemini/ i .agents/ (w tym bramka PreToolUse i strażnik DPA Gemini).${NC}"
 
 # --------------------------------------------------------------------------- #

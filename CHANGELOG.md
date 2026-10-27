@@ -25,10 +25,12 @@ Dokumentującą:
   - Ochrona przed nadpisywaniem: pomija pliki o identycznym hashu, zgłasza konflikt przy rozbieżności treści.
   - Wzbogacanie metadanych YAML (`source: agents-os-core`, `sha256`, `published`, `status: new`).
 - 📦 **Harness & Distribution Engine**:
-  - Szablon `vault/`: dodano `vault/scripts/guard_confidential_gemini.py`, `vault/.agents/hooks.json` i redundantny symlink `vault/.agents/scripts/`.
+  - Szablon `vault/`: dodano fizyczne kopie `vault/scripts/guard_confidential_gemini.py` oraz `vault/.agents/scripts/guard_confidential_gemini.py` (usunięto nietrwałe symlinki na rzecz pełnej spójności wieloplatformowej).
+  - Wyeliminowano ryzyko zerwania hooka: w `os-upgrade-project` wdrożono fizyczną kopię pliku do `.agents/scripts/guard_confidential_gemini.py` z uprawnieniami 755 (zamiast zawodnego `ln -sf`).
+  - Automatyczna weryfikacja spójności: rozszerzono `scripts/validate-handshakes.py` oraz `tests/test_guard_confidential_gemini.py` o weryfikację istnienia i zgodności sum SHA-256 między wersją kanoniczną w `scripts/` a kopią roboczą w `.agents/scripts/`.
   - Udokumentowano zasadę braku symlinków w produkcyjnym vaulcie (pliki w prawdziwym sejfie muszą być zwykłymi plikami).
+  - Konfiguracja Multi-Machine: w `AGENTS.md` oraz `vault/README.md` dodano opis hierarchii ścieżki vaulta i wymóg zdefiniowania `OBSIDIAN_VAULT_PATH` na innych maszynach (np. VPS) w reżimie Zero Full-Disk Probing.
   - Nowy skill `second-brain`: dodany do `global_skills/`, `vault/.agents/skills/` oraz do listy `SHARED_SKILLS` w `scripts/sync-skills.sh`.
-  - `os-upgrade-project`: zaktualizowano o automatyczne wdrażanie hooka PreToolUse strażnika poufności i symlinka w modernizowanych repozytoriach.
   - `.ai/agentic.config.json`: podbicie wersji do `7.0-swarm`, dodanie bloków `context.second_brain` i `data_protection`.
 
 ### 🔗 Pełna dystrybucja deskryptorów om-* pipeline (`.ai/trackers`, `.ai/browsers`)

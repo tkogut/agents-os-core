@@ -2,6 +2,7 @@ import unittest
 import sys
 import os
 import json
+import hashlib
 
 # Add scripts directory to path
 scripts_dir = os.path.join(os.path.dirname(__file__), "..", "scripts")
@@ -270,6 +271,37 @@ class TestGuardConfidentialGemini(unittest.TestCase):
                 os.environ["OBSIDIAN_VAULT_PATH"] = old_env
             else:
                 os.environ.pop("OBSIDIAN_VAULT_PATH", None)
+
+    def test_18_guard_copies_integrity_and_sync(self):
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        canon_path = os.path.join(repo_root, "scripts", "guard_confidential_gemini.py")
+        agents_path = os.path.join(repo_root, ".agents", "scripts", "guard_confidential_gemini.py")
+        vault_path = os.path.join(repo_root, "vault", "scripts", "guard_confidential_gemini.py")
+        vault_agents_path = os.path.join(repo_root, "vault", ".agents", "scripts", "guard_confidential_gemini.py")
+
+        self.assertTrue(os.path.isfile(canon_path), f"Brak kanonicznego pliku strażnika: {canon_path}")
+        with open(canon_path, "rb") as f:
+            canon_hash = hashlib.sha256(f.read()).hexdigest()
+
+        # Check execution hook copy in .agents/scripts/
+        self.assertTrue(os.path.isfile(agents_path), f"Brak pliku strażnika w .agents/scripts/: {agents_path}")
+        self.assertFalse(os.path.islink(agents_path), f"Plik {agents_path} nie może być symlinkiem!")
+        with open(agents_path, "rb") as f:
+            agents_hash = hashlib.sha256(f.read()).hexdigest()
+        self.assertEqual(agents_hash, canon_hash, "Drift: .agents/scripts/guard_confidential_gemini.py różni się od scripts/")
+
+        # Check template in vault/scripts/
+        if os.path.exists(vault_path):
+            with open(vault_path, "rb") as f:
+                vault_hash = hashlib.sha256(f.read()).hexdigest()
+            self.assertEqual(vault_hash, canon_hash, "Drift: vault/scripts/guard_confidential_gemini.py różni się od scripts/")
+
+        # Check template in vault/.agents/scripts/
+        if os.path.exists(vault_agents_path):
+            self.assertFalse(os.path.islink(vault_agents_path), f"Plik {vault_agents_path} nie może być symlinkiem!")
+            with open(vault_agents_path, "rb") as f:
+                vault_agents_hash = hashlib.sha256(f.read()).hexdigest()
+            self.assertEqual(vault_agents_hash, canon_hash, "Drift: vault/.agents/scripts/guard_confidential_gemini.py różni się od scripts/")
 
 if __name__ == "__main__":
     unittest.main()
