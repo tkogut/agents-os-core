@@ -200,9 +200,13 @@ def main():
     # ZRODLO 1: lokalny szablon (offline, brak wektora supply-chain)
     # ---------------------------------------------------------------------- #
     local_template_path = os.path.expanduser(
-        "~/.antigravity/templates/v6.5-swarm/.agents/skills/%s" % skill_name)
+        "~/.antigravity/templates/v7.0-swarm/.agents/skills/%s" % skill_name)
+    if not os.path.exists(local_template_path):
+        local_template_path = os.path.expanduser(
+            "~/.antigravity/templates/v6.5-swarm/.agents/skills/%s" % skill_name)
     if os.path.exists(local_template_path):
-        print("[1/%d] Skill '%s' z lokalnego szablonu (v6.5-swarm)..." % (total_sources, skill_name))
+        tmpl_ver = "v7.0-swarm" if "v7.0-swarm" in local_template_path else "v6.5-swarm"
+        print("[1/%d] Skill '%s' z lokalnego szablonu (%s)..." % (total_sources, skill_name, tmpl_ver))
         try:
             if os.path.exists(dest_dir):
                 shutil.rmtree(dest_dir)

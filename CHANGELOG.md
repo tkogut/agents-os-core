@@ -11,6 +11,12 @@ Dokumentującą:
 
 ## [7.0.0-swarm] - 2026-10-27
 
+### 🧹 CLI & Template Version Alignment (`v7.0`)
+- **`os-upgrade-project`**: Zaktualizowano wszystkie komunikaty końcowe, instrukcje zatwierdzenia zmian w Git (`chore(swarm): modernize project to AGENTS-OS v7.0`, gałąź `feature/swarm-v7.0-modernize`) oraz nagłówki generowanych plików `MEMORY.md` i `task.md` (`version: 7.0-swarm`).
+- **`INSTALL.sh` & Initializers (`bootstrap.py`, `bootstrap-claude.py`, `os-init-claude`)**: Wdrożono szablon docelowy `~/.antigravity/templates/v7.0-swarm`, zaktualizowano wersję początkowych commitów do v7.0 oraz naprawiono regułę `.gitattributes` w bootstrap-claude (usunięto błędny `merge=union` z `task.md`).
+- **`os-add-skill`**: Dodano hierarchiczne sprawdzanie szablonu lokalnego `v7.0-swarm` z zachowaniem fallbacku do `v6.5-swarm`.
+- **Szablony `vault/`**: Wyrównano deklaracje wersji we wszystkich plikach (`AGENTS.md`, `CLAUDE.md`, `HANDOFF.md`, `GOVERNANCE.md`, `core-rule.md`, `specs/AGENTS-OS.md`, `specs/graph.json`).
+
 ### 🧠 Decoupled Second Brain Integration (`sejf-tk`) & DPA Governance (ISO 27001 Rigor)
 - 🛡️ **Hardware PreToolUse Security Gate (`guard_confidential_gemini.py`)**:
   - Twarda blokada fail-closed dla modeli Gemini w konsumenckim planie (brak DPA).
