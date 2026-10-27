@@ -11,15 +11,22 @@ Dokumentującą:
 
 ## [7.0.0-swarm] - 2026-10-27
 
-### 🧠 Decoupled Second Brain Integration (`sejf-tk`) & DPA Governance
+### 🧠 Decoupled Second Brain Integration (`sejf-tk`) & DPA Governance (ISO 27001 Rigor)
 - 🛡️ **Hardware PreToolUse Security Gate (`guard_confidential_gemini.py`)**:
   - Twarda blokada fail-closed dla modeli Gemini w konsumenckim planie (brak DPA).
   - Automatyczne przechwytywanie prób odczytu plików `confidential: true`, `raw/notes/*` oraz strefy `Firma/*` z przekierowaniem do Claude Code.
   - Ochrona przed wyciekiem w wyszukiwaniu: blokada poleceń rekurencyjnych (`grep -r`, `find -exec`) nad katalogami z poufną zawartością.
   - Zero Full-Disk Probing: hierarchiczne rozwiązywanie ścieżki (config -> env -> domyślna `C:\Users\tkogut\Documents\sejf_tk`). Brak skanowania całego dysku.
-  - Sub-millisecond Performance: Fast-Bypass (<0.1ms) dla operacji poza sejfem oraz 60-sekundowy cache frontmattera w `/tmp/`, eliminujący błędy `signal: killed` na WSL 9p.
+  - Bezpieczny Cache ISO 27001: przeniesiono cache z `/tmp` do prywatnego katalogu użytkownika (`~/.cache/agents-os-core/`, uprawnienia 0700 dla katalogu, 0600 dla pliku).
+  - Weryfikacja Integralności: w cache'u przechowywana jest wyłącznie lista chronionych zasobów z sumą kontrolną SHA-256 (nigdy gotowa decyzja allow/deny). Wykrycie naruszenia lub uszkodzenia powoduje przebudowę; przy błędzie odczytu system blokuje dostęp (fail-closed).
+- 📜 **Skrypt Bezpiecznej Publikacji Wiedzy (`scripts/publish_knowledge_to_vault.py`)**:
+  - Bezpieczny transfer notatek z `.agents/specs/knowledge` do `<vault>/raw/notes` (domyślnie dry-run, zapis wymaga flagi `--apply`).
+  - Skaner sekretów i PII: blokuje pliki z kluczami API, tokenami JWT, hasłami, e-mailami spoza domeny grupy, numerami PESEL i IBAN (w raporcie wyłącznie nazwa reguły, zero wycieku wartości).
+  - Ochrona przed nadpisywaniem: pomija pliki o identycznym hashu, zgłasza konflikt przy rozbieżności treści.
+  - Wzbogacanie metadanych YAML (`source: agents-os-core`, `sha256`, `published`, `status: new`).
 - 📦 **Harness & Distribution Engine**:
   - Szablon `vault/`: dodano `vault/scripts/guard_confidential_gemini.py`, `vault/.agents/hooks.json` i redundantny symlink `vault/.agents/scripts/`.
+  - Udokumentowano zasadę braku symlinków w produkcyjnym vaulcie (pliki w prawdziwym sejfie muszą być zwykłymi plikami).
   - Nowy skill `second-brain`: dodany do `global_skills/`, `vault/.agents/skills/` oraz do listy `SHARED_SKILLS` w `scripts/sync-skills.sh`.
   - `os-upgrade-project`: zaktualizowano o automatyczne wdrażanie hooka PreToolUse strażnika poufności i symlinka w modernizowanych repozytoriach.
   - `.ai/agentic.config.json`: podbicie wersji do `7.0-swarm`, dodanie bloków `context.second_brain` i `data_protection`.
