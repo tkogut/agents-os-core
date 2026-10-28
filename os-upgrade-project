@@ -59,6 +59,14 @@ done
 TARGET_DIR="${TARGET_DIR:-$(pwd)}"
 TARGET_DIR="$(realpath "$TARGET_DIR")"
 
+# Ochrona repozytorium źródłowego (dystrybutora frameworka)
+if [ -f "$TARGET_DIR/INSTALL.sh" ] && [ -d "$TARGET_DIR/vault" ] && [ -d "$TARGET_DIR/global_skills" ]; then
+    echo -e "${RED}🛑 BŁĄD ARCHITEKTONICZNY: Wykryto katalog źródłowy frameworka (agents-os-core)!${NC}"
+    echo -e "${YELLOW}   'os-upgrade-project' służy wyłącznie do modernizacji projektów potomnych (np. mms4tk, cezar, linkedin-tracker).${NC}"
+    echo -e "${YELLOW}   Uruchamianie go wewnątrz repozytorium dystrybutora jest zablokowane, aby zapobiec degradacji wersji i nadpisaniu plików źródłowych szablonami Vault.${NC}"
+    exit 1
+fi
+
 echo -e "${BLUE}🛸 AGENTS-OS v7.0 — Upgrade & Distributed Sync Modernizer${NC}"
 echo -e "📁 Ścieżka projektu: ${TARGET_DIR}"
 if [ "$UPDATE_SKILLS" = "true" ]; then
