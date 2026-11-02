@@ -163,18 +163,24 @@ mkdir -p "$VAULT_DIR/.agents/specs"
 curl -fsSL -o "$VAULT_DIR/.agents/specs/awesome-skills-catalog.md" "https://raw.githubusercontent.com/sickn33/antigravity-awesome-skills/main/CATALOG.md" || echo "⚠️  Nie udało się pobrać katalogu skilli."
 
 echo "⚙️ Rejestracja narzędzi systemowych (backend)..."
+# UWAGA: narzędzia poniżej są rejestrowane jako SYMLINKI do $SCRIPT_DIR, nie jako
+# kopie (cp). Przed 2026-11-02 instalacja kopiowała pliki, więc zainstalowana
+# wersja cicho się starzała względem repo i raz spowodowało to realny incydent
+# bezpieczeństwa: nieaktualna binarka os-upgrade-project (bez self-run guarda
+# i bez wpisu PreToolUse w szablonie) została uruchomiona na samym repo
+# agents-os-core i skasowała aktywny guard PreToolUse z .claude/settings.json
+# (patrz PR #40). Symlink eliminuje ten dryf całkowicie — binarka na PATH
+# zawsze odzwierciedla aktualny stan repo, z którego uruchomiono INSTALL.sh.
 if [ -f "$SCRIPT_DIR/os-init" ]; then
     # Sprzątanie: usuń stary plik os-init z v4.x jeśli istnieje w PATH
     sudo -n rm -f /usr/local/bin/os-init 2>/dev/null || rm -f "$HOME/.local/bin/os-init" 2>/dev/null || true
 
-    if sudo -n cp "$SCRIPT_DIR/os-init" /usr/local/bin/os-init-run 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-init-run
-        echo "✓ os-init-run zarejestrowany w /usr/local/bin/os-init-run"
+    if sudo -n ln -sf "$SCRIPT_DIR/os-init" /usr/local/bin/os-init-run 2>/dev/null; then
+        echo "✓ os-init-run zarejestrowany w /usr/local/bin/os-init-run (symlink -> $SCRIPT_DIR/os-init)"
     else
         mkdir -p "$HOME/.local/bin"
-        cp "$SCRIPT_DIR/os-init" "$HOME/.local/bin/os-init-run"
-        chmod +x "$HOME/.local/bin/os-init-run"
-        echo "✓ os-init-run zarejestrowany w $HOME/.local/bin/os-init-run"
+        ln -sf "$SCRIPT_DIR/os-init" "$HOME/.local/bin/os-init-run"
+        echo "✓ os-init-run zarejestrowany w $HOME/.local/bin/os-init-run (symlink -> $SCRIPT_DIR/os-init)"
     fi
 fi
 
@@ -184,14 +190,12 @@ fi
 if [ -f "$SCRIPT_DIR/os-init-claude" ]; then
     sudo -n rm -f /usr/local/bin/os-init-claude 2>/dev/null || rm -f "$HOME/.local/bin/os-init-claude" 2>/dev/null || true
 
-    if sudo -n cp "$SCRIPT_DIR/os-init-claude" /usr/local/bin/os-init-claude-run 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-init-claude-run
-        echo "✓ os-init-claude-run zarejestrowany w /usr/local/bin/os-init-claude-run"
+    if sudo -n ln -sf "$SCRIPT_DIR/os-init-claude" /usr/local/bin/os-init-claude-run 2>/dev/null; then
+        echo "✓ os-init-claude-run zarejestrowany w /usr/local/bin/os-init-claude-run (symlink -> $SCRIPT_DIR/os-init-claude)"
     else
         mkdir -p "$HOME/.local/bin"
-        cp "$SCRIPT_DIR/os-init-claude" "$HOME/.local/bin/os-init-claude-run"
-        chmod +x "$HOME/.local/bin/os-init-claude-run"
-        echo "✓ os-init-claude-run zarejestrowany w $HOME/.local/bin/os-init-claude-run"
+        ln -sf "$SCRIPT_DIR/os-init-claude" "$HOME/.local/bin/os-init-claude-run"
+        echo "✓ os-init-claude-run zarejestrowany w $HOME/.local/bin/os-init-claude-run (symlink -> $SCRIPT_DIR/os-init-claude)"
     fi
 fi
 
@@ -208,50 +212,42 @@ if [ -f "$SCRIPT_DIR/os-add-skill" ]; then
     # Sprzątanie: usuń stary plik os-add-skill-run z v4.1.x jeśli istnieje
     sudo -n rm -f /usr/local/bin/os-add-skill-run 2>/dev/null || rm -f "$HOME/.local/bin/os-add-skill-run" 2>/dev/null || true
 
-    if sudo -n cp "$SCRIPT_DIR/os-add-skill" /usr/local/bin/os-add-skill 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-add-skill
-        echo "✓ os-add-skill zainstalowany w /usr/local/bin/os-add-skill"
+    if sudo -n ln -sf "$SCRIPT_DIR/os-add-skill" /usr/local/bin/os-add-skill 2>/dev/null; then
+        echo "✓ os-add-skill zainstalowany w /usr/local/bin/os-add-skill (symlink -> $SCRIPT_DIR/os-add-skill)"
     else
         mkdir -p "$HOME/.local/bin"
-        cp "$SCRIPT_DIR/os-add-skill" "$HOME/.local/bin/os-add-skill"
-        chmod +x "$HOME/.local/bin/os-add-skill"
-        echo "✓ os-add-skill zainstalowany w $HOME/.local/bin/os-add-skill"
+        ln -sf "$SCRIPT_DIR/os-add-skill" "$HOME/.local/bin/os-add-skill"
+        echo "✓ os-add-skill zainstalowany w $HOME/.local/bin/os-add-skill (symlink -> $SCRIPT_DIR/os-add-skill)"
     fi
 fi
 
 if [ -f "$SCRIPT_DIR/os-run-builder" ]; then
-    if sudo -n cp "$SCRIPT_DIR/os-run-builder" /usr/local/bin/os-run-builder 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-run-builder
-        echo "✓ os-run-builder zainstalowany w /usr/local/bin/os-run-builder"
+    if sudo -n ln -sf "$SCRIPT_DIR/os-run-builder" /usr/local/bin/os-run-builder 2>/dev/null; then
+        echo "✓ os-run-builder zainstalowany w /usr/local/bin/os-run-builder (symlink -> $SCRIPT_DIR/os-run-builder)"
     else
         mkdir -p "$HOME/.local/bin"
-        cp "$SCRIPT_DIR/os-run-builder" "$HOME/.local/bin/os-run-builder"
-        chmod +x "$HOME/.local/bin/os-run-builder"
-        echo "✓ os-run-builder zainstalowany w $HOME/.local/bin/os-run-builder"
+        ln -sf "$SCRIPT_DIR/os-run-builder" "$HOME/.local/bin/os-run-builder"
+        echo "✓ os-run-builder zainstalowany w $HOME/.local/bin/os-run-builder (symlink -> $SCRIPT_DIR/os-run-builder)"
     fi
 fi
 
 if [ -f "$SCRIPT_DIR/os-upgrade-project" ]; then
-    if sudo -n cp "$SCRIPT_DIR/os-upgrade-project" /usr/local/bin/os-upgrade-project 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-upgrade-project
-        echo "✓ os-upgrade-project zainstalowany w /usr/local/bin/os-upgrade-project"
+    if sudo -n ln -sf "$SCRIPT_DIR/os-upgrade-project" /usr/local/bin/os-upgrade-project 2>/dev/null; then
+        echo "✓ os-upgrade-project zainstalowany w /usr/local/bin/os-upgrade-project (symlink -> $SCRIPT_DIR/os-upgrade-project)"
     else
         mkdir -p "$HOME/.local/bin"
-        cp "$SCRIPT_DIR/os-upgrade-project" "$HOME/.local/bin/os-upgrade-project"
-        chmod +x "$HOME/.local/bin/os-upgrade-project"
-        echo "✓ os-upgrade-project zainstalowany w $HOME/.local/bin/os-upgrade-project"
+        ln -sf "$SCRIPT_DIR/os-upgrade-project" "$HOME/.local/bin/os-upgrade-project"
+        echo "✓ os-upgrade-project zainstalowany w $HOME/.local/bin/os-upgrade-project (symlink -> $SCRIPT_DIR/os-upgrade-project)"
     fi
 fi
 
 if [ -f "$SCRIPT_DIR/os-publish-knowledge" ]; then
-    if sudo -n cp "$SCRIPT_DIR/os-publish-knowledge" /usr/local/bin/os-publish-knowledge 2>/dev/null; then
-        sudo -n chmod +x /usr/local/bin/os-publish-knowledge
-        echo "✓ os-publish-knowledge zainstalowany w /usr/local/bin/os-publish-knowledge"
+    if sudo -n ln -sf "$SCRIPT_DIR/os-publish-knowledge" /usr/local/bin/os-publish-knowledge 2>/dev/null; then
+        echo "✓ os-publish-knowledge zainstalowany w /usr/local/bin/os-publish-knowledge (symlink -> $SCRIPT_DIR/os-publish-knowledge)"
     else
         mkdir -p "$HOME/.local/bin"
-        cp "$SCRIPT_DIR/os-publish-knowledge" "$HOME/.local/bin/os-publish-knowledge"
-        chmod +x "$HOME/.local/bin/os-publish-knowledge"
-        echo "✓ os-publish-knowledge zainstalowany w $HOME/.local/bin/os-publish-knowledge"
+        ln -sf "$SCRIPT_DIR/os-publish-knowledge" "$HOME/.local/bin/os-publish-knowledge"
+        echo "✓ os-publish-knowledge zainstalowany w $HOME/.local/bin/os-publish-knowledge (symlink -> $SCRIPT_DIR/os-publish-knowledge)"
     fi
 fi
 
