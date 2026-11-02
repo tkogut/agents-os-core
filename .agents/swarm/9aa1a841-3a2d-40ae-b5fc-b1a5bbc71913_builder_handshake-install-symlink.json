@@ -1,0 +1,11 @@
+{
+  "conversation_id": "9aa1a841-3a2d-40ae-b5fc-b1a5bbc71913",
+  "role": "Builder Agent",
+  "status": "SUCCESS",
+  "files_modified": [
+    "INSTALL.sh"
+  ],
+  "math_consistency_check": "PASSED",
+  "timestamp": "2026-11-02T20:07:55Z",
+  "notes": "INSTALL.sh now installs os-init/os-init-claude/os-add-skill/os-run-builder/os-upgrade-project/os-publish-knowledge via ln -sf instead of cp (both sudo and user-local branches), eliminating the stale-installed-binary drift that caused the PreToolUse guard deletion incident fixed in PR #40. Functionally verified symlink creation + execution in a scratch HOME."
+}
