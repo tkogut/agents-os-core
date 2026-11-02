@@ -10,8 +10,8 @@ AGENTS-OS v7.0 is a coordination, knowledge-integration and containerization fra
 
 ## 👥 Podział Ról w Architekturze Swarm Triad
 
-1. **Coordinator (Gemini 3.8 Flash Medium / Antigravity):** Planowanie, routing zadań, analiza backlogu `task.md` oraz zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). NIE edytuje kodu aplikacyjnego/produkcyjnego poza `tmp/worktrees/`.
-2. **Builder (Gemini 3.1 Pro / Antigravity / Cursor / Claude Code):** Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym środowisku worktree (`tmp/worktrees/`).
+1. **Coordinator (Gemini 4 Argon / Gemini 3.8 Flash Medium / Antigravity):** Planowanie, routing zadań, analiza backlogu `task.md` oraz zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). NIE edytuje kodu aplikacyjnego/produkcyjnego poza `tmp/worktrees/`.
+2. **Builder (Gemini 3.1 Pro / Claude 3.7 / Claude Opus 5.5 / Claude Code / Antigravity / Cursor):** Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym środowisku worktree (`tmp/worktrees/`).
 3. **Auditor (Gemini 3.8 Flash Medium):** Linting, audyt bezpieczeństwa, weryfikacja logów, sprawdzanie kontraktów matematycznych/handshake oraz akceptacja PR przed scaleniem.
 
 ---
