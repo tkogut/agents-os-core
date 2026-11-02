@@ -1,6 +1,6 @@
 # 🔀 Agents-OS Context Router & Task Entry-Point
 
-**System:** AGENTS-OS v6.5 Swarm Edition  
+**System:** AGENTS-OS v7.0 Swarm Edition  
 **Context Budget Policy:** Lean entry-point router loading a maximum of 3 domain modules simultaneously.
 
 ---

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🛸 AGENTS-OS v6.5 — Grill-Me Architectural Pre-Flight Protocol (Python Fallback)
+🛸 AGENTS-OS v7.0 — Grill-Me Architectural Pre-Flight Protocol (Python Fallback)
 """
 
 CYAN = "\033[36m"
@@ -11,7 +11,7 @@ BOLD = "\033[1m"
 RESET = "\033[0m"
 
 print(f"{MAGENTA}{BOLD}{'=' * 68}{RESET}")
-print(f"{CYAN}{BOLD}🛸 [AGENTS-OS v6.5] INICJALIZACJA PROTOKOŁU /grill-me{RESET}")
+print(f"{CYAN}{BOLD}🛸 [AGENTS-OS v7.0] INICJALIZACJA PROTOKOŁU /grill-me{RESET}")
 print(f"{YELLOW}Protokół Rygoru Architektonicznego przed Fazą Implementacji (Builder){RESET}")
 print(f"{MAGENTA}{BOLD}{'=' * 68}{RESET}\n")
 

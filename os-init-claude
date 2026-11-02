@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # os-init-claude <nazwa-projektu>
-# AGENTS-OS v6.5 SWARM — Claude Code Project Initializer
+# AGENTS-OS v7.0 SWARM — Claude Code Project Initializer
 #
 # Analogiczne do os-init, ale:
 #   - Używa vault/CLAUDE.md + vault/.claude/commands/ jako szablon

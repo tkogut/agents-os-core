@@ -9,6 +9,45 @@ Dokumentującą:
 
 ## [Unreleased]
 
+## [7.0.0-swarm] - 2026-10-27
+
+### 📚 Automated INGEST Scaffolding & `/os-publish-knowledge` Skill
+- **`scripts/publish_knowledge_to_vault.py`**: Dodano flagę `--ingest` realizującą automatyczny scaffolding procedury INGEST (wzorzec Karpathy LLM Wiki):
+  - Tworzenie strony źródłowej `wiki/sources/src-<slug>.md` (kebab-case, ekstrakcja tytułu, tagów, podsumowania i nagłówków sekcji, powiązania z `raw/notes`).
+  - Automatyczna rejestracja w `index.md` pod `## Źródła (sources)` oraz wpis do dziennika `log.md` (`## [YYYY-MM-DD] ingest | ...`).
+  - Aktualizacja stanu notatki w `raw/notes/` (`status: processed`, znacznik daty).
+  - Ochrona integralności: pomijanie istniejących stron źródłowych bez nadpisywania (`EXISTS_KEPT`).
+- **Skill `/os-publish-knowledge`**: Utworzono skill w `global_skills/os-publish-knowledge/SKILL.md` (zsynchronizowany do `vault/` i `.claude/skills/`).
+- **CLI `os-publish-knowledge`**: Nowe narzędzie CLI w repozytorium i instalatorze `INSTALL.sh` z automatycznym wykrywaniem `.agents/specs/knowledge`.
+
+### 🧹 CLI & Template Version Alignment (`v7.0`)
+- **`os-upgrade-project`**: Zaktualizowano wszystkie komunikaty końcowe, instrukcje zatwierdzenia zmian w Git (`chore(swarm): modernize project to AGENTS-OS v7.0`, gałąź `feature/swarm-v7.0-modernize`) oraz nagłówki generowanych plików `MEMORY.md` i `task.md` (`version: 7.0-swarm`).
+- **`INSTALL.sh` & Initializers (`bootstrap.py`, `bootstrap-claude.py`, `os-init-claude`)**: Wdrożono szablon docelowy `~/.antigravity/templates/v7.0-swarm`, zaktualizowano wersję początkowych commitów do v7.0 oraz naprawiono regułę `.gitattributes` w bootstrap-claude (usunięto błędny `merge=union` z `task.md`).
+- **`os-add-skill`**: Dodano hierarchiczne sprawdzanie szablonu lokalnego `v7.0-swarm` z zachowaniem fallbacku do `v6.5-swarm`.
+- **Szablony `vault/`**: Wyrównano deklaracje wersji we wszystkich plikach (`AGENTS.md`, `CLAUDE.md`, `HANDOFF.md`, `GOVERNANCE.md`, `core-rule.md`, `specs/AGENTS-OS.md`, `specs/graph.json`).
+
+### 🧠 Decoupled Second Brain Integration (`sejf-tk`) & DPA Governance (ISO 27001 Rigor)
+- 🛡️ **Hardware PreToolUse Security Gate (`guard_confidential_gemini.py`)**:
+  - Twarda blokada fail-closed dla modeli Gemini w konsumenckim planie (brak DPA).
+  - Automatyczne przechwytywanie prób odczytu plików `confidential: true`, `raw/notes/*` oraz strefy `Firma/*` z przekierowaniem do Claude Code.
+  - Ochrona przed wyciekiem w wyszukiwaniu: blokada poleceń rekurencyjnych (`grep -r`, `find -exec`) nad katalogami z poufną zawartością.
+  - Zero Full-Disk Probing: hierarchiczne rozwiązywanie ścieżki (config -> env -> domyślna `C:\Users\tkogut\Documents\sejf_tk`). Brak skanowania całego dysku.
+  - Bezpieczny Cache ISO 27001: przeniesiono cache z `/tmp` do prywatnego katalogu użytkownika (`~/.cache/agents-os-core/`, uprawnienia 0700 dla katalogu, 0600 dla pliku).
+  - Weryfikacja Integralności: w cache'u przechowywana jest wyłącznie lista chronionych zasobów z sumą kontrolną SHA-256 (nigdy gotowa decyzja allow/deny). Wykrycie naruszenia lub uszkodzenia powoduje przebudowę; przy błędzie odczytu system blokuje dostęp (fail-closed).
+- 📜 **Skrypt Bezpiecznej Publikacji Wiedzy (`scripts/publish_knowledge_to_vault.py`)**:
+  - Bezpieczny transfer notatek z `.agents/specs/knowledge` do `<vault>/raw/notes` (domyślnie dry-run, zapis wymaga flagi `--apply`).
+  - Skaner sekretów i PII: blokuje pliki z kluczami API, tokenami JWT, hasłami, e-mailami spoza domeny grupy, numerami PESEL i IBAN (w raporcie wyłącznie nazwa reguły, zero wycieku wartości).
+  - Ochrona przed nadpisywaniem: pomija pliki o identycznym hashu, zgłasza konflikt przy rozbieżności treści.
+  - Wzbogacanie metadanych YAML (`source: agents-os-core`, `sha256`, `published`, `status: new`).
+- 📦 **Harness & Distribution Engine**:
+  - Szablon `vault/`: dodano fizyczne kopie `vault/scripts/guard_confidential_gemini.py` oraz `vault/.agents/scripts/guard_confidential_gemini.py` (usunięto nietrwałe symlinki na rzecz pełnej spójności wieloplatformowej).
+  - Wyeliminowano ryzyko zerwania hooka: w `os-upgrade-project` wdrożono fizyczną kopię pliku do `.agents/scripts/guard_confidential_gemini.py` z uprawnieniami 755 (zamiast zawodnego `ln -sf`).
+  - Automatyczna weryfikacja spójności: rozszerzono `scripts/validate-handshakes.py` oraz `tests/test_guard_confidential_gemini.py` o weryfikację istnienia i zgodności sum SHA-256 między wersją kanoniczną w `scripts/` a kopią roboczą w `.agents/scripts/`.
+  - Udokumentowano zasadę braku symlinków w produkcyjnym vaulcie (pliki w prawdziwym sejfie muszą być zwykłymi plikami).
+  - Konfiguracja Multi-Machine: w `AGENTS.md` oraz `vault/README.md` dodano opis hierarchii ścieżki vaulta i wymóg zdefiniowania `OBSIDIAN_VAULT_PATH` na innych maszynach (np. VPS) w reżimie Zero Full-Disk Probing.
+  - Nowy skill `second-brain`: dodany do `global_skills/`, `vault/.agents/skills/` oraz do listy `SHARED_SKILLS` w `scripts/sync-skills.sh`.
+  - `.ai/agentic.config.json`: podbicie wersji do `7.0-swarm`, dodanie bloków `context.second_brain` i `data_protection`.
+
 ### 🔗 Pełna dystrybucja deskryptorów om-* pipeline (`.ai/trackers`, `.ai/browsers`)
 - ✨ **Vault zyskuje `vault/.ai/trackers/github.md` i `vault/.ai/browsers/agent-browser.md`** — dotąd `vault/.ai/agentic.config.json` był jedynym elementem pipeline'u om-* w Złotym Standardzie; same deskryptory operacji (tracker/przeglądarka), bez których żaden skill om-* nie ma jak wykonać operacji typu `create-pr`/`comment-pr`, nigdy nie trafiały do nowych/aktualizowanych projektów automatycznie.
 - 🔧 **`os-upgrade-project`**: nowy, niezależny od `.ai/agentic.config.json` blok kopiujący brakujące pliki z `.ai/trackers/` i `.ai/browsers/` — projekt z już zcustomizowanym configiem (jak `mms4tk`) nadal dostaje brakujące deskryptory, zamiast zostać pominięty przez istniejący `[ ! -f .ai/agentic.config.json ]` guard.
