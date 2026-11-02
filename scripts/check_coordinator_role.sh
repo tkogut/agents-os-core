@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check_coordinator_role.sh — Safety Gate v6.5 (R-ROLE-01)
+# check_coordinator_role.sh — Safety Gate v7.0 (R-ROLE-01)
 # Weryfikuje zakaz bezpośrednich commitów na main/master oraz obecność
 # poprawnego Builder handshake przed commitem zmian w kodzie produkcyjnym.
 

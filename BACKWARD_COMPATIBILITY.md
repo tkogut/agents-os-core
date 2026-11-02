@@ -30,7 +30,7 @@ skills warn when a change violates it.
 
 | Surface | What it does | Breaking change means | Required path |
 |---|---|---|---|
-| `.ai/agentic.config.json` | Dual-purpose: the repo's own `project`/`pipeline`/`swarm`/`context`/`evaluator` block (AGENTS-OS v6.5 native) **and** the om-* skill collection's `tracker`/`browser`/`validation`/`labels`/`qaGate`/`paths` block, coexisting in one file by convention. | Removing or reshaping either block without checking who reads it — the two schemas are not unified by a shared spec, only by sharing a file path. The top-level `version` key belongs to the native block (`"6.5-swarm"`); no om-* skill logic currently reads `config.version` at runtime (verified against the shipped skill sources), so it does not collide functionally, but a future om-* skill that starts reading `version` would. | Grep both this repo's own tooling and the installed `om-*` skill sources for the key before changing or removing it. |
+| `.ai/agentic.config.json` | Dual-purpose: the repo's own `project`/`pipeline`/`swarm`/`context`/`evaluator` block (AGENTS-OS v7.0 native) **and** the om-* skill collection's `tracker`/`browser`/`validation`/`labels`/`qaGate`/`paths` block, coexisting in one file by convention. | Removing or reshaping either block without checking who reads it — the two schemas are not unified by a shared spec, only by sharing a file path. The top-level `version` key belongs to the native block (`"7.0-swarm"`, bumped from `"6.5-swarm"`); new blocks `context.second_brain` and `data_protection` are optional additive keys. | Grep both this repo's own tooling and the installed `om-*` skill sources for the key before changing or removing it. |
 
 ## Skill distribution layout
 

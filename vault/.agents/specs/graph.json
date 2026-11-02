@@ -1,12 +1,12 @@
 {
   "project": "AGENTS-OS Project",
-  "version": "6.5-Swarm",
+  "version": "7.0-Swarm",
   "nodes": [
     {
       "id": ".agents/specs/AGENTS-OS.md",
       "label": "AGENTS-OS.md",
       "type": "Ultimate Source of Truth",
-      "description": "Constitution of AGENTS-OS v6.5 governing all Swarm rules and system operations."
+      "description": "Constitution of AGENTS-OS v7.0 governing all Swarm rules and system operations."
     },
     {
       "id": ".agents/specs/knowledge/integracja archotectury open-mercato.md",

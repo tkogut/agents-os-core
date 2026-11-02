@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AGENTS-OS v6.5 Swarm Edition — Universal Agent Onboarding Engine
+AGENTS-OS v7.0 Swarm Edition — Universal Agent Onboarding Engine
 Scans git state, MEMORY.md, task.md, plans, and swarm handshakes to generate
 an executive onboarding briefing for any incoming agent (Antigravity, Claude Code, Cursor).
 """

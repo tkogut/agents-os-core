@@ -1,6 +1,6 @@
 # 🛡️ Cezar Runtime HANDOFF Template (Fault-Tolerance & Session Resumption)
 
-**System:** AGENTS-OS v6.5 Swarm Edition  
+**System:** AGENTS-OS v7.0 Swarm Edition  
 **Purpose:** Fault-tolerance protocol for agent session crashes, environment resets, or context handoffs.
 
 ---

@@ -4,14 +4,14 @@
 
 ## Overview
 
-AGENTS-OS is a coordination and containerization framework for AI agent swarms (Antigravity IDE, Claude Code, Cursor, Zed). It provides architectural rigor via the async **Swarm Triad** model (Coordinator / Builder / Auditor), conflict-free distributed state sync across machines (Laptop WSL, VPS, Desktop) through `.agents/MEMORY.md` and `.agents/task.md`, and dynamic skill-library distribution to downstream projects via `os-init`, `os-upgrade-project`, and `os-add-skill`. This repo is itself the framework's source — changes here propagate outward to every project that bootstraps from it.
+AGENTS-OS v7.0 is a coordination, knowledge-integration and containerization framework for AI agent swarms (Antigravity IDE, Claude Code, Cursor, Zed). It provides architectural rigor via the async **Swarm Triad** model (Coordinator / Builder / Auditor), conflict-free distributed state sync across machines (Laptop WSL, VPS, Desktop) through `.agents/MEMORY.md` and `.agents/task.md`, hardware-gated Second Brain access (`sejf-tk`) with RODO/DPA compliance boundaries, and dynamic skill-library distribution to downstream projects via `os-init`, `os-upgrade-project`, and `os-add-skill`. This repo is itself the framework's source — changes here propagate outward to every project that bootstraps from it.
 
 ---
 
 ## 👥 Podział Ról w Architekturze Swarm Triad
 
-1. **Coordinator (Gemini 3.8 Flash Medium / Antigravity):** Planowanie, routing zadań, analiza backlogu `task.md` oraz zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). NIE edytuje kodu aplikacyjnego/produkcyjnego poza `tmp/worktrees/`.
-2. **Builder (Gemini 3.1 Pro / Antigravity / Cursor / Claude Code):** Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym środowisku worktree (`tmp/worktrees/`).
+1. **Coordinator (Gemini 4 Argon / Gemini 3.8 Flash Medium / Antigravity):** Planowanie, routing zadań, analiza backlogu `task.md` oraz zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). NIE edytuje kodu aplikacyjnego/produkcyjnego poza `tmp/worktrees/`.
+2. **Builder (Gemini 3.1 Pro / Claude 3.7 / Claude Opus 5.5 / Claude Code / Antigravity / Cursor):** Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym środowisku worktree (`tmp/worktrees/`).
 3. **Auditor (Gemini 3.8 Flash Medium):** Linting, audyt bezpieczeństwa, weryfikacja logów, sprawdzanie kontraktów matematycznych/handshake oraz akceptacja PR przed scaleniem.
 
 ---
@@ -56,6 +56,7 @@ AGENTS-OS is a coordination and containerization framework for AI agent swarms (
 | Skill library / distribution to downstream projects | `global_skills/`, `.claude/skills/`, `vault/`, `docs/SKILLS_ARCHITECTURE.md` | This repo is a **distributor**, not just an app: a change here propagates to every project that later runs `os-init` / `os-upgrade-project` / `os-add-skill`. Treat the blast radius as repository-wide, not file-local. |
 | Claude Code slash commands | `.claude/commands/*.md` | Five core commands shipped today: `/worktree-init`, `/handshake`, `/qa-gate`, `/commit`, `/grill-me`. |
 | om-* agent pipeline (PR review, issue triage, spec writing) | `.ai/agentic.config.json`, `.ai/trackers/github.md`, `.ai/browsers/agent-browser.md`, `SDLC.md` | `tracker=github`, `browser=agent-browser`, `qaGate=true`, full label taxonomy. This config block lives additively alongside the repo's own `project`/`pipeline`/`swarm`/`context`/`evaluator` keys in the same JSON file — the two schemas coexist by convention, not by a shared spec. |
+| Second Brain & DPA Governance (`sejf-tk`, Gemini vs Claude) | `scripts/guard_confidential_gemini.py`, `scripts/publish_knowledge_to_vault.py`, `global_skills/second-brain/SKILL.md`, `global_skills/os-publish-knowledge/SKILL.md` | Gemini consumer (bez DPA) ma twardy zakaz dostępu do `confidential: true`, `Firma/`, `raw/notes/` oraz recursive search (przekierowanie do Claude Code). Prywatny cache ISO 27001 (`~/.cache/agents-os-core/`, 0700/0600) z sumą SHA-256. Zero full-disk probing (tylko config/env/default). Hierarchia ścieżki: parametr CLI -> `OBSIDIAN_VAULT_PATH` -> `.ai/agentic.config.json` -> wartość domyślna (`/mnt/c/Users/tkogut/Documents/sejf_tk`). Na innej maszynie (np. VPS, inny laptop bez domyślnej ścieżki WSL) WYMAGANE jest ustawienie zmiennej środowiskowej `OBSIDIAN_VAULT_PATH` lub wpisu w configu; brak ścieżki skutkuje natychmiastowym fail-closed (blokada bez skanowania dysku). Plik na ścieżce hooka (`.agents/scripts/guard_confidential_gemini.py`) musi być fizyczną kopią (nie symlinkiem) identyczną z `scripts/`. Bezpieczna publikacja z `.agents/specs/knowledge/` do `raw/notes` przez `publish_knowledge_to_vault.py` / `/os-publish-knowledge` (skan PII/sekretów, zakaz nadpisywania, automatyczny scaffolding INGEST z flagą `--ingest`). |
 | Tests | `execution/test_bootstrap.sh`, `scripts/validate-handshakes.py` | The bootstrap end-to-end test creates throwaway **public** GitHub repos as a side effect. If a run aborts mid-test, clean up manually — the default `gh` token has no `delete_repo` scope. |
 
 ---

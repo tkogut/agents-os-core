@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 guard_coordinator_pretool.py — Antigravity / Gemini PreToolUse Hook (R-ROLE-01 / Worktree Enforce)
-Part of AGENTS-OS v6.5 Swarm Governance.
+Part of AGENTS-OS v7.0 Swarm Governance.
 
 Ensures that the Coordinator (main thread) cannot directly modify production
 source code in the root workspace. Modifying production code requires:
