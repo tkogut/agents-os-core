@@ -214,7 +214,7 @@ To ensure downstream projects bootstrapped via `os-init` inherit the guard:
      }
    }
    ```
-3. A symlink `vault/.agents/scripts/guard_confidential_gemini.py -> ../../scripts/guard_confidential_gemini.py` is included out-of-the-box to handle relative execution paths.
+3. A physical copy at `vault/.agents/scripts/guard_confidential_gemini.py` is included out-of-the-box to handle relative execution paths — a plain file, not a symlink, per the vault's own no-symlinks rule (see `CLAUDE.md` Second Brain protocol).
 4. `vault/.agents/skills/second-brain/` pre-installed.
 
 #### B. Skill Synchronizer (`scripts/sync-skills.sh`)
@@ -278,7 +278,7 @@ SHARED_SKILLS=(
 2. **Zero Full-Disk Probing**: Nie ma skanowania całego dysku w poszukiwaniu vaulta. Ścieżka pobierana jest z configu/env lub domyślnej `C:\Users\tkogut\Documents\sejf_tk` (`/mnt/c/Users/tkogut/Documents/sejf_tk`). W razie braku kreator pyta usera.
 3. **Default Tier**: All Gemini models default to `consumer` (untrusted for confidential data) until an operator formally switches configuration to `enterprise_dpa`.
 4. **Cache Invalidation**: Cache expiration is fixed at 60 seconds, which balances fresh frontmatter discovery with instantaneous tool responsiveness.
-5. **Symlink Redundancy**: Both direct `scripts/` path and `.agents/scripts/` symlink are provisioned in templates to guarantee zero path errors regardless of Antigravity version.
+5. **Path Redundancy**: Both the direct `scripts/` path and an `.agents/scripts/` physical copy (not a symlink — forbidden in the vault) are provisioned in templates to guarantee zero path errors regardless of Antigravity version.
 
 ---
 
