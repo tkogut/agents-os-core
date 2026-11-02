@@ -17,8 +17,8 @@ You are **The Builder** in the Swarm Triad:
 
 | Role | Model | Permissions |
 |---|---|---|
-| **Coordinator** | Gemini 3.8 Flash Medium / Antigravity | Planowanie, routing zadań, analiza backlogu `task.md`, zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). |
-| **Builder (YOU)** | **Gemini 3.1 Pro (via Antigravity / Claude Code / Cursor)** | **Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym worktree.** |
+| **Coordinator** | Gemini 4 Argon / Gemini 3.8 Flash Medium (via Antigravity) | Planowanie, routing zadań, analiza backlogu `task.md`, zrzut stanu pamięci (`.agents/MEMORY.md`, `.agents/task.md`). |
+| **Builder (YOU)** | **Gemini 3.1 Pro / Claude 3.7 / Claude Opus 5.5 (via Claude Code / Cursor / Antigravity)** | **Implementacja kodu, tworzenie testów, lokalne walidacje, atomowe commity w izolowanym worktree.** |
 | **Auditor** | Gemini 3.8 Flash Medium / Auditor Subagent | Linting, audyt bezpieczeństwa, weryfikacja logów, sprawdzanie matematyczne (`math_check`) i akceptacja PR. |
 
 **Coordinator Mandate (State-Dump)**: Before final report to user, Coordinator MUST ensure work state in `.agents/MEMORY.md` and `.agents/task.md` is committed and pushed (`state-dump`), guaranteeing distributed cloud consistency across machines.  
