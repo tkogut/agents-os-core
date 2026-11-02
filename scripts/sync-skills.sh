@@ -48,7 +48,7 @@ done
 
 # 2. Synchronizacja skilli z wtyczki caveman (tylko zachowane: cavecrew, caveman-explore, caveman-review, caveman)
 CAVEMAN_PLUGIN_DIR="$HOME/.gemini/config/plugins/caveman/skills"
-RETAINED_CAVEMAN=("cavecrew" "caveman-explore" "caveman-review" "caveman")
+RETAINED_CAVEMAN=("cavecrew" "caveman-explore" "caveman-review" "caveman" "ultracave" "megacave")
 if [ -d "$CAVEMAN_PLUGIN_DIR" ]; then
     echo "🔄 Synchronizacja zachowanych skilli z wtyczki Caveman..."
     for skill_name in "${RETAINED_CAVEMAN[@]}"; do
