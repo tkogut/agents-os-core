@@ -87,6 +87,17 @@ class TestGuardCoordinatorPretool(unittest.TestCase):
         }
         self.assertEqual(evaluate_tool_call(payload_attr)["decision"], "allow")
 
+    def test_guard_registered_in_all_hook_configs(self):
+        import json
+        import os
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        for rel in (".gemini/hooks.json", ".antigravity/hooks.json", ".agents/hooks.json"):
+            with open(os.path.join(repo_root, rel), encoding="utf-8") as fh:
+                entry = json.load(fh).get("guard-coordinator")
+            self.assertIsNotNone(entry, f"guard-coordinator niezarejestrowany w {rel}")
+            cmds = [h["command"] for g in entry["PreToolUse"] for h in g["hooks"]]
+            self.assertIn("python3 scripts/guard_coordinator_pretool.py", cmds, rel)
+
 
 if __name__ == "__main__":
     unittest.main()
