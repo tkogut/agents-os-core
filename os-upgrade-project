@@ -24,6 +24,7 @@ RED="\033[0;31m"
 NC="\033[0m"
 
 UPDATE_SKILLS=false
+REFRESH_HOOKS=false
 TARGET_DIR=""
 
 for arg in "$@"; do
@@ -42,10 +43,15 @@ for arg in "$@"; do
             echo ""
             echo "Opcje:"
             echo "  --update-skills, -u    Wymusza aktualizację istniejących skilli do wersji z Vault"
+            echo "  --refresh-hooks        Podmienia zarządzane wpisy w hooks.json na wersję z szablonu (kopia *.bak);"
+            echo "                         domyślnie hooks.json jest SCALANY: dodaje brakujące wpisy, nie nadpisuje własnych"
             exit 0
             ;;
         --update-skills|-u)
             UPDATE_SKILLS=true
+            ;;
+        --refresh-hooks)
+            REFRESH_HOOKS=true
             ;;
         *)
             if [ -z "$TARGET_DIR" ]; then
@@ -172,6 +178,16 @@ if [ -d "$SCRIPT_DIR/scripts" ]; then
 elif [ -d "$VAULT_DIR/scripts" ]; then
     cp -rn "$VAULT_DIR/scripts/." "$TARGET_DIR/scripts/" 2>/dev/null || true
 fi
+# Strażnicy to infrastruktura bezpieczeństwa: `cp -n` powyżej nie aktualizuje istniejących kopii,
+# więc stara wersja zostawałaby w projekcie. Odśwież je jawnie, jeśli różnią się od źródła.
+GUARD_SRC_DIR="$SCRIPT_DIR/scripts"
+[ -d "$GUARD_SRC_DIR" ] || GUARD_SRC_DIR="$VAULT_DIR/scripts"
+for guard_name in guard_confidential_gemini.py guard_coordinator_pretool.py; do
+    if [ -f "$GUARD_SRC_DIR/$guard_name" ] && ! cmp -s "$GUARD_SRC_DIR/$guard_name" "$TARGET_DIR/scripts/$guard_name"; then
+        cp -p "$GUARD_SRC_DIR/$guard_name" "$TARGET_DIR/scripts/$guard_name" 2>/dev/null \
+            && echo -e "${GREEN}   ✓ Odświeżono scripts/$guard_name do wersji źródłowej.${NC}"
+    fi
+done
 chmod +x "$TARGET_DIR/scripts/"*.sh "$TARGET_DIR/scripts/"*.py 2>/dev/null || true
 
 
@@ -242,9 +258,19 @@ HOOKS_CONTENT='{
 }'
 
 mkdir -p "$TARGET_DIR/.antigravity" "$TARGET_DIR/.gemini" "$TARGET_DIR/.agents"
-echo "$HOOKS_CONTENT" > "$TARGET_DIR/.antigravity/hooks.json"
-echo "$HOOKS_CONTENT" > "$TARGET_DIR/.gemini/hooks.json"
-echo "$HOOKS_CONTENT" > "$TARGET_DIR/.agents/hooks.json"
+# hooks.json jest SCALANY (nie nadpisywany): brakujące wpisy zarządzane są dodawane, własne wpisy projektu
+# i różniące się wpisy zarządzane zostają (podmiana tylko z --refresh-hooks, po kopii *.bak).
+MERGE_HOOKS="$SCRIPT_DIR/scripts/merge_hooks_json.py"
+MERGE_ARGS=(--template-stdin)
+[ "$REFRESH_HOOKS" = "true" ] && MERGE_ARGS+=(--refresh)
+if [ -f "$MERGE_HOOKS" ]; then
+    for hooks_file in "$TARGET_DIR/.antigravity/hooks.json" "$TARGET_DIR/.gemini/hooks.json" "$TARGET_DIR/.agents/hooks.json"; do
+        printf '%s' "$HOOKS_CONTENT" | python3 "$MERGE_HOOKS" "$hooks_file" "${MERGE_ARGS[@]}" \
+            || echo -e "${YELLOW}   ⚠ Nie udało się scalić $hooks_file (plik bez zmian).${NC}"
+    done
+else
+    echo -e "${YELLOW}   ⚠ Brak $MERGE_HOOKS: hooks.json NIE został zmieniony (nie nadpisuję bez narzędzia scalającego).${NC}"
+fi
 mkdir -p "$TARGET_DIR/.agents/scripts"
 if [ -f "$SCRIPT_DIR/scripts/guard_confidential_gemini.py" ]; then
     cp -p "$SCRIPT_DIR/scripts/guard_confidential_gemini.py" "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
@@ -253,7 +279,7 @@ elif [ -f "$TARGET_DIR/scripts/guard_confidential_gemini.py" ]; then
     cp -p "$TARGET_DIR/scripts/guard_confidential_gemini.py" "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
     chmod 755 "$TARGET_DIR/.agents/scripts/guard_confidential_gemini.py" 2>/dev/null || true
 fi
-echo -e "${GREEN}   ✓ Pliki hooks.json zaktualizowane w .antigravity/, .gemini/ i .agents/ (w tym bramka PreToolUse i strażnik DPA Gemini).${NC}"
+echo -e "${GREEN}   ✓ Pliki hooks.json scalone w .antigravity/, .gemini/ i .agents/ (własne wpisy zachowane; bramka PreToolUse i strażnik DPA Gemini dodane, jeśli brakowało).${NC}"
 
 # --------------------------------------------------------------------------- #
 # 4b. Natywne Hooki Claude Code (.claude/settings.json)
