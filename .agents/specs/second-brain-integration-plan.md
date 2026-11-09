@@ -1,6 +1,6 @@
 # Plan wdrożenia: agenci harnessu ↔ „drugi mózg” (vault `sejf_tk`)
 
-> **Status: WDROŻONY (kroki 0-5 i 7); krok 6: T1 20/20, T2 i T3 zdane, T4 i T5 do wykonania (2026-11-09).** Zapisy w vaulcie: tylko kroki 1, 2 i 5, na polecenie właściciela. Kroki 3 i 4 zmieniają `scripts/*` za zgodą właściciela (2026-11-09, jako autoryzacja Coordinatora).
+> **Status: WDROŻONY (kroki 0-5 i 7); krok 6: T1 20/20, T2 i T3 zdane, T4 i T5 niewykonane (decyzja właściciela 2026-11-09: dalsze testy pominięte).** Zapisy w vaulcie: tylko kroki 1, 2 i 5, na polecenie właściciela. Kroki 3 i 4 zmieniają `scripts/*` za zgodą właściciela (2026-11-09, jako autoryzacja Coordinatora).
 > Źródło ustaleń: sesja `/grill-me` z 2026-11-07 (decyzje D1–D12). Protokół wymaga też wpisu ustaleń do `.agents/MEMORY.md` → `## 📝 Decisions & Key Milestones` (krok 7).
 > Plan nie zawiera treści stron poufnych ani żadnych sekretów.
 
