@@ -1,5 +1,5 @@
 # 🛸 Kompendium i Ściąga: Umiejętności Open-Mercato (OM Skills)
-> **Ekosystem:** AGENTS-OS Enterprise Swarm Platform (v6.5)  
+> **Ekosystem:** AGENTS-OS Enterprise Swarm Platform (v7.0)  
 > **Liczba modułów:** 36 skilli automatyzacji SDLC  
 > **Konfiguracja bazowa:** `.ai/agentic.config.json` | `SDLC.md`
 
