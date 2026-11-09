@@ -1,105 +1,138 @@
-# Specyfikacja Architektoniczna AGENTS-OS v6.5 Swarm Edition
+# Specyfikacja Architektoniczna AGENTS-OS v7.1 Swarm Edition
 
-Niniejszy dokument przedstawia kompletną architekturę, strukturę oraz zasady działania systemu operacyjnego dla agentów — **AGENTS-OS v6.5 (Swarm Edition)**, wdrożonego w repozytorium `tkogut/agents-os-core`.
+Niniejszy dokument przedstawia architekturę, strukturę oraz zasady działania systemu operacyjnego dla agentów — **AGENTS-OS v7.1 (Swarm Edition)**, wdrożonego w repozytorium `tkogut/agents-os-core`. Wersję systemu określa plik [`VERSION`](../../VERSION); zmiany względem wcześniejszych wydań opisuje [`CHANGELOG.md`](../../CHANGELOG.md). Zasady nadrzędne: [`AGENTS-OS.md`](AGENTS-OS.md) (konstytucja).
 
 ---
 
 ## 1. Wprowadzenie i Cel (Executive Summary)
 
-**AGENTS-OS** to ustrukturyzowane środowisko i zestaw skryptów narzędziowych integrujących edytor **Antigravity IDE** z agentami AI (w tym CLI `agy` bazującym na Claude Code). Głównym celem systemu jest automatyzacja cyklu wytwórczego oprogramowania poprzez:
-*   Standardyzację struktury projektów (Złoty Standard).
-*   Dynamiczne rozszerzanie możliwości agenta za pomocą pakietów umiejętności (Skilli).
+**AGENTS-OS** to ustrukturyzowane środowisko i zestaw narzędzi integrujących edytor **Antigravity IDE** oraz **Claude Code** z agentami AI. Głównym celem systemu jest automatyzacja cyklu wytwórczego oprogramowania poprzez:
+*   Standardyzację struktury projektów (szablon `vault/`).
+*   Dynamiczne rozszerzanie możliwości agenta za pomocą pakietów umiejętności (skilli).
 *   Autonomiczną synchronizację wiedzy o platformie w architekturze GitOps za pomocą protokołu MCP.
-*   Zapewnienie stabilności wykonania poprzez implementację sprzętowo-programowych obejść (workarounds) na błędy silnika uruchomieniowego.
+*   Bezpieczną pracę agentów z osobistą bazą wiedzy (Second Brain, ISO 27001) bez naruszania poufności.
+*   Stabilność wykonania dzięki obejściom błędów silnika oraz bramkom jakości (hooki, QA gate, testy).
 
 ---
 
 ## 2. Architektura Roju (The Swarm Triad)
 
-System dystrybuuje zadania i logikę pomiędzy trzy wyspecjalizowane role agentowe, eliminując monolityczną odpowiedzialność pojedynczego modelu:
+System dystrybuuje zadania pomiędzy trzy wyspecjalizowane role agentowe. Aktualne modele podaje [`CLAUDE.md`](../../CLAUDE.md) i [`agents.yaml`](../../agents.yaml); poniżej wartości z 2026-11-09:
 
-| Rola | Model Domyślny | Odpowiedzialność i Ograniczenia |
+| Rola | Model | Odpowiedzialność i Ograniczenia |
 | :--- | :--- | :--- |
-| **Coordinator** | Gemini 3.5 Flash (High) | Zarządca kontekstu i backlogu. Analizuje plik `task.md` i planuje pracę w `.agents/plans/`. **Kategoryczny zakaz modyfikowania kodu źródłowego.** |
-| **Builder** | Claude Sonnet 4.6 (Thinking) | Wdraża zmiany, refaktoryzuje i optymalizuje kod. Pracuje wyłącznie na wydzielonych gałęziach roboczych (Git Worktrees). |
-| **Auditor** | Gemini 3.5 Flash (Low) | Weryfikuje poprawność kodu, uruchamia testy jednostkowe i statyczne, analizuje logi. Działa w tle (Scheduled Tasks). |
+| **Coordinator** | Gemini 4 Argon / Gemini 3.8 Flash Medium (Antigravity) | Zarządca kontekstu i backlogu: `task.md`, plany w `.agents/plans/`, zrzut stanu (`.agents/MEMORY.md`). Zakaz modyfikowania kodu w głównym drzewie bez worktree (hook `guard-coordinator`, decyzja `force_ask`). |
+| **Builder** | Gemini 3.1 Pro / Claude 3.7 / Claude Opus 5.5 (Claude Code, Cursor, Antigravity) | Implementacja, testy, lokalne walidacje, atomowe commity wyłącznie w izolowanym worktree. Zmiany w `scripts/*` i skryptach instalatora wymagają autoryzacji koordynatora. |
+| **Auditor** | Gemini 3.8 Flash Medium / subagent Auditor | Linting, audyt bezpieczeństwa, weryfikacja logów, sprawdzanie matematyczne (`math_check`), akceptacja PR. |
 
 ---
 
-## 3. Topologia Katalogu Projektu (Skill Anatomy v2.4)
+## 3. Topologia Katalogu
 
-Struktura nowo utworzonego projektu (szablon **The Vault**) ustrukturyzowana jest następująco:
+Repozytorium źródłowe `agents-os-core`:
 
 ```
 .
-├── agents.yaml             # Definicja aktywnych ról i przypisanych do nich modeli
-├── task.md                 # Dynamiczny backlog i status synchronizacji systemu
-├── design-tokens.md        # Wizualne wytyczne projektu (kolory, typografia, style)
-├── .gemini/
-│   └── mcp_config.json     # Lokalna konfiguracja per-projekt dla serwerów MCP
-├── .github/
-│   └── workflows/          # Potoki CI/CD (automatyzacja i harmonogramy)
+├── VERSION                 # Wersja systemu (źródło prawdy)
+├── agents.yaml             # Definicja ról i modeli
+├── CLAUDE.md, AGENTS.md    # Manifest sesji Claude Code / opis frameworka
+├── SDLC.md, CHANGELOG.md   # Cykl wytwórczy, historia zmian
+├── INSTALL.sh              # Instalator systemowy
+├── os-init, os-init-claude, os-add-skill,
+│   os-upgrade-project, os-run-builder, os-publish-knowledge   # CLI
 ├── .agents/
-│   ├── mcp-servers/        # Lokalne węzły Model Context Protocol (np. antigravity-docs)
-│   ├── skills/             # Paczki rozszerzeń zainstalowane lokalnie
-│   ├── hooks.json          # Hooki bezpieczeństwa i stabilizacji (np. pre-model calls)
-│   ├── rules/              # Rygorystyczne instrukcje i ograniczenia zachowania agenta
-│   ├── plans/              # Plany operacyjne i podział zadań na subagenty
-│   ├── specs/              # Dokumentacja techniczna i Graph RAG (specs/graph.json)
-│   └── swarm/              # Pamięć podręczna logów i handshake subagentów
-└── src/                    # Folder przeznaczony na zweryfikowany kod źródłowy
+│   ├── hooks.json          # Hooki Antigravity/Gemini (lustra: .gemini/, .antigravity/)
+│   ├── hooks/              # Skrypty hooków Claude Code
+│   ├── scripts/            # Kopie strażników (identyczne z scripts/)
+│   ├── mcp-servers/        # Lokalne węzły MCP (antigravity-docs)
+│   ├── rules/, plans/      # Reguły zachowania, plany operacyjne
+│   ├── specs/              # Specyfikacje, graph.json, knowledge/
+│   ├── eval/               # Moduł ewaluacji promptów
+│   ├── swarm/              # Handshake'e subagentów
+│   └── MEMORY.md, task.md  # Stan i backlog (SSOT)
+├── .claude/                # settings.json (hooki), commands/, skills/
+├── .ai/                    # agentic.config.json, trackers/, browsers/, specs/
+├── .github/workflows/      # mcp-docs-updater.yml, om-skills-sync.yml
+├── global_skills/          # Skille systemowe
+├── scripts/                # Strażnicy, skaner wycieków, publikacja do vaulta, handshake
+├── tests/                  # pytest
+└── vault/                  # Szablon projektu potomnego („The Vault”)
 ```
+
+Projekt potomny dostaje podzbiór wg szablonu `vault/` (m.in. `.agents/`, `CLAUDE.md`, `agents.yaml`, `SDLC.md`, skille, strażnicy).
 
 ---
 
 ## 4. Analiza Komponentów i Narzędzi CLI
 
 ### 4.1 Instalator systemowy (`INSTALL.sh`)
-Skrypt odpowiedzialny za jednorazową konfigurację środowiska systemowego programisty w środowisku Windows WSL2 (Ubuntu):
-1.  **Zależności systemowe:** Instaluje menedżer pakietów `snapd` oraz GitHub CLI (`gh`).
-2.  **Antigravity CLI (`agy`):** Pobiera oficjalny binarny plik wykonywalny napisany w Go i instaluje go w `/usr/local/bin` lub `~/.local/bin`.
-3.  **Środowisko Python (venv):** Inicjalizuje odizolowany wirtualny folder `~/.antigravity/venv` i instaluje biblioteki `GitPython` oraz `PyGithub` niezbędne do działania bootstrappera.
-4.  **Konfiguracja Shell:** Tworzy plik konfiguracyjny `~/.bashrc.d/antigravity` zawierający definicję aliasu dla `antigravity` (zdalne otwieranie IDE z poziomu WSL za pomocą ścieżki Windows AppData) oraz funkcję powłoki `os-init`.
+Jednorazowa konfiguracja środowiska programisty (Windows WSL2, Ubuntu). Etapy (według komentarzy w skrypcie):
+1.  **Zależności systemu** oraz izolowane środowisko Python (venv `~/.antigravity/venv`, m.in. `GitPython`, `PyGithub` dla bootstrappera).
+2.  **Integracja z modułem kompresji tożsamości (Caveman)** oraz konfiguracja Gita.
+3.  **Kopiowanie The Vault** do `~/.antigravity/templates/v<MAJOR.MINOR>-swarm` (obecnie `v7.1-swarm`); stare szablony są usuwane (lista w skrypcie obejmuje `v5.0`–`v7.0`).
+4.  **Globalne umiejętności (skille)** oraz dowiązania narzędzi CLI (symlinki zamiast kopii).
+5.  **Rozszerzenie WSL dla Antigravity IDE** i (tylko interaktywnie) logowanie do usług CLI.
 
-### 4.2 Narzędzie `os-init`
-Funkcja-opakowanie (shell wrapper) wywołująca binarny skrypt `os-init-run`.
-*   **Dlaczego funkcja shell, a nie skrypt?** Tradycyjne skrypty uruchamiane jako osobny proces nie mogą modyfikować katalogu roboczego (`cd`) powłoki nadrzędnej. Wrapper przechwytuje zmienną `__PROJECT_DIR__` wypisywaną przez skrypt pythonowy i wykonuje zmianę katalogu w bieżącej sesji terminala.
-*   **Proces bootstrapu:** Inicjalizuje repozytorium git $\rightarrow$ Kopiuje szablony z **Vault** $\rightarrow$ Tworzy pierwszy commit $\rightarrow$ Tworzy repozytorium GitHub za pomocą `gh repo create` $\rightarrow$ Wykonuje push $\rightarrow$ Uruchamia Antigravity IDE w nowo powstałym katalogu.
+### 4.2 `os-init` i `os-init-claude`
+`os-init <nazwa-projektu>` tworzy projekt, repozytorium GitHub, pierwszy commit z push i otwiera IDE. Wywoływany jest przez powłokę jako wrapper, który przechwytuje zmienną `__PROJECT_DIR__` i zmienia katalog w bieżącej sesji (osobny proces nie zmieniłby katalogu powłoki nadrzędnej). Szablon pochodzi z lokalnego `vault/` repozytorium lub z `~/.antigravity/templates/v7.1-swarm`. `os-init-claude` tworzy wariant dla Claude Code (CLAUDE.md, `.claude/commands/`).
 
-### 4.3 Dynamiczny instalator skilli (`os-add-skill`)
-Skrypt w Pythonie pobierający w locie zdefiniowane pakiety umiejętności z repozytorium `antigravity-awesome-skills`.
-*   **Bezpieczeństwo:** Zabezpieczony przed atakami typu Path Traversal (blokuje znaki `/`, `\`, `..` w nazwie skilla).
-*   **Mechanizm działania:** Odpytuje API GitHub, pobiera rekurencyjnie całą strukturę plików i katalogów określonego skilla i zapisuje go bezpośrednio w katalogu `.agents/skills/<nazwa>`.
+### 4.3 `os-add-skill`
+Skrypt w Pythonie instalujący pakiet umiejętności do `.agents/skills/<nazwa>`. Zabezpieczony przed Path Traversal (blokuje `/`, `\`, `..` w nazwie). Kolejność źródeł: najpierw lokalny szablon (offline, bez wektora supply-chain), potem źródła zdalne (repozytorium `antigravity-awesome-skills` przez API GitHub).
+
+### 4.4 `os-upgrade-project`
+Modernizuje istniejący projekt do bieżącego standardu: reguły `.gitattributes` (`merge=union` dla `MEMORY.md`), parametry Gita, hooki Antigravity (`hooks.json` jest **scalany**, nie nadpisywany: `scripts/merge_hooks_json.py`, opcja `--refresh-hooks`), hooki Claude Code (`.claude/settings.json`), dowiązania `.claude/skills/*`, pamięć `MEMORY.md`. Odświeża strażników w `scripts/`, gdy różnią się od źródła.
+
+### 4.5 `os-run-builder`, `os-publish-knowledge`
+`os-run-builder <gałąź>` tworzy izolowany worktree Buildera w `tmp/worktrees/`. `os-publish-knowledge` publikuje notatki z `.agents/specs/knowledge` do `<vault>/raw/notes` (skan PII i sekretów, domyślnie dry-run; opcjonalny scaffolding INGEST).
 
 ---
 
 ## 5. Integracja GitOps & Model Context Protocol (MCP)
 
-Wersja 5.0 wdraża system dynamicznego dostarczania wiedzy i autonomicznego aktualizowania bazy dokumentacji:
+System dostarcza wiedzę o platformie i aktualizuje ją autonomicznie:
 
-1.  **Węzeł Dokumentacji (MCP Server):** W folderze `.agents/mcp-servers/antigravity-docs/` uruchomiony jest serwer Node.js ([mcp_server.js](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/mcp_server.js)) implementujący protokół MCP. Dostarcza on do agenta narzędzia wyszukiwania i odczytu oficjalnej dokumentacji Antigravity.
-2.  **Lokalna Rejestracja:** Plik [.gemini/mcp_config.json](file:///home/tkogut/projects/agents-os-core/.gemini/mcp_config.json) deklaruje ścieżkę do serwera MCP, izolując go per-projekt (brak rejestracji globalnej chroni przed wyciekiem kontekstu).
-3.  **Autonomiczna Aktualizacja Dokumentacji (GitOps CI/CD):**
-    System automatycznie synchronizuje zmiany w oficjalnej dokumentacji bez zaangażowania dewelopera. Całość opiera się na cyklicznym przepływie pracy GitHub Actions zdefiniowanym w [.github/workflows/mcp-docs-updater.yml](file:///home/tkogut/projects/agents-os-core/.github/workflows/mcp-docs-updater.yml).
+1.  **Węzeł Dokumentacji (MCP Server):** w `.agents/mcp-servers/antigravity-docs/` działa serwer Node.js ([mcp_server.js](../mcp-servers/antigravity-docs/mcp_server.js)) implementujący protokół MCP; udostępnia narzędzia wyszukiwania i odczytu dokumentacji Antigravity.
+2.  **Lokalna Rejestracja:** plik [.gemini/mcp_config.json](../../.gemini/mcp_config.json) deklaruje ścieżkę do serwera, izolując go per-projekt (brak rejestracji globalnej chroni przed wyciekiem kontekstu).
+3.  **Autonomiczna Aktualizacja (GitOps CI/CD):** cykliczny przepływ GitHub Actions [.github/workflows/mcp-docs-updater.yml](../../.github/workflows/mcp-docs-updater.yml).
 
-### Przebieg Przepływu Autonomicznej Aktualizacji (Workflow Sequence):
-*   **Krok 1: Inicjalizacja & Scraper (`scraper.py`):** Co miesiąc (lub przy ręcznym uruchomieniu) bot uruchamia bezgłową przeglądarkę Playwright ([scraper.py](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/scraper.py)) na stronie `https://antigravity.google/docs/get-started`. Parsuje strukturę paska bocznego i zapisuje listę linków do pliku [links.json](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/links.json).
-*   **Krok 2: Ekstrakcja Treści (`extractor.py`):** Skrypt [extractor.py](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/extractor.py) iteruje po linkach z indeksu, pobiera wyrenderowaną przez JS treść z kontenera `.docs-main-content` i zapisuje czysty tekst do plików Markdown w folderze [knowledge_base/](file:///home/tkogut/projects/agents-os-core/.agents/mcp-servers/antigravity-docs/knowledge_base/).
-*   **Krok 3: Dirty-Check & Auto-Commit:** System sprawdza różnice w plikach (`git diff`). W przypadku wykrycia modyfikacji, bot automatycznie tworzy commit `chore(mcp): auto-refresh Antigravity docs YYYY-MM-DD` i wypycha zmiany do repozytorium zdalnego.
-*   **Krok 4: Lokalna Aktualizacja i Użycie:** Deweloper pobiera zmiany za pomocą `git pull`. Ponieważ lokalny serwer MCP serwuje pliki bezpośrednio z podkatalogu `knowledge_base/`, agenci roju w kolejnej sesji pracy natychmiast zyskują dostęp do najnowszej wiedzy bez potrzeby restartu czy reinstalacji środowiska.
+### Przebieg aktualizacji
+*   **Krok 1: Scraper (`scraper.py`):** bot uruchamia bezgłową przeglądarkę Playwright na `https://antigravity.google/docs/get-started`, parsuje pasek boczny i zapisuje linki do [links.json](../mcp-servers/antigravity-docs/links.json).
+*   **Krok 2: Ekstrakcja (`extractor.py`):** [extractor.py](../mcp-servers/antigravity-docs/extractor.py) pobiera wyrenderowaną treść i zapisuje Markdown w [knowledge_base/](../mcp-servers/antigravity-docs/knowledge_base/).
+*   **Krok 3: Dirty-Check & Auto-Commit:** `git diff`; przy zmianach commit `chore(mcp): auto-refresh Antigravity docs YYYY-MM-DD` i push.
+*   **Krok 4: Lokalna aktualizacja:** `git pull`; serwer MCP serwuje pliki bezpośrednio z `knowledge_base/`, więc kolejna sesja ma najnowszą wiedzę bez reinstalacji.
+
+---
+
+## 6. Hooki i obejścia błędów silnika
+
+*   **Blokada File Edit Hang (Antigravity):** wbudowany edytor diffów Antigravity potrafi zawiesić wątek; w agentach Antigravity pliki edytuje się przez terminal (Rule 3 w `.agents/rules/core-rule.md`). Claude Code używa własnych narzędzi edycji.
+*   **Stale Worktree Crash:** dawny hook `before_model_call: git worktree prune` nie jest już zainstalowany w żadnym `hooks.json`. Osierocone worktree usuwa się ręcznie (`git worktree prune`) i po merge.
+*   **Hooki Antigravity/Gemini** (`.agents/hooks.json`, lustra w `.gemini/` i `.antigravity/`): `guard-confidential-gemini` (PreToolUse, poufność vaulta), `guard-coordinator` (PreToolUse, R-ROLE-01) oraz `distributed-sync` (SessionStart, SessionEnd, PreInvocation, Stop).
+*   **Hooki Claude Code** (`.claude/settings.json`, skrypty w `.agents/hooks/`): PreToolUse `claude-pre-tool-guard.sh`, re-grounding przy UserPromptSubmit, zrzut przed kompaktowaniem i zrzut stanu przy Stop/SessionEnd.
+*   **Git pre-commit** (`scripts/install-git-hooks.sh`): `scripts/check_coordinator_role.sh` blokuje commit kodu na main/master i wymaga handshake'u Buildera.
 
 ---
 
-## 6. Zapobieganie Błędom Silnika (Defensive Workarounds)
+## 7. Second Brain i poufność (ISO 27001)
 
-Z powodu niestabilności wbudowanych mechanizmów IDE, system wymusza rygorystyczne procedury bezpieczeństwa:
-*   **Blokada File Edit Hang:** Wbudowane narzędzie edycji diffów w Antigravity generuje pętle zawieszające wątek. Zastąpiono je obowiązkiem edycji plików wyłącznie za pomocą basha (heredoc / cat).
-*   **Stale Worktree Crash:** Osierocone gałęzie robocze powodują paraliż agenta. W pliku `.agents/hooks.json` wdrożono automatyczny hook przed każdym zapytaniem do modelu:
-    ```json
-    {
-      "before_model_call": "git worktree prune"
-    }
-    ```
+*   **Dostęp:** Gemini (bez DPA) czyta tylko `index-public.md` i strony bez flagi poufności; Claude Code i Claude Desktop (konto organizacji, DPA) mają stałą zgodę na strony poufne bez prawa do kopiowania ich treści do repozytoriów i plików harnessu.
+*   **Mechanizmy:** strażnik `scripts/guard_confidential_gemini.py` (odmowy odczytu stron poufnych, `index.md`, `wiki/overview.md`, rekurencyjnego wyszukiwania; cztery identyczne kopie), skaner `scripts/scan_confidential_leaks.py` (frazy kontrolne i wzorce sekretów w plikach harnessu), skill `second-brain`, publikacja `scripts/publish_knowledge_to_vault.py`.
+*   **Dokumenty:** [second-brain-integration-plan.md](second-brain-integration-plan.md), [second-brain-propagation-report.md](second-brain-propagation-report.md).
 
 ---
-*Dokumentacja wygenerowana zgodnie ze standardem docs-architect. Wersja 5.0-AG.*
+
+## 8. Wersjonowanie, testy i bramka jakości
+
+*   **Wersja:** plik `VERSION` (np. `7.1.0-swarm`); katalog szablonu `v<MAJOR.MINOR>-swarm`; Rule 4 w `core-rule.md`; spójność wymusza `tests/test_version_consistency.py`.
+*   **Testy (`pytest tests`):** strażnicy (poufności i Coordinatora), skaner wycieków, scalanie `hooks.json`, publikacja do vaulta, spójność wersji.
+*   **QA gate przed PR** (CLAUDE.md, sekcja 5): `shellcheck`, `py_compile`, `validate-handshakes`, skaner wycieków, opcjonalnie `execution/test_bootstrap.sh`.
+
+---
+
+## 9. Znane ograniczenia (stan 2026-11-09)
+
+*   `claude-pre-tool-guard.sh` kończy się kodem 1, który w Claude Code nie blokuje wywołania (blokuje kod 2); ochrona main/master po stronie Claude'a to zasada, nie blokada techniczna (decyzja właściciela: bez zmian).
+*   Strażnik poufności nie pilnuje Claude'a; dla narzędzi bez hooków (Cursor, Codex, aider) zakazy dostępu do vaulta są polityką.
+
+---
+*Dokument zaktualizowany dla wydania 7.1.0-swarm (2026-11-09); poprzednia treść opisywała wydanie 5.0-AG/6.5.*

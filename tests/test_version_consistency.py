@@ -16,10 +16,9 @@ HISTORICAL = re.compile(
     r"^(tmp/|\.ai/specs/|\.agents/mcp-servers/|\.agents/specs/archive/)|knowledge/|CHANGELOG\.md$|_handshake\.json$|"
     r"swarm_audit_report|BACKWARD_COMPAT|antigravity-docs|awesome-skills-catalog"
 )
-# Dokumenty z treścią opisującą starsze wersje; do przeglądu w osobnym PR (usuń z listy po aktualizacji).
 PENDING_REVIEW = {
-    ".agents/specs/AGENTS-OS.md", ".agents/specs/architecture.md", ".agents/specs/graph.json",
-    ".agents/eval/evaluator.md", ".agents/hooks/claude-pre-tool-guard.sh",
+    # Plik chroniony (hooki blokują jego edycję przez agenta): nagłówek zmienia właściciel ręcznie.
+    ".agents/hooks/claude-pre-tool-guard.sh",
 }
 # Stan sesji i historia: tylko pierwsza linia (nagłówek) ma być aktualna.
 STATE_FILES = {".agents/MEMORY.md", ".agents/task.md", "vault/.agents/MEMORY.md", "vault/.agents/task.md",

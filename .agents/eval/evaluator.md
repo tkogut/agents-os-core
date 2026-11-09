@@ -1,4 +1,4 @@
-# Evaluator Module (AGENTS-OS v6.5)
+# Evaluator Module (AGENTS-OS v7.1)
 
 > Cost optimization and prompt validation engine.
 
@@ -54,6 +54,9 @@ Each test case is a JSON file in `.agents/eval/cases/`:
 - **Monthly**: Cost report and optimization recommendations
 
 ## Commands
+
+> **Status: planowane.** Skrypt `scripts/run-evaluator.py` nie istnieje w repozytorium (stan 2026-11-09); katalog `.agents/eval/cases/` przechowuje przypadki testowe. Poniższe polecenia opisują docelowy interfejs.
+
 ```bash
 # Run full evaluation suite
 python3 scripts/run-evaluator.py --cases .agents/eval/cases/ --target gemini-flash
