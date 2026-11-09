@@ -1,5 +1,5 @@
 ---
-description: Globalny systemowy skill dla skill-rebuild w AGENTS-OS v6.0.
+description: Globalny systemowy skill dla skill-rebuild w AGENTS-OS v7.1.
 ---
 
 Przeczytaj instrukcje ze skilla `skill-rebuild` z pliku `.claude/skills/skill-rebuild/SKILL.md` (lub `.agents/skills/skill-rebuild/SKILL.md`) i wykonaj zadanie zgodnie z jego procedurą.

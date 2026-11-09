@@ -1,6 +1,6 @@
 ---
 name: logic-auditor
-description: Globalny systemowy skill dla logic-auditor w AGENTS-OS v6.0.
+description: Globalny systemowy skill dla logic-auditor w AGENTS-OS v7.1.
 trigger_words: ["audit logic", "check consistency", "math check", "caveman-review"]
 ---
 

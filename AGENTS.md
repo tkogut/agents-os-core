@@ -4,7 +4,7 @@
 
 ## Overview
 
-AGENTS-OS v7.0 is a coordination, knowledge-integration and containerization framework for AI agent swarms (Antigravity IDE, Claude Code, Cursor, Zed). It provides architectural rigor via the async **Swarm Triad** model (Coordinator / Builder / Auditor), conflict-free distributed state sync across machines (Laptop WSL, VPS, Desktop) through `.agents/MEMORY.md` and `.agents/task.md`, hardware-gated Second Brain access (`sejf-tk`) with RODO/DPA compliance boundaries, and dynamic skill-library distribution to downstream projects via `os-init`, `os-upgrade-project`, and `os-add-skill`. This repo is itself the framework's source — changes here propagate outward to every project that bootstraps from it.
+AGENTS-OS v7.1 is a coordination, knowledge-integration and containerization framework for AI agent swarms (Antigravity IDE, Claude Code, Cursor, Zed). It provides architectural rigor via the async **Swarm Triad** model (Coordinator / Builder / Auditor), conflict-free distributed state sync across machines (Laptop WSL, VPS, Desktop) through `.agents/MEMORY.md` and `.agents/task.md`, hardware-gated Second Brain access (`sejf-tk`) with RODO/DPA compliance boundaries, and dynamic skill-library distribution to downstream projects via `os-init`, `os-upgrade-project`, and `os-add-skill`. This repo is itself the framework's source — changes here propagate outward to every project that bootstraps from it.
 
 ---
 

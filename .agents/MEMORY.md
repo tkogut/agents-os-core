@@ -1,4 +1,4 @@
-# 🧠 AGENTS-OS v6.5 SWARM MEMORY ENGINE (v0.42.1)
+# 🧠 AGENTS-OS v7.1 SWARM MEMORY ENGINE (v0.42.1)
 
 ---
 version: 0.42.1

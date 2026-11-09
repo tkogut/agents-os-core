@@ -1,5 +1,5 @@
 # 🧠 BAZA WIEDZY DLA NOTEBOOK.LM: EKOSYSTEM SKILLI OPEN-MERCATO (OM)
-> **Dokument źródłowy:** AGENTS-OS Platform v6.5 Swarm & Cezar Runtime
+> **Dokument źródłowy:** AGENTS-OS Platform v7.1 Swarm & Cezar Runtime
 > **Zastosowanie:** Pełna mapa pojęciowa, relacje encji, architektura przepływów i ontologia dla silnika NotebookLM.
 > **Liczba modułów:** 36 autonomicznych umiejętności SDLC.
 
