@@ -348,5 +348,24 @@ class TestGuardConfidentialGemini(unittest.TestCase):
         res = self._gemini("run_command", CommandLine="rg TODO /home/tkogut/projects/some-app/src")
         self.assertEqual(res["decision"], "allow")
 
+    def test_26_guard_registered_in_all_hook_configs(self):
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        for rel in (".gemini/hooks.json", ".antigravity/hooks.json", ".agents/hooks.json"):
+            with open(os.path.join(repo_root, rel), encoding="utf-8") as fh:
+                cfg = json.load(fh)
+            entry = cfg.get("guard-confidential-gemini")
+            self.assertIsNotNone(entry, f"Strażnik niezarejestrowany w {rel}")
+            cmds = [h["command"] for g in entry["PreToolUse"] for h in g["hooks"]]
+            self.assertIn("python3 scripts/guard_confidential_gemini.py", cmds, rel)
+
+    def test_27_hook_cli_stdin_roundtrip(self):
+        import subprocess
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        payload = {"modelName": "gemini-3.8-flash",
+                   "toolCall": {"name": "read_file", "args": {"Path": os.path.join(self.vault_dir, "index.md")}}}
+        r = subprocess.run([sys.executable, os.path.join(repo_root, "scripts", "guard_confidential_gemini.py")],
+                           input=json.dumps(payload), capture_output=True, text=True, cwd=repo_root)
+        self.assertEqual(json.loads(r.stdout)["decision"], "deny")
+
 if __name__ == "__main__":
     unittest.main()
