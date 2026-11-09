@@ -428,6 +428,10 @@ def evaluate_hook(payload: dict) -> dict:
             # 6b. Recursive search over confidential dirs
             has_search_cmd = bool(re.search(r'\b(grep|egrep|fgrep|rg|ripgrep|ag|find)\b', cmd_norm))
             has_recursive_flag = bool(re.search(r'(-[a-z]*r|--recursive|-exec\b)', cmd_norm))
+            # ripgrep, ag, ack and `git grep` search directories recursively by default (no flag needed)
+            if re.search(r'(\b(rg|ripgrep|ag|ack)\b|\bgit\s+grep\b)', cmd_norm):
+                has_search_cmd = True
+                has_recursive_flag = True
             
             if has_search_cmd and has_recursive_flag:
                 targets_confidential_dir = False
