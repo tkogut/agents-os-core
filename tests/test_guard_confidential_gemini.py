@@ -339,5 +339,14 @@ class TestGuardConfidentialGemini(unittest.TestCase):
         res = self._gemini("read_file", Path="/home/tkogut/projects/some-app/docs/index.md")
         self.assertEqual(res["decision"], "allow")
 
+    def test_24_gemini_default_recursive_search_tools_denied(self):
+        for tool in ("rg", "ripgrep -i", "ag", "ack", "git grep"):
+            res = self._gemini("run_command", CommandLine=f"{tool} umowa {self.vault_dir}/wiki")
+            self.assertEqual(res["decision"], "deny", tool)
+
+    def test_25_non_vault_rg_allowed(self):
+        res = self._gemini("run_command", CommandLine="rg TODO /home/tkogut/projects/some-app/src")
+        self.assertEqual(res["decision"], "allow")
+
 if __name__ == "__main__":
     unittest.main()
