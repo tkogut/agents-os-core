@@ -1,6 +1,6 @@
 # Plan wdrożenia: agenci harnessu ↔ „drugi mózg” (vault `sejf_tk`)
 
-> **Status: WDRAŻANIE (zatwierdzony 2026-11-09). Kroki 0–2 wykonane, krok 3 w PR.** Zapisy w vaulcie: tylko kroki 1, 2 i 5, na polecenie właściciela. Kroki 3 i 4 zmieniają `scripts/*` za zgodą właściciela (2026-11-09, jako autoryzacja Coordinatora).
+> **Status: WDROŻONY (kroki 0-5 i 7); krok 6: T1 20/20, T2 i T3 zdane, T4 i T5 niewykonane (decyzja właściciela 2026-11-09: dalsze testy pominięte).** Zapisy w vaulcie: tylko kroki 1, 2 i 5, na polecenie właściciela. Kroki 3 i 4 zmieniają `scripts/*` za zgodą właściciela (2026-11-09, jako autoryzacja Coordinatora).
 > Źródło ustaleń: sesja `/grill-me` z 2026-11-07 (decyzje D1–D12). Protokół wymaga też wpisu ustaleń do `.agents/MEMORY.md` → `## 📝 Decisions & Key Milestones` (krok 7).
 > Plan nie zawiera treści stron poufnych ani żadnych sekretów.
 
@@ -138,6 +138,7 @@ Bez zmian: `HERMES.md`, klon i token Hermesa, `.gitignore`.
 | R15 | Szyfrowanie dysku, 2FA GitHub | oświadczenie właściciela: ryzyko zamknięte; brak weryfikacji technicznej w tym planie |
 | R16 | Stałe zezwolenie na `--apply` w repo gry rozszerzone na inne projekty | zakres zezwolenia: tylko `CLAUDE.md` gry; inne projekty wymagają osobnej decyzji |
 | R17 | Zakaz zapisu dla Gemini i innych modeli to polityka bez blokady technicznej (strażnik blokuje odczyt, nie zapis; Cursor/Codex/aider bez hooka); zapis zepsuje stronę lub wywoła konflikt | zakaz w skillu i `AGENT-GEMINI.md`; jeden pisarz na plik; commituje tylko Obsidian Git, więc zmianę cofa historia Gita; przegląd `git log` vaulta po sesjach z Gemini i w LINT; Gemini nie czyta poufnych, więc zapis nie wynosi treści poufnych. Świadomie przyjęte (decyzja 2026-11-09) |
+| R18 | Strażnik był niezarejestrowany w `hooks.json` repo harnessu (usunięty w `3efd040`); Gemini działał tylko na polityce | przywrócony w PR #49; test rejestracji w trzech plikach; wykonanie hooka potwierdzone w żywym Antigravity (odświeżenie cache strażnika). Otwarte: `guard-coordinator` też usunięty, decyzja właściciela |
 
 ---
 

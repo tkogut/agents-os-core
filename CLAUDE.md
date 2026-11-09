@@ -23,7 +23,8 @@ You are **The Builder** in the Swarm Triad:
 
 **Second Brain & ISO 27001 Protocol:**
 - Vault `sejf_tk` jest zasobem zewnętrznym (jedna instancja, brak klonowania do projektów).
-- Gemini Consumer podlega twardej blokadzie PreToolUse (`scripts/guard_confidential_gemini.py`) dla stron `confidential: true`, `Firma/` i `raw/notes/`.
+- Gemini Consumer podlega twardej blokadzie PreToolUse (`scripts/guard_confidential_gemini.py`, zarejestrowany w `.gemini/`, `.antigravity/` i `.agents/hooks.json`) dla stron `confidential: true`, `Firma/` i `raw/notes/` oraz dla `index.md` i `wiki/overview.md`; Gemini czyta wyłącznie `index-public.md` (stempel świeżości 24 h). Zakaz zapisu w vaulcie dla Gemini to polityka bez blokady technicznej.
+- Claude Code i Claude Desktop (konto MIW Group, DPA) mają stałą zgodę na czytanie stron `confidential: true` (vault `AGENTS.md` pkt 6); treści poufnej nie wolno zapisywać w `MEMORY.md`, `task.md`, handshake'ach, opisach commitów/PR ani w repozytoriach. Egzekwuje to skaner `scripts/scan_confidential_leaks.py` (frazy kontrolne i wzorce sekretów).
 - Publikacja notatek z `.agents/specs/knowledge` do `<vault>/raw/notes` odbywa się wyłącznie skryptem `scripts/publish_knowledge_to_vault.py` lub skillem `/os-publish-knowledge` (skan PII/sekretów, tryb dry-run, automatyczny scaffolding INGEST, brak commitów git w vaulcie).
 - W vaulcie zabrania się tworzenia symlinków — pliki muszą być zwykłymi plikami.
 
@@ -117,11 +118,14 @@ python3 -m py_compile scripts/*.py os-add-skill
 # 3. Weryfikacja łańcucha handshakes
 python3 scripts/validate-handshakes.py
 
-# 4. Testy e2e bootstrapu (opcjonalnie przed wydaniem)
+# 4. Skan wycieku treści poufnych do plików harnessu
+python3 scripts/scan_confidential_leaks.py
+
+# 5. Testy e2e bootstrapu (opcjonalnie przed wydaniem)
 bash execution/test_bootstrap.sh
 ```
 
-**Polityka bramki:** Żaden PR nie może zostać otwarty ani zmergowany bez zielonego przejścia walidacji AST i handshakes.
+**Polityka bramki:** Żaden PR nie może zostać otwarty ani zmergowany bez zielonego przejścia walidacji AST, handshakes i skanu wycieku.
 
 ---
 
