@@ -1,6 +1,6 @@
 # AGENTS-OS Swarm Role Registry
 project: agents-os-core
-version: 7.0
+version: 7.1
 
 roles:
   gem:

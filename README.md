@@ -1,4 +1,4 @@
-# 🛸 AGENTS-OS v7.0 Swarm Edition — Instrukcja Obsługi
+# 🛸 AGENTS-OS v7.1 Swarm Edition — Instrukcja Obsługi
 
 > **Dla kogo jest ten dokument?**  
 > Dla każdego programisty i operatora — wyjaśniamy krok po kroku architekturę asynchronicznego roju agentów AI, bezkonfliktową synchronizację rozproszoną oraz zestaw narzędzi CLI.
@@ -34,7 +34,7 @@
 | **`INSTALL.sh`** | Instalator | Jednorazowa konfiguracja środowiska, szablonów, zależności Pythona i komend powłoki |
 | **`os-init`** | CLI / Shell | Tworzy nowe repozytorium z szablonu Vault i otwiera Antigravity IDE |
 | **`os-init-claude`** | CLI / Shell | Tworzy nowe repozytorium zoptymalizowane pod VS Code i Claude Code |
-| **`os-upgrade-project`** | CLI | Migruje dowolny projekt do standardu v7.0 Swarm (auto-sync, union-merge, hooki, symlinki) |
+| **`os-upgrade-project`** | CLI | Migruje dowolny projekt do standardu v7.1 Swarm (auto-sync, union-merge, hooki, symlinki) |
 | **`os-add-skill`** | CLI | Dynamicznie pobiera i linkuje skille z rejestrów RAG oraz bazy `sickn33/awesome-skills` |
 | **`os-run-builder`** | CLI | Automatyzuje izolację środowiska roboczego w Git Worktree (`tmp/worktrees/`) |
 | **`/grill-me`** | CLI / Skill | Pre-flight interview weryfikujący topologię maszyn, bazy fail-closed i odporność na awarie |
@@ -122,7 +122,7 @@ Dodatkowo:
 
 ## 6. `os-upgrade-project` — Modernizacja Istniejących Projektów
 
-Jeśli masz starszy projekt i chcesz wdrożyć natywny silnik asynchronicznej pracy wielomaszynowej AGENTS-OS v7.0 Swarm:
+Jeśli masz starszy projekt i chcesz wdrożyć natywny silnik asynchronicznej pracy wielomaszynowej AGENTS-OS v7.1 Swarm:
 
 ```bash
 # Wewnątrz katalogu projektu:
@@ -262,7 +262,7 @@ Szczegółowa specyfikacja interfejsów, formatów JSON, schematów pamięci i p
 <br><hr><br>
 
 <a name="english"></a>
-# [EN] AGENTS-OS v7.0 Swarm Edition — User Guide
+# [EN] AGENTS-OS v7.1 Swarm Edition — User Guide
 
 > **Enterprise-grade asynchronous multi-agent framework for Antigravity IDE and Claude Code.**
 
@@ -279,7 +279,7 @@ Szczegółowa specyfikacja interfejsów, formatów JSON, schematów pamięci i p
 | **`INSTALL.sh`** | Installer | Single-command system setup, Python venv, templates, and shell integration |
 | **`os-init`** | CLI | Creates a new Golden Standard repository and launches Antigravity IDE |
 | **`os-init-claude`** | CLI | Creates a new repository tailored for VS Code and Claude Code |
-| **`os-upgrade-project`** | CLI | Modernizes existing repositories to v7.0 Swarm (auto-sync, union-merge, hooks) |
+| **`os-upgrade-project`** | CLI | Modernizes existing repositories to v7.1 Swarm (auto-sync, union-merge, hooks) |
 | **`os-add-skill`** | CLI | Dynamically fetches skills from RAG registries and 1,400+ community skills |
 | **`os-run-builder`** | CLI | Automates Git Worktree workspace isolation under `tmp/worktrees/` |
 | **`/grill-me`** | CLI / Skill | Pre-flight architectural interview ensuring fail-closed resilience and state dumps |

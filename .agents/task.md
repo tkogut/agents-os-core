@@ -1,4 +1,4 @@
-# Task Backlog: Hook Branch Safety & Main/Master Protection (AGENTS-OS v7.0 Swarm)
+# Task Backlog: Hook Branch Safety & Main/Master Protection (AGENTS-OS v7.1 Swarm)
 Branch: `fix/hook-branch-protection`
 Worktree: `tmp/worktrees/fix/hook-branch-protection`
 

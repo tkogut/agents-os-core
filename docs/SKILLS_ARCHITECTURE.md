@@ -1,6 +1,6 @@
 # 🏛️ Architektura Skilli AGENTS-OS: Model Dwuwarstwowy (Dual-Tier)
 
-AGENTS-OS v7.0 rozwiązuje odwieczny dylemat agentowych środowisk programistycznych: **jak zapewnić asystentom AI dostęp do tysięcy wąskich kompetencji dziedzinowych bez zapchania okna kontekstowego (Prompt Bloat) i degradacji myślenia?**
+AGENTS-OS v7.1 rozwiązuje odwieczny dylemat agentowych środowisk programistycznych: **jak zapewnić asystentom AI dostęp do tysięcy wąskich kompetencji dziedzinowych bez zapchania okna kontekstowego (Prompt Bloat) i degradacji myślenia?**
 
 Odpowiedzią jest **Architektura Dwuwarstwowa (Dual-Tier Skill Architecture)**:
 1. **Warstwa 1 (Core OS)**: 63 preinstalowane, zoptymalizowane pod Prompt Caching skille systemowe.

@@ -9,10 +9,13 @@ Dokumentującą:
 
 ## [Unreleased]
 
+## [7.1.0-swarm] - 2026-11-09
+
 ### 🏷️ Porządek z wersjami (2026-11-09)
-- 📌 **Plik `VERSION`** (`7.0.0-swarm`): jedyne źródło prawdy o wersji systemu; Rule 4 w `.agents/rules/core-rule.md` przepisana pod ten plik.
+- 📌 **Wydanie 7.1.0-swarm** (minor: integracja drugiego mózgu, strażnicy hooków, skaner wycieków, scalanie `hooks.json`). **Plik `VERSION`** (`7.1.0-swarm`): jedyne źródło prawdy o wersji systemu; Rule 4 w `.agents/rules/core-rule.md` przepisana pod ten plik.
+- 📦 **Katalog szablonu zmienia nazwę na `~/.antigravity/templates/v7.1-swarm`**: po aktualizacji uruchom `INSTALL.sh` (instaluje nowy szablon i usuwa `v7.0-swarm`). Do tego czasu skrypty korzystają z lokalnego katalogu `vault/` repozytorium.
 - 🧪 **`tests/test_version_consistency.py`**: wymusza Rule 4 (żywe pliki mają wersję z `VERSION`, `agentic.config.json`, katalog szablonu w `INSTALL.sh`, nagłówek wydania w `CHANGELOG.md`).
-- 🧹 Usunięto stare ciągi v6.5/v6.0 z żywych plików: `README.md`, `docs/API.md` (przykład konfiguracji: `7.0-swarm`), `docs/SKILLS_ARCHITECTURE.md`, `CLAUDE.md`, `SDLC.md`, `agents.yaml`, nagłówków `.gitignore`/`.gitattributes`, bannerów bootstrapperów, szablonów w `vault/` (`task.md`, `agents.yaml`, `SDLC.md`, `os-run-builder`, `.gitattributes`) oraz nagłówków `.agents/MEMORY.md` i `.agents/task.md`.
+- 🧹 Usunięto stare ciągi v6.5/v6.0/v4.2 i podniesiono v7.0 → v7.1 w żywych plikach (README, docs, `CLAUDE.md`, `SDLC.md`, `agents.yaml`, `INSTALL.sh`, `os-*`, bootstrappery, skille, strażnicy, szablon `vault/`, `.ai/agentic.config.json`); wcześniej wykryte m.in.: `README.md`, `docs/API.md` (przykład konfiguracji: `7.0-swarm`), `docs/SKILLS_ARCHITECTURE.md`, `CLAUDE.md`, `SDLC.md`, `agents.yaml`, nagłówków `.gitignore`/`.gitattributes`, bannerów bootstrapperów, szablonów w `vault/` (`task.md`, `agents.yaml`, `SDLC.md`, `os-run-builder`, `.gitattributes`) oraz nagłówków `.agents/MEMORY.md` i `.agents/task.md`.
 - 🗑️ Usunięto martwe fallbacki do katalogu szablonu `v6.5-swarm` (`os-upgrade-project`, `os-add-skill`, bootstrappery); `INSTALL.sh` i tak usuwa stare szablony.
 - ℹ️ Bez zmian (historia lub treść wymagająca przeglądu): wydane wpisy `CHANGELOG.md`, dokumenty źródłowe z `knowledge/`, `.agents/specs/AGENTS-OS.md` (konstytucja v6.5-AG), `architecture.md`, `graph.json`, `swarm_audit_report.md`, `.agents/eval/evaluator.md`, specyfikacje `.ai/specs/*` z datą, `claude-pre-tool-guard.sh` (plik chroniony).
 

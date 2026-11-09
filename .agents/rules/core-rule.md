@@ -12,7 +12,7 @@
 - Due to known issues with native File Edit Tools (such as infinite +0 -0 loops), file edits or creations in this repository must use raw terminal commands (`cat << 'EOF'`, `sed`, etc.) until fixed.
 
 ## Rule 4: System Version Consistency
-- Jedynym źródłem prawdy o wersji systemu jest plik `VERSION` w katalogu głównym (np. `7.0.0-swarm`; w dokumentach i nazwach katalogów szablonów skrót `v7.0` / `v7.0-swarm`).
+- Jedynym źródłem prawdy o wersji systemu jest plik `VERSION` w katalogu głównym (np. `7.1.0-swarm`; w dokumentach i nazwach katalogów szablonów skrót `v7.1` / `v7.1-swarm`).
 - Przy zmianie wersji zaktualizuj `VERSION`, a następnie wszystkie żywe pliki: skrypty (`os-*`, `INSTALL.sh`, bootstrapery), nazwy katalogów szablonów (`v<MAJOR.MINOR>-swarm`), dokumentację (`README.md`, `docs/`, `SDLC.md`, `CLAUDE.md`), `agents.yaml` i szablony w `vault/`. Wpisy historyczne (`CHANGELOG.md` dla wydanych wersji, cytowane dokumenty źródłowe) zostają bez zmian.
 - Spójność wymusza `tests/test_version_consistency.py` (część `pytest tests`): pozostawienie starego ciągu wersji w żywym pliku jest błędem testu.
 

@@ -1,4 +1,4 @@
-# SDLC — Software Development Lifecycle (AGENTS-OS v7.0)
+# SDLC — Software Development Lifecycle (AGENTS-OS v7.1)
 
 > Source of Truth for agent-driven development workflows.
 

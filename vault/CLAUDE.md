@@ -1,7 +1,7 @@
 ---
 trigger: always_on
 role: builder
-version: 7.0-swarm
+version: 7.1-swarm
 ide: vscode-claude-code
 ---
 
@@ -146,4 +146,4 @@ bash execution/test_bootstrap.sh
 
 ---
 
-*AGENTS-OS v7.0 Swarm Edition | Builder Role Active*
+*AGENTS-OS v7.1 Swarm Edition | Builder Role Active*
