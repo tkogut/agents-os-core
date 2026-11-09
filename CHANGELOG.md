@@ -9,6 +9,26 @@ Dokumentującą:
 
 ## [Unreleased]
 
+### 🧠 Second Brain: dostęp agentów bez naruszania poufności (2026-11-09, PR #44–#53)
+Plan i raport: `.agents/specs/second-brain-integration-plan.md`, `.agents/specs/second-brain-propagation-report.md`.
+- 🛡️ **Strażnik `guard_confidential_gemini.py`**: modele bez DPA nie czytają `index.md` ani `wiki/overview.md` (komunikat odsyła do `index-public.md`); `rg`, `ripgrep`, `ag`, `ack` i `git grep` po vaulcie traktowane jak wyszukiwanie rekurencyjne (luka: wcześniej blokowane tylko `-r`/`--recursive`/`-exec`). Cztery kopie nadal identyczne; testy 19–27.
+- 🔌 **Rejestracja hooków**: `guard-confidential-gemini` i `guard-coordinator` przywrócone w `.gemini/`, `.antigravity/` i `.agents/hooks.json` (zniknęły w commicie `3efd040`); test rejestracji w trzech plikach. Wykonanie hooka potwierdzone w żywym Antigravity.
+- 🔎 **`scripts/scan_confidential_leaks.py`**: skan `.agents/MEMORY.md`, `.agents/task.md`, handshake'ów i opcjonalnie opisów PR (`--stdin`/`--file`) pod kątem fraz kontrolnych (`CANARY-SB-…`) i wzorców sekretów; wypisuje tylko nazwy reguł, nigdy wartości; kod 2 przy błędzie odczytu (fail-closed). Wpięty w QA gate (`CLAUDE.md` §5).
+- 🧠 **Skill `second-brain`**: `index-public.md`, stempel świeżości 24 h, kontrola markerów konfliktu, stała zgoda Claude Code/Desktop na strony poufne (konto MIW Group, DPA; decyzja właściciela 2026-11-09), zakaz zapisu w vaulcie dla Gemini jako polityka bez blokady technicznej.
+- 📄 **Dokumentacja**: wiersz Second Brain w `AGENTS.md`, `CLAUDE.md` §1 i §5, wpis decyzji D1–D12 w `.agents/MEMORY.md`.
+- 🚚 **Rozprowadzenie**: 10 PR-ów w projektach swarm (strażnik, rejestracja hooka, skill, skaner, sekcja `CLAUDE.md`).
+- 🔧 **`os-upgrade-project`**: `hooks.json` jest SCALANY (nowe `scripts/merge_hooks_json.py`), nie nadpisywany; własne wpisy projektu zostają, opcja `--refresh-hooks` podmienia tylko wpisy zarządzane (z kopią `*.bak`); strażnicy w `scripts/` odświeżani, gdy różnią się od źródła (`cp -rn` ich nie aktualizował).
+- ⚠️ **Znane ograniczenia**: `claude-pre-tool-guard.sh` kończy się kodem 1, który w Claude Code nie blokuje (decyzja właściciela: bez zmian); strażnik nie pilnuje Claude'a; zakaz zapisu Gemini to polityka.
+
+### 🛠️ Zmiany z 2026-11-02 (PR #39–#43)
+- 🔒 `fix(security)`: przywrócono bramkę PreToolUse, zsynchronizowano tabelę ról w `vault/` (#40).
+- 📦 `fix(install)`: narzędzia CLI instalowane jako dowiązania symboliczne zamiast kopii (#41).
+- 🪨 Skille `caveman`: synchronizacja z lokalnym stanem (#42) i przejście na trzy rodzeństwa `caveman`/`ultracave`/`megacave` (#43).
+- 🛰️ Odświeżenie dokumentacji Antigravity w `.agents/mcp-servers/antigravity-docs/` (#39).
+
+### 📝 Dokumenty
+- `vault/raw_notes/OM_SKILLS_*`: napis wersji v6.5 → v7.0 (#44).
+
 ## [7.0.0-swarm] - 2026-10-27
 
 ### 📚 Automated INGEST Scaffolding & `/os-publish-knowledge` Skill

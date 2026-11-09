@@ -135,7 +135,8 @@ os-upgrade-project ~/projects/stary-projekt
 Skrypt automatycznie:
 - Wdraża reguły `.gitattributes` (`merge=union` dla `MEMORY.md` i `task.md`).
 - Ustawia parametry `pull.rebase=true` i `merge.conflictstyle=diff3`.
-- Wdraża natywne hooki cyklu życia (`SessionStart` pull / `SessionEnd` auto state-dump).
+- Wdraża natywne hooki cyklu życia (`SessionStart` pull / `SessionEnd` auto state-dump) i bramki PreToolUse (strażnik poufności Second Brain, strażnik Coordinatora). Pliki `hooks.json` są **scalane, nie nadpisywane**: własne wpisy projektu zostają, brakujące zarządzane są dodawane. `--refresh-hooks` podmienia tylko wpisy zarządzane (po kopii `*.bak`).
+- Odświeża strażników w `scripts/` (`guard_confidential_gemini.py`, `guard_coordinator_pretool.py`), gdy różnią się od źródła, i dostarcza skaner `scripts/scan_confidential_leaks.py`.
 - Tworzy dowiązania symboliczne do 63+ skilli w `.claude/skills/`.
 - Inicjalizuje standard pamięci maszynowej `.agents/MEMORY.md` (v0.42.1).
 
