@@ -388,13 +388,20 @@ if [ -z "$IDE_BIN" ]; then
 fi
 
 if [ -n "$IDE_BIN" ]; then
-    echo "   📦 Instalacja rozszerzenia Remote - WSL..."
-    if "$IDE_BIN" --install-extension ms-vscode-remote.remote-wsl &>/dev/null; then
+    echo "   📦 Instalacja rozszerzenia Remote - WSL (krok opcjonalny)..."
+    WSL_EXT_RC=0
+    WSL_EXT_OUT=$(timeout 120 "$IDE_BIN" --install-extension ms-vscode-remote.remote-wsl 2>&1) || WSL_EXT_RC=$?
+    if [ "$WSL_EXT_RC" -eq 0 ]; then
         echo "   ✓ Rozszerzenie Remote - WSL zainstalowane pomyślnie."
     else
-        echo "   ⚠️  Nie udało się automatycznie zainstalować rozszerzenia Remote - WSL."
-        echo "      Zainstaluj je ręcznie w IDE lub uruchom:"
-        echo "      \"$IDE_BIN\" --install-extension ms-vscode-remote.remote-wsl"
+        echo "   ⚠️  Nie udało się zainstalować rozszerzenia Remote - WSL (kod wyjścia: $WSL_EXT_RC). Instalacja trwa dalej."
+        # Pokaż rzeczywistą przyczynę (bez szumu logów wewnętrznych IDE), zamiast ją ukrywać.
+        echo "$WSL_EXT_OUT" | grep -v -E '^\[createInstance\]|^Installing extensions' | grep -v '^[[:space:]]*$' | tail -3 | sed 's/^/      Przyczyna: /'
+        if echo "$WSL_EXT_OUT" | grep -qi 'certificate'; then
+            echo "      Wskazówka: błąd certyfikatu TLS (np. firmowy proxy / inspekcja SSL): dodaj certyfikat firmowy do zaufanych w Windows."
+        fi
+        echo "      Krok jest opcjonalny: Antigravity może łączyć się z WSL bez tego rozszerzenia."
+        echo "      Ręcznie: \"$IDE_BIN\" --install-extension ms-vscode-remote.remote-wsl"
     fi
 else
     echo "   ⚠️  Nie odnaleziono instalacji Antigravity IDE w systemie Windows."
