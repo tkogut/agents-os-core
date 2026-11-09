@@ -101,13 +101,13 @@ class TestGuardConfidentialGemini(unittest.TestCase):
         self.assertEqual(res["decision"], "allow")
 
     def test_07_gemini_reading_non_confidential_file(self):
-        # index.md is public
+        # index-public.md is the Gemini entry point (index.md is denied, see test_19)
         payload = {
             "modelName": "gemini-3.8-flash",
             "toolCall": {
                 "name": "read_file",
                 "args": {
-                    "Path": os.path.join(self.vault_dir, "index.md")
+                    "Path": os.path.join(self.vault_dir, "index-public.md")
                 }
             }
         }
@@ -302,6 +302,42 @@ class TestGuardConfidentialGemini(unittest.TestCase):
             with open(vault_agents_path, "rb") as f:
                 vault_agents_hash = hashlib.sha256(f.read()).hexdigest()
             self.assertEqual(vault_agents_hash, canon_hash, "Drift: vault/.agents/scripts/guard_confidential_gemini.py różni się od scripts/")
+
+    def _gemini(self, name, **args):
+        return guard_confidential_gemini.evaluate_hook(
+            {"modelName": "gemini-3.8-flash", "toolCall": {"name": name, "args": args}}
+        )
+
+    def test_19_gemini_denied_index_md_points_to_index_public(self):
+        for rel in ("index.md", "wiki/overview.md"):
+            res = self._gemini("read_file", Path=os.path.join(self.vault_dir, rel))
+            self.assertEqual(res["decision"], "deny", rel)
+            self.assertIn("index-public.md", res["reason"])
+            self.assertIn("Claude Code", res["reason"])
+
+    def test_20_gemini_index_denied_windows_path_and_case(self):
+        res = self._gemini("view_file", AbsolutePath=r"C:\Users\tkogut\Documents\sejf_tk\INDEX.md")
+        self.assertEqual(res["decision"], "deny")
+
+    def test_21_gemini_bash_index_md_denied_but_index_public_allowed(self):
+        base = os.path.join(self.vault_dir, "")
+        res = self._gemini("run_command", CommandLine=f"cat {base}index.md")
+        self.assertEqual(res["decision"], "deny")
+        res = self._gemini("run_command", CommandLine=f"cat {base}wiki/overview.md")
+        self.assertEqual(res["decision"], "deny")
+        res = self._gemini("run_command", CommandLine=f"cat {base}index-public.md")
+        self.assertEqual(res["decision"], "allow")
+
+    def test_22_claude_still_allowed_to_read_index_md(self):
+        res = guard_confidential_gemini.evaluate_hook(
+            {"modelName": "claude-opus-5-5",
+             "toolCall": {"name": "read_file", "args": {"Path": os.path.join(self.vault_dir, "index.md")}}}
+        )
+        self.assertEqual(res["decision"], "allow")
+
+    def test_23_non_vault_index_md_allowed(self):
+        res = self._gemini("read_file", Path="/home/tkogut/projects/some-app/docs/index.md")
+        self.assertEqual(res["decision"], "allow")
 
 if __name__ == "__main__":
     unittest.main()

@@ -35,6 +35,16 @@ CACHE_DIR_DEFAULT = os.path.expanduser("~/.cache/agents-os-core")
 CACHE_FILE_NAME = "vault_confidential_cache.json"
 CACHE_TTL = 60.0  # seconds
 
+# Vault entry points that expose descriptions/names of confidential pages without a
+# `confidential` flag. Models without DPA must use index-public.md instead.
+PUBLIC_ONLY_DENIED_RELS = {"index.md", "wiki/overview.md"}
+PUBLIC_ONLY_CMD_RE = re.compile(r"(?<![\w-])(index\.md|overview\.md)(?![\w-])")
+PUBLIC_ONLY_REASON = (
+    "🛑 [POLITYKA POUFNOŚCI GEMINI — BRAK DPA] ODRZUCONO:\n"
+    "'index.md' i 'wiki/overview.md' zawierają opisy lub nazwy stron poufnych.\n"
+    "➡️ Użyj 'index-public.md' (indeks bez stron poufnych) albo skieruj zadanie do Claude Code."
+)
+
 def normalize_path(path_str: str) -> str:
     """Normalizes Windows, WSL, relative, and case variations into a canonical unix-like path."""
     if not path_str:
@@ -376,6 +386,12 @@ def evaluate_hook(payload: dict) -> dict:
                     )
                 }
 
+        # 4b. Entry points that leak confidential descriptions (index.md, wiki/overview.md)
+        if norm_file and norm_file.startswith(vault_dir):
+            rel_pub = os.path.relpath(norm_file, vault_dir).replace("\\", "/").lower()
+            if rel_pub in PUBLIC_ONLY_DENIED_RELS:
+                return {"decision": "deny", "reason": PUBLIC_ONLY_REASON}
+
         # 5. Directory search tool check
         if norm_dir and norm_dir.startswith(vault_dir):
             rel_dir = os.path.relpath(norm_dir, vault_dir).replace("\\", "/").lower()
@@ -392,6 +408,10 @@ def evaluate_hook(payload: dict) -> dict:
 
         # 6. Run command (Bash) check
         if tool_name in ["run_command", "bash", "execute_command"] and cmd_norm:
+            # 6-pre. index.md / overview.md referenced in a vault-touching command
+            if PUBLIC_ONLY_CMD_RE.search(cmd_norm):
+                return {"decision": "deny", "reason": PUBLIC_ONLY_REASON}
+
             # 6a. Direct reference to confidential file
             for rel in conf_rels:
                 base = os.path.basename(rel)
