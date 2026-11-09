@@ -1,4 +1,4 @@
-# 🧠 AGENTS-OS v7.0 SWARM MEMORY ENGINE (v0.42.1)
+# 🧠 AGENTS-OS v7.1 SWARM MEMORY ENGINE (v0.42.1)
 
 ---
 version: 0.42.1
@@ -20,7 +20,7 @@ last_sync: init
   - No direct pushes to main/master by execution roles
 
 ## 📝 Decisions & Key Milestones
-- [INIT] Project initialized under AGENTS-OS v7.0 Swarm Edition.
+- [INIT] Project initialized under AGENTS-OS v7.1 Swarm Edition.
 - [SYNC] Conflict-free distributed auto-sync enabled for `MEMORY.md` and `task.md`.
 
 ## 🔄 Machine Session Log

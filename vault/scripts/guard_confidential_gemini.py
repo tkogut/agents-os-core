@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 guard_confidential_gemini.py — PreToolUse Guard for Gemini Confidentiality Policy
-Part of AGENTS-OS Swarm Governance & Data Protection (v7.0 ISO 27001 Rigor).
+Part of AGENTS-OS Swarm Governance & Data Protection (v7.1 ISO 27001 Rigor).
 
 Governance & ISO 27001 Security Specifications:
 1. Zero Full-Disk Probing:

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# AGENTS-OS v7.0 SWARM EDITION - UNIVERSAL INSTALLER
+# AGENTS-OS v7.1 SWARM EDITION - UNIVERSAL INSTALLER
 # Architekt: Antigravity Orchestrator & User tkogut
 # ==============================================================================
 
@@ -9,7 +9,7 @@ set -e
 # Ustalenie absolutnej ścieżki do katalogu instalatora
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🚀 Rozpoczynam instalację AGENTS-OS v7.0 Swarm Edition z katalogu: $SCRIPT_DIR..."
+echo "🚀 Rozpoczynam instalację AGENTS-OS v7.1 Swarm Edition z katalogu: $SCRIPT_DIR..."
 
 # 1. Zależności systemu
 
@@ -109,11 +109,11 @@ fi
 
 # 3. Kopiowanie The Vault
 AGY_DIR="$HOME/.antigravity"
-VAULT_DIR="$AGY_DIR/templates/v7.0-swarm"
+VAULT_DIR="$AGY_DIR/templates/v7.1-swarm"
 
 # Czyszczenie starych wersji szablonów w celu zachowania czystości systemu
 echo "🧹 Czyszczenie starych szablonów..."
-for old_tmpl in v5.0-swarm v6.0-swarm v6.2-swarm v6.5-swarm; do
+for old_tmpl in v5.0-swarm v6.0-swarm v6.2-swarm v6.5-swarm v7.0-swarm; do
     if [ -d "$AGY_DIR/templates/$old_tmpl" ]; then
         rm -rf "$AGY_DIR/templates/$old_tmpl"
         echo "   ✓ Usunięto przestarzały szablon $old_tmpl"
@@ -433,7 +433,7 @@ else
 fi
 
 echo "===================================================================="
-echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: AGENTS-OS v7.0 SWARM GOTOWY."
+echo "✅ DEPLOY ZAKOŃCZONY SUKCESEM: AGENTS-OS v7.1 SWARM GOTOWY."
 echo ""
 echo "🚀 NAJWAŻNIEJSZE KOMENDY SYSTEMOWE:"
 echo "  1. Aktywacja powłoki w bieżącym terminalu:"
@@ -444,7 +444,7 @@ echo "     • os-init nazwa-projektu         → Tworzy projekt i otwiera Antig
 echo "     • os-init-claude nazwa-projektu  → Tworzy projekt zoptymalizowany pod VS Code / Claude Code"
 echo ""
 echo "  3. Modernizacja istniejących projektów:"
-echo "     • os-upgrade-project [ścieżka]   → Migracja do v7.0 (auto-sync, union-merge, hooki, 80+ skilli)"
+echo "     • os-upgrade-project [ścieżka]   → Migracja do v7.1 (auto-sync, union-merge, hooki, 80+ skilli)"
 echo ""
 echo "  4. Zarządzanie skillami i pracą agentów:"
 echo "     • os-add-skill nazwa-skilla      → Pobiera skill z bazy 1400+ skilli RAG (sickn33)"

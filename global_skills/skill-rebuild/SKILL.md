@@ -1,6 +1,6 @@
 ---
 name: skill-rebuild
-description: Globalny systemowy skill dla skill-rebuild w AGENTS-OS v6.0.
+description: Globalny systemowy skill dla skill-rebuild w AGENTS-OS v7.1.
 trigger_words: ["rebuild system", "refresh skills", "sync core", "os-rebuild", "skill-rebuild"]
 ---
 

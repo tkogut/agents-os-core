@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# AGENTS-OS v6.0 — Skills Synchronizer
+# AGENTS-OS v7.1 — Skills Synchronizer
 # Synchronizuje skille między global_skills/ a vault/.agents/skills/
 # w celu uniknięcia rozbieżności wersji w szablonie instalacyjnym.
 # ==============================================================================

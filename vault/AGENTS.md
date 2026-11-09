@@ -4,7 +4,7 @@
 
 ## Overview
 
-Ten projekt jest zarządzany w standardzie **AGENTS-OS v7.0 Swarm Edition**. Zapewnia to architektoniczny rygor za pośrednictwem asynchronicznego modelu **Swarm Triad** (Coordinator / Builder / Auditor), bezkonfliktową synchronizację stanu pamięci między maszynami (`.agents/MEMORY.md`, `.agents/task.md`) oraz dynamiczną bibliotekę skilli (Model Dwuwarstwowy).
+Ten projekt jest zarządzany w standardzie **AGENTS-OS v7.1 Swarm Edition**. Zapewnia to architektoniczny rygor za pośrednictwem asynchronicznego modelu **Swarm Triad** (Coordinator / Builder / Auditor), bezkonfliktową synchronizację stanu pamięci między maszynami (`.agents/MEMORY.md`, `.agents/task.md`) oraz dynamiczną bibliotekę skilli (Model Dwuwarstwowy).
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: swarm-bootstrapper
-description: Automatyczna instancjacja Złotego Standardu AGENTS-OS v6.0 w nowych projektach.
+description: Automatyczna instancjacja Złotego Standardu AGENTS-OS v7.1 w nowych projektach.
 trigger_words: ["@agents.md instantiate", "os-init", "bootstrap", "swarm init"]
 version: 1.0
 ---

@@ -1,6 +1,6 @@
 {
   "$schema": "https://agents-os.dev/schemas/agentic-config/v1",
-  "version": "7.0-swarm",
+  "version": "7.1-swarm",
   "project": {
     "name": "agents-os-core",
     "type": "meta-framework",

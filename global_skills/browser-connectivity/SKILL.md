@@ -1,6 +1,6 @@
 ---
 name: browser-connectivity
-description: Globalny systemowy skill dla browser-connectivity (CDP Bridge) w AGENTS-OS v4.2.
+description: Globalny systemowy skill dla browser-connectivity (CDP Bridge) w AGENTS-OS v7.1.
 ---
 
 # 🌐 Browser Connectivity (CDP Bridge)

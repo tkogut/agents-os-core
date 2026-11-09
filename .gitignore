@@ -1,4 +1,4 @@
-# AGENTS-OS v6.5 Default ignore
+# AGENTS-OS v7.1 Default ignore
 
 # Personal Claude Code overrides (not team-shared)
 .claude/settings.local.json

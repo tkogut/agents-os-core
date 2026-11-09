@@ -1,4 +1,4 @@
-# AGENTS-OS Template Vault Scaffold (v7.0)
+# AGENTS-OS Template Vault Scaffold (v7.1)
 
 Szablon bazowy dystrybuowany do projektów potomnych przez `os-init` i `os-upgrade-project`.
 

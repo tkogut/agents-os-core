@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 publish_knowledge_to_vault.py — Secure Publication of Knowledge Notes to Obsidian Vault
-Part of AGENTS-OS Swarm Knowledge Integration (v7.0 ISO 27001 Rigor).
+Part of AGENTS-OS Swarm Knowledge Integration (v7.1 ISO 27001 Rigor).
 
 Specifications:
 - Copies markdown notes from .agents/specs/knowledge to <vault>/raw/notes.
