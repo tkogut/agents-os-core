@@ -1,6 +1,6 @@
-# 🛸 AGENTS-OS v6.5 Swarm Edition — API & CLI Reference
+# 🛸 AGENTS-OS v7.0 Swarm Edition — API & CLI Reference
 
-> **Dokumentacja Techniczna i Referencja Interfejsów CLI / API dla AGENTS-OS v6.5**  
+> **Dokumentacja Techniczna i Referencja Interfejsów CLI / API dla AGENTS-OS v7.0**  
 > Zgodność ze standardem: `Swarm Triad`, `Open-Mercato SDLC`, `Cezar Runtime`.
 
 ---
@@ -30,7 +30,7 @@
 
 ## 1. Przegląd Architektury
 
-AGENTS-OS v6.5 Swarm Edition to rozproszony framework koordynacji agentów AI (Antigravity IDE, Claude Code, Cursor, Zed) działający w modelu asynchronicznym (Swarm Triad):
+AGENTS-OS v7.0 Swarm Edition to rozproszony framework koordynacji agentów AI (Antigravity IDE, Claude Code, Cursor, Zed) działający w modelu asynchronicznym (Swarm Triad):
 
 ```mermaid
 flowchart TD
@@ -101,7 +101,7 @@ os-init-claude <project-name>
 
 ### `os-upgrade-project`
 
-Migruje istniejące repozytorium do standardu **AGENTS-OS v6.5 Swarm Edition** z obsługą bezkonfliktowej synchronizacji wielomaszynowej.
+Migruje istniejące repozytorium do standardu **AGENTS-OS v7.0 Swarm Edition** z obsługą bezkonfliktowej synchronizacji wielomaszynowej.
 
 ```bash
 os-upgrade-project [target-directory] [--update-skills]
@@ -244,7 +244,7 @@ python3 scripts/validate-handshakes.py --conversation-id <UUID>
 Główny rejestr pamięci operacyjnej Swarm w standardzie append-only / union merge.
 
 ```markdown
-# 🧠 AGENTS-OS v6.5 SWARM MEMORY ENGINE (v0.42.1)
+# 🧠 AGENTS-OS v7.0 SWARM MEMORY ENGINE (v0.42.1)
 
 ---
 version: 0.42.1
@@ -296,7 +296,7 @@ Format pliku wymiany stanu pomiędzy rolami Swarm Triad:
 Reguły bezkonfliktowego automatycznego scalania w środowisku rozproszonym:
 
 ```gitattributes
-# AGENTS-OS v6.5 Swarm Edition - Distributed Auto-Sync Rules
+# AGENTS-OS v7.0 Swarm Edition - Distributed Auto-Sync Rules
 .agents/MEMORY.md merge=union
 .agents/task.md merge=union
 MEMORY.md merge=union
@@ -312,7 +312,7 @@ Konfiguracja pipeline'u walidacji, bramek jakościowych i ról:
 ```json
 {
   "$schema": "https://agents-os.dev/schemas/agentic.config.v1.json",
-  "version": "6.5.0",
+  "version": "7.0-swarm",
   "pipeline": {
     "default_branch": "master",
     "gates": {

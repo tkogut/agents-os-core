@@ -19,7 +19,7 @@ if os.path.exists(local_vault):
 elif os.path.exists(os.path.expanduser("~/.antigravity/templates/v7.0-swarm")):
     VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v7.0-swarm")
 else:
-    VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v6.5-swarm")
+    VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v7.0-swarm")
 
 # --------------------------------------------------------------------------- #
 # Argument handling
@@ -53,7 +53,7 @@ if not os.path.exists(TARGET_DIR):
     print(f"📦 Tworzenie projektu: {TARGET_DIR}")
     os.makedirs(TARGET_DIR)
 
-print(f"🚀 INICJACJA AGENTS-OS v6.0 SWARM W: {TARGET_DIR}")
+print(f"🚀 INICJACJA AGENTS-OS v7.0 SWARM W: {TARGET_DIR}")
 
 # --------------------------------------------------------------------------- #
 # 2. Kopiowanie Vault (Złoty Standard)
@@ -297,7 +297,7 @@ if not repo_exists and token:
         gh_repo = user.create_repo(
             name=project_name,
             private=False,
-            description=f"AGENTS-OS v6.0 — {project_name}"
+            description=f"AGENTS-OS v7.0 — {project_name}"
         )
         print(f"   ✅ Repo utworzone: {gh_repo.html_url}")
     except Exception as e:
@@ -326,7 +326,7 @@ except Exception as e:
     print(f"   ⚠️  Push failed: {e}")
     print(f"      Możesz pushować ręcznie: git push -u origin {repo.active_branch.name}")
 
-print(f"\n✨ AGENTS-OS v6.0 Swarm — projekt GOTOWY.")
+print(f"\n✨ AGENTS-OS v7.0 Swarm — projekt GOTOWY.")
 print(f"   GitHub: https://github.com/{gh_user}/{project_name}")
 
 # WAŻNE: ostatnia linia = sygnał dla os-init (shell function) do cd

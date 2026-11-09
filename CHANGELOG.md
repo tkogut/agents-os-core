@@ -9,6 +9,13 @@ Dokumentującą:
 
 ## [Unreleased]
 
+### 🏷️ Porządek z wersjami (2026-11-09)
+- 📌 **Plik `VERSION`** (`7.0.0-swarm`): jedyne źródło prawdy o wersji systemu; Rule 4 w `.agents/rules/core-rule.md` przepisana pod ten plik.
+- 🧪 **`tests/test_version_consistency.py`**: wymusza Rule 4 (żywe pliki mają wersję z `VERSION`, `agentic.config.json`, katalog szablonu w `INSTALL.sh`, nagłówek wydania w `CHANGELOG.md`).
+- 🧹 Usunięto stare ciągi v6.5/v6.0 z żywych plików: `README.md`, `docs/API.md` (przykład konfiguracji: `7.0-swarm`), `docs/SKILLS_ARCHITECTURE.md`, `CLAUDE.md`, `SDLC.md`, `agents.yaml`, nagłówków `.gitignore`/`.gitattributes`, bannerów bootstrapperów, szablonów w `vault/` (`task.md`, `agents.yaml`, `SDLC.md`, `os-run-builder`, `.gitattributes`) oraz nagłówków `.agents/MEMORY.md` i `.agents/task.md`.
+- 🗑️ Usunięto martwe fallbacki do katalogu szablonu `v6.5-swarm` (`os-upgrade-project`, `os-add-skill`, bootstrappery); `INSTALL.sh` i tak usuwa stare szablony.
+- ℹ️ Bez zmian (historia lub treść wymagająca przeglądu): wydane wpisy `CHANGELOG.md`, dokumenty źródłowe z `knowledge/`, `.agents/specs/AGENTS-OS.md` (konstytucja v6.5-AG), `architecture.md`, `graph.json`, `swarm_audit_report.md`, `.agents/eval/evaluator.md`, specyfikacje `.ai/specs/*` z datą, `claude-pre-tool-guard.sh` (plik chroniony).
+
 ### 🧠 Second Brain: dostęp agentów bez naruszania poufności (2026-11-09, PR #44–#53)
 Plan i raport: `.agents/specs/second-brain-integration-plan.md`, `.agents/specs/second-brain-propagation-report.md`.
 - 🛡️ **Strażnik `guard_confidential_gemini.py`**: modele bez DPA nie czytają `index.md` ani `wiki/overview.md` (komunikat odsyła do `index-public.md`); `rg`, `ripgrep`, `ag`, `ack` i `git grep` po vaulcie traktowane jak wyszukiwanie rekurencyjne (luka: wcześniej blokowane tylko `-r`/`--recursive`/`-exec`). Cztery kopie nadal identyczne; testy 19–27.

@@ -25,7 +25,7 @@ if os.path.exists(local_vault):
 elif os.path.exists(os.path.expanduser("~/.antigravity/templates/v7.0-swarm")):
     VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v7.0-swarm")
 else:
-    VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v6.5-swarm")
+    VAULT_DIR = os.path.expanduser("~/.antigravity/templates/v7.0-swarm")
 
 # --------------------------------------------------------------------------- #
 # Argument handling
@@ -59,7 +59,7 @@ if not os.path.exists(TARGET_DIR):
     print(f"📦 Tworzenie projektu: {TARGET_DIR}")
     os.makedirs(TARGET_DIR)
 
-print(f"🚀 INICJACJA AGENTS-OS v6.0 SWARM W: {TARGET_DIR}")
+print(f"🚀 INICJACJA AGENTS-OS v7.0 SWARM W: {TARGET_DIR}")
 
 # --------------------------------------------------------------------------- #
 # 2. Kopiowanie Vault (Złoty Standard)

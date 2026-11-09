@@ -1,7 +1,7 @@
-# 📋 AGENTS-OS v6.5 Swarm Task Backlog
+# 📋 AGENTS-OS v7.0 Swarm Task Backlog
 
 ---
-version: 6.5-swarm
+version: 7.0-swarm
 sync_mode: distributed-union
 ---
 

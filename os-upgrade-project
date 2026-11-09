@@ -91,8 +91,6 @@ if [ -d "$SCRIPT_DIR/vault" ]; then
     VAULT_DIR="$SCRIPT_DIR/vault"
 elif [ -d "$HOME/.antigravity/templates/v7.0-swarm" ]; then
     VAULT_DIR="$HOME/.antigravity/templates/v7.0-swarm"
-elif [ -d "$HOME/.antigravity/templates/v6.5-swarm" ]; then
-    VAULT_DIR="$HOME/.antigravity/templates/v6.5-swarm"
 elif [ -d "$HOME/projects/agents-os-core/vault" ]; then
     VAULT_DIR="$HOME/projects/agents-os-core/vault"
 else

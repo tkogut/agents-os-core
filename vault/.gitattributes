@@ -1,4 +1,4 @@
-# AGENTS-OS v6.5 Swarm Edition - Distributed Sync Merge Policy
+# AGENTS-OS v7.0 Swarm Edition - Distributed Sync Merge Policy
 #
 # RULE: `merge=union` is correct ONLY for append-only logs, where every line is
 # an independent fact and concatenating both sides loses nothing.
