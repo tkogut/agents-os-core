@@ -9,6 +9,9 @@ Dokumentującą:
 
 ## [Unreleased]
 
+### 🔧 Instalator
+- `INSTALL.sh`: krok rozszerzenia Remote - WSL pokazuje rzeczywistą przyczynę błędu (dawniej `&>/dev/null`), podpowiada przy błędzie certyfikatu TLS, ma limit czasu 120 s i jest oznaczony jako opcjonalny; kod wyjścia instalatora bez zmian.
+
 ## [7.1.0-swarm] - 2026-11-09
 
 ### 🏷️ Porządek z wersjami (2026-11-09)
