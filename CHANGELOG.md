@@ -9,6 +9,9 @@ Dokumentującą:
 
 ## [Unreleased]
 
+### 🔧 Skill `os-publish-knowledge`
+- Instrukcja dla agenta nie każe już używać `--ingest` (dry-run i `--apply` bez niego); `--ingest` zarezerwowany dla sesji redaktora wiki w vaulcie (zasada jednego pisarza, vault `AGENTS.md` pkt 8-9; spójne z planem second-brain). Dodano opis `--source` dla projektów bez `.agents/specs/knowledge/`.
+
 ### 🔧 Instalator
 - `INSTALL.sh`: krok rozszerzenia Remote - WSL pokazuje rzeczywistą przyczynę błędu (dawniej `&>/dev/null`), podpowiada przy błędzie certyfikatu TLS, ma limit czasu 120 s i jest oznaczony jako opcjonalny; kod wyjścia instalatora bez zmian.
 
