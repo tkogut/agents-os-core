@@ -29,6 +29,8 @@ Skill odpowiedzialny za bezpieczną publikację notatek wiedzy inżynieryjnej (`
 
 W katalogu dowolnego projektu:
 
+> **Źródło:** domyślnie `.agents/specs/knowledge/`. Projekty bez tego katalogu (np. gra z digestami w `docs/second-brain/digests`) wskazują go przez `--source <katalog>`.
+
 ### 1. Podgląd bezpieczny (Dry-Run)
 ```bash
 os-publish-knowledge
@@ -41,7 +43,10 @@ os-publish-knowledge --apply
 ```
 Kopiuje notatki do `<vault>/raw/notes/` ze statusem `status: new`.
 
-### 3. Pełny cykl: Publikacja + Automatyczny Scaffolding INGEST
+### 3. Pełny cykl: Publikacja + Automatyczny Scaffolding INGEST (tylko sesja redaktora wiki)
+
+> **Agenci projektów NIE używają `--ingest`.** Zapisuje on w `index.md`, `log.md` i `wiki/sources/` vaulta, gdzie obowiązuje zasada jednego pisarza (vault `AGENTS.md` pkt 8–9). INGEST wykonuje sesja redaktora wiki (Claude Code / Claude Desktop w vaulcie) w porozumieniu z właścicielem. Poniższa opcja jest dla tej sesji albo na wyraźne polecenie właściciela.
+
 ```bash
 os-publish-knowledge --apply --ingest
 ```
@@ -58,20 +63,22 @@ Wykonuje publikację oraz natychmiastowy scaffolding INGEST w vaulcie:
 Gdy użytkownik prosi o:
 - „Opublikuj notatki wiedzy z projektu”,
 - „Wykonaj transfer wiedzy do sejfu”,
-- „Zrób ingest wiedzy”,
+- „Zrób ingest wiedzy” (opublikuj notatki przez `--apply`; sam INGEST do wiki wykona sesja redaktora, patrz niżej),
 
 Wykonaj następujące kroki:
 
-1. **Uruchom weryfikację Dry-Run**:
+1. **Uruchom weryfikację Dry-Run** (z `--source <katalog>`, jeśli projekt nie ma `.agents/specs/knowledge/`):
    ```bash
-   os-publish-knowledge --ingest
+   os-publish-knowledge
    ```
 2. **Sprawdź raport**:
    - Jeśli `🛑 Zablokowano: > 0` lub `⚠️ Konflikty: > 0` – **ZATRZYMAJ SIĘ**. Zgłoś użytkownikowi pliki do oczyszczenia (podaj tylko typ reguły, zero sekretów).
-3. **Zastosuj zmiany (`--apply --ingest`)**:
+3. **Zastosuj zmiany (`--apply`, bez `--ingest`)**:
    ```bash
-   os-publish-knowledge --apply --ingest
+   os-publish-knowledge --apply
    ```
-4. **Dekompozycja pojęciowa (Opcjonalny krok semantyczny LLM)**:
-   - Po scaffoldingu przejrzyj utworzoną stronę `wiki/sources/src-<slug>.md`.
+   Nie używaj `--ingest` ani nie edytuj ręcznie `index.md`, `log.md`, `wiki/` w vaulcie. Nie wykonuj w vaulcie komend git i nie twórz tam symlinków.
+4. **Zgłoś wynik** właścicielowi: nazwy opublikowanych plików, wynik skanera i informację, że INGEST do wiki czeka na sesję redaktora.
+5. **Dekompozycja pojęciowa (opcjonalny krok semantyczny LLM; tylko sesja redaktora wiki po INGEST)**:
+   - Przejrzyj utworzoną stronę `wiki/sources/src-<slug>.md`.
    - Jeśli notatka definiuje nowe kluczowe pojęcia biznesowe lub techniczne, utwórz dedykowane strony w `wiki/concepts/<pojęcie>.md` (min. 2 powiązania, wikilinki) i zaktualizuj `index.md`.
