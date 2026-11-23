@@ -101,10 +101,11 @@ def main():
 
     repo_root = get_repo_root()
     global_dir = os.path.join(repo_root, "global_skills")
-    vault_agent_dir = os.path.join(repo_root, "vault", ".agents", "skills")
+    vault_dir = os.path.join(repo_root, "vault")
+    vault_agent_dir = os.path.join(vault_dir, ".agents", "skills")
     local_agent_dir = os.path.join(repo_root, ".agents", "skills")
     claude_dir = os.path.join(repo_root, ".claude", "skills")
-    vault_claude_dir = os.path.join(repo_root, "vault", ".claude", "skills")
+    vault_claude_dir = os.path.join(vault_dir, ".claude", "skills")
 
     print(f"🚀 Checking upstream skills repository: {args.upstream}...")
     with tempfile.TemporaryDirectory() as tmp_dir:
