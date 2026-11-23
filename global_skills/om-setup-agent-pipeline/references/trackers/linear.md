@@ -119,12 +119,15 @@ The view command's embedded comment connection is bounded. When the caller needs
 Text query, state, optional team → matching issues. Translate `open` to non-terminal state types and `closed` to terminal types; omit the state flags for all states.
 
 ```bash
-# open
-linear issue query --search "<query>" --all-teams \
+# open; omit --search for an empty query, add --search "$ISSUE_QUERY" otherwise
+ISSUE_QUERY="<query>"
+set -- --all-teams
+[ -z "$ISSUE_QUERY" ] || set -- "$@" --search "$ISSUE_QUERY"
+linear issue query "$@" \
   --state triage --state backlog --state unstarted --state started --limit 0 --json
 
 # closed
-linear issue query --search "<query>" --all-teams \
+linear issue query "$@" \
   --state completed --state canceled --limit 0 --json
 
 # any state
@@ -233,6 +236,86 @@ The JSON array carries `id`, `body`, `createdAt`, `updatedAt`, `url`, user/exter
 linear issue comment update "{commentId}" --body-file <body-file>
 ```
 
+#### get-lock
+
+For a PR, delegate to the companion `.ai/trackers/github.md` **get-lock**,
+including repository/kind/item, owner identity, exact SHA and failure semantics.
+For a Linear issue, return explicit `UNSUPPORTED`: the shared protocol
+uses comment election for these issues, never for GitHub PRs.
+
+#### acquire-lock
+
+For a PR, delegate to the companion `.ai/trackers/github.md` **acquire-lock**,
+including repository/kind/item, owner identity, exact SHA and failure semantics.
+For a Linear issue, return explicit `UNSUPPORTED`: the shared protocol
+uses comment election for these issues, never for GitHub PRs.
+
+#### release-lock
+
+For a PR, delegate to the companion `.ai/trackers/github.md` **release-lock**,
+including repository/kind/item, owner identity, exact SHA and failure semantics.
+For a Linear issue, return explicit `UNSUPPORTED`: the shared protocol
+uses comment election for these issues, never for GitHub PRs.
+
+#### get-claim-reset
+
+`{kind}`, `{item}` → latest tracker-audited human `claim-reset` label application
+as `{id,createdAt,actor}`, or `null` if none. Read every event page, including past
+applications after label removal. Verify the event actor is a human permitted to
+manage item labels; bot applications and comment/body text never authorize reset.
+A failed/unsupported audit read is not `null`: stop recovery and report the gap.
+This cutoff permanently retires claim comments created strictly before it;
+same-second/unknown timestamps are uncertain and remain blocking. It does not
+relax QA, merge, scheduler reservations or command/process isolation.
+
+For PRs delegate to the companion `.ai/trackers/github.md` **get-claim-reset**.
+For tracker issues return an explicit `UNSUPPORTED` recovery result unless this
+repository's descriptor implements an authenticated human label-history read.
+Do not infer reset authority from an issue's current labels or text. Normal
+claim election remains available without reset; a requested but unverifiable
+reset blocks takeover and names the missing provider capability.
+
+#### claim-winner
+
+`{kind}`, `{item}`, `LIVE_CLAIM_IDS` (JSON array of comment handles from a complete
+fresh **list-issue-comments** read, selected by the skill's live/stale policy) →
+`{id,user,body}` for the lowest server creation-order candidate, or `null` when
+none is visible. Missing/unreadable/incomplete data is an error, never an empty
+success. Require the caller's own id in the fresh candidate set before proceeding.
+Ignore explicitly `released`/`withdrawn` comments even if passed as live. Do not
+filter by actor: two contenders may share one bot account. Numeric ids compare
+numerically; opaque ids use creation time then stable id. The caller repeats the
+read/election and performs the post-label ownership check; this is not atomic.
+
+For a PR, delegate to the companion `.ai/trackers/github.md` **claim-winner**.
+For a Linear issue, use this descriptor's paginated **list-issue-comments**,
+intersect UUID handles with `LIVE_CLAIM_IDS`, exclude terminal comments, and sort
+by UTC `createdAt` then UUID (Linear UUIDs are not monotonic). Return the original
+UUID, authenticated user identity and body. Tied creation timestamps remain a
+visibility race; UUID order is deterministic once both comments are visible.
+
+#### withdraw-claim
+
+`{kind}`, `{item}`, `{commentId}`, full terminal body file, expected authenticated
+actor and `Claim-Run` → rewrite only that run's original candidate through **update-comment**,
+then read it back through **list-issue-comments**. Retain its legacy first line,
+marker and run id; change `Claim-State: active` to `withdrawn` (loser) or `released`
+(owner after cleanup), with the reason/winner. Before writing, verify exact item,
+comment id, authenticated author and run id; a mismatch stops cleanup. Do not
+edit a foreign candidate or delete its label. Return the same id and verified
+terminal state; failed update/read-back is a blocker. Never fall back to a new
+comment leaving the old active candidate in place.
+
+For a PR, delegate to the companion `.ai/trackers/github.md` **withdraw-claim**,
+passing the repository, PR number, GitHub conversation comment id, run identity
+and terminal body unchanged. Perform both ownership verification and read-back
+against GitHub; never pass a GitHub id to this descriptor's issue comment commands.
+For a Linear issue, use this descriptor's own **update-comment** and complete
+**list-issue-comments**, preserving the original issue-specific handle and actor.
+If the companion predates **withdraw-claim**, perform the same checks using its
+GitHub **update-comment** and **list-issue-comments** operations. Missing safe
+listing/editing remains a blocker; do not fall back to the issue tracker.
+
 ### Pull requests
 
 Every operation in this section executes the same-named operation from `.ai/trackers/github.md`, preserving its inputs, outputs, guards, pagination, and cross-repository rules.
@@ -252,6 +335,9 @@ Delegate to GitHub **create-pr**. Reference the Linear key in the body, then use
 #### update-pr
 Delegate to GitHub **update-pr**.
 
+#### close-pr
+Delegate to GitHub **close-pr**. Keep linked Linear issues unchanged.
+
 #### comment-pr
 Delegate to GitHub **comment-pr**.
 
@@ -269,6 +355,9 @@ Delegate to GitHub **get-pr-diff**.
 
 #### get-pr-files
 Delegate to GitHub **get-pr-files**.
+
+#### get-pr-author-association
+Delegate to GitHub **get-pr-author-association**.
 
 #### checkout-pr
 Delegate to GitHub **checkout-pr**.
@@ -308,6 +397,11 @@ Delegate to GitHub **get-run-failed-logs**.
 #### rerun-failed
 Delegate to GitHub **rerun-failed**.
 
+#### approve-pending-runs
+Delegate to GitHub **approve-pending-runs**.
+
+**Reviewed-SHA binding:** `sha-bound` — inherited from the GitHub operation it delegates to.
+
 #### watch-run
 Delegate to GitHub **watch-run**.
 
@@ -320,4 +414,4 @@ Delegate to GitHub **list-labels**; this is the PR label taxonomy setup inspects
 Delegate to GitHub **create-label**.
 
 #### ensure-label-taxonomy
-Delegate to GitHub **ensure-label-taxonomy**. Linear issue-label provisioning remains an explicit team-owned setup step described under Label guards.
+Delegate to GitHub **ensure-label-taxonomy**. Linear issue-label provisioning remains an explicit team-owned setup step described under Label guards. Create `autofix.label` (default `cez-autofix`) in the selected issue team before applying issue-triage proposals; GitHub companion labels do not provision it.

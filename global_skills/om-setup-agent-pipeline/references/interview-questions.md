@@ -6,17 +6,38 @@ The questions step 3 of `om-setup-agent-pipeline` asks the user (skipped with `-
 2. Which tracker provider to install (default: `gitlab` when the `origin` remote points at a GitLab host — gitlab.com, or a self-managed host `glab` is authenticated against — otherwise `github`):
    - `github` — issues, PRs, reviews, CI, and labels through the `gh` CLI.
    - `gitlab` — issues, merge requests, reviews, CI pipelines, and labels through the `glab` CLI (`glab api`), on gitlab.com or a self-managed instance. Stand-alone: no companion descriptor.
+   - `forgejo` — issues, pull requests, reviews, CI (commit statuses and Forgejo Actions), and labels through the Forgejo REST API with `curl` + `jq`, on a self-hosted instance or Codeberg. Stand-alone: no companion descriptor. There is no host detection; pick it explicitly for a Forgejo-hosted `origin`. Its CI workflows live in `.forgejo/workflows/`; read `.github/workflows/` only when that directory does not exist (Forgejo's own fallback rule).
    - `linear` — Linear issues through `schpet/linear-cli`, with GitHub as the required PR/review/CI companion. Setup installs both `linear.md` and `github.md`.
    - `jira` — Jira Cloud work items through Atlassian CLI (`acli`), with GitHub as the required PR/review/CI companion. Setup installs both `jira.md` and `github.md`.
    - a custom provider — scaffold from `TEMPLATE.md`; stop tracker-driven work until every required operation is filled in.
 
-   This sets the config's `tracker` field to the selected primary descriptor. Before accepting `gitlab`, run its **auth-check** (`glab` and `jq` installed, `glab` authenticated for the remote's host). Before accepting a split provider, confirm its issue CLI and the companion `gh` CLI are installed/authenticated, and explain the provider-specific environment/config prerequisites from its descriptor.
+   This sets the config's `tracker` field to the selected primary descriptor. Before accepting `gitlab`, run its **auth-check** (`glab` and `jq` installed, `glab` authenticated for the remote's host). Before accepting `forgejo`, run its **auth-check** (`curl` 7.76+, `jq`, the remote's host reachable, and a token in `FORGEJO_TOKEN_<HOST>` or `FORGEJO_TOKEN` with the scopes its Prerequisites list). Before accepting a split provider, confirm its issue CLI and the companion `gh` CLI are installed/authenticated, and explain the provider-specific environment/config prerequisites from its descriptor.
 3. Which browser provider to install (default: `agent-browser`; `playwright` is
    the compatibility choice). Explain that the selected descriptor owns
    autonomous CLI/browser provisioning and that repository-native E2E suites
    remain authoritative.
-4. Labels: install the full taxonomy above (recommended), keep a subset, or disable labels entirely.
-5. QA gate on or off. Recommend on when the repo ships user-facing changes.
-6. Where specs live (`paths.specs`, default `.ai/specs`) — confirm or point at an existing design-doc directory.
-7. Optional repo-local review checklist path.
-8. Project docs to generate (each only when missing): `SDLC.md` (recommended), `AGENTS.md` with the task-routing table (when no agent instruction file exists), `CODE_REVIEW.md`, and `BACKWARD_COMPATIBILITY.md`.
+4. Labels: install the full taxonomy above (recommended), keep a subset, or disable labels entirely. When labels stay enabled, confirm the name of the human-applied automerge label (`automerge.label`, default `automerge`) that puts a PR in `om-auto-merge-buddy`'s unattended merge queue. Confirm `automerge.mode` (default guarded `prepare-and-merge`; `prepare-to-merge` for preparation only) and `automerge.requireIndependentReview` (boolean, default false; true requires separate native current-head human approval). Also confirm `automerge.defaultToHumanQa` (boolean, default false): automatically run QA/sign-off for missing mandatory approval, or true to prefer human QA. `--human-qa`/`--auto-qa` override it; eligibility/actual coverage still apply. Automatic code review/autofix remains required; explicit CLI policy overrides settings per invocation.
+Confirm `automerge.humanOnlyLabels` and `automerge.humanOnlyAuthors` (nonempty-string arrays, default `[]`) and `automerge.complexQa` (`always` by default; `needs-qa` or `never` only by explicit choice). Preserve existing settings on updates; `--defaults` writes the documented defaults. Human-only matches require pinned human QA, never an automatic substitute.
+
+5. Automerge eligibility (only when labels stay enabled) — which PRs `om-auto-merge-triage` may propose for the automerge label. Show the defaults, then confirm or edit each one, and write the answers to `automerge.eligibility`:
+   - **Priority tiers**, in order. The default is 1 `qa-approved`, 2 `ai-judgment`, 3 `security` or `small`, 4 `trusted-author`, 5 `fixes-issue`. A PR lands in the first tier it matches; one matching no tier is never proposed. Within a tier, PRs are ordered by priority label, then risk, then age.
+   - **AI judgment** (`aiJudgment.staleAfterDays`, default `7`): prioritize important, still-relevant fixes close to merge, giving older PRs with relevant screenshots and a bounded review backlog extra attention. Judge the diff and feedback rather than trusting labels or the PR pitch. Requested changes require a positive judgment regardless of tier; screenshots do not count as QA approval.
+   - **Small PR limit** (`smallPrFileLimit`, default `10`): a PR is `small` when it changes fewer files than this.
+   - **Security labels** (`securityLabels`, default the `security` category label).
+   - **Trusted authors** (`trustedAuthors`, default none): logins that form their own tier and bypass the author-association exclusion. Suggest the maintainers and any dependency bot the repository uses, but add only the logins the user names.
+   - **Excluded author associations** (default `first-time-contributor`, `outside-collaborator`, `none`). Their PRs are never proposed unless the author is trusted.
+   - **Excluded labels** (default `do-not-merge`, `blocked`, `qa-failed`).
+   - **Window and limits**: `lookbackDays` (default `30` — only PRs opened in the last month; `--from-oldest` covers the oldest month instead), `analyzeLimit` (default `100` PRs gated and label-ranked) and the output `limit` (default `20` — the shortlist AI judgment runs on, and the most PRs proposed).
+   Preserve explicit existing tiers and exclusions on reconfiguration unless the user chooses the new policy. To adopt AI rescue, add `ai-judgment` and remove `changes-requested` from exclusions.
+   Under `--defaults`, write the defaults with an empty `trustedAuthors`. Never guess logins.
+6. Issue autofix eligibility (when labels stay enabled): confirm `autofix.label` (default `cez-autofix`) and `autofix.eligibility` (`lookbackDays: 30`, `analyzeLimit: 100`, `limit: 20`, `excludeLabels: ["blocked", "do-not-fix"]`). `om-auto-issue-triage` proposes only useful, still-relevant issues with decided acceptance criteria and bounded implementation; it skips current/uncertain claims and labels only human-confirmed issues. Preserve explicit existing values. Explain that labeling can trigger the repository's existing worker, while this skill never installs or starts one. Under `--defaults`, write the documented defaults without guessing worker integrations.
+7. QA gate on or off. Recommend on when the repo ships user-facing changes.
+8. Where specs live (`paths.specs`, default `.ai/specs`) — confirm or point at an existing design-doc directory.
+9. Optional repo-local review checklist path.
+10. Project docs to generate (each only when missing): `SDLC.md` (recommended), `AGENTS.md` with the task-routing table (when no agent instruction file exists), `CODE_REVIEW.md`, and `BACKWARD_COMPATIBILITY.md`.
+
+Then consult `references/config-capabilities.md`. Ask only for optional
+capabilities the repository already evidences or the user explicitly enables;
+show the detected file/value and keep the safe default otherwise. Under
+`--defaults`, never guess harness commands, platform repositories, publication
+destinations, design providers, or knowledge sources.
