@@ -1,6 +1,6 @@
 # Tracker provider: {name}
 
-Copy this file to `.ai/trackers/{name}.md`, set `"tracker": "{name}"` in `.ai/agentic.config.json`, and fill in every operation below. This is the whole integration surface: no skill changes are needed to support a new tracker — skills name operations, this file says how to execute them. Use `github.md` as the reference implementation for structure and level of detail; `gitlab.md` shows a stand-alone provider for a different code host, including how to serialize its objects into the field shapes skills parse.
+Copy this file to `.ai/trackers/{name}.md`, set `"tracker": "{name}"` in `.ai/agentic.config.json`, and fill in every operation below. This is the whole integration surface: no skill changes are needed to support a new tracker — skills name operations, this file says how to execute them. Use `github.md` as the reference implementation for structure and level of detail; `gitlab.md` shows a stand-alone provider for a different code host, including how to serialize its objects into the field shapes skills parse; `forgejo.md` shows one built on plain `curl` + `jq` when the host has no CLI with a raw-API mode.
 
 ## How to write a provider
 
@@ -8,7 +8,7 @@ Copy this file to `.ai/trackers/{name}.md`, set `"tracker": "{name}"` in `.ai/ag
 - **Split-provider setups are normal.** Many teams track issues in one tool (Linear, Jira) while PRs and CI stay on the code host (GitHub). In that case implement the *Issues* section against the issue tracker and delegate the *Pull requests*, *Labels*, and *Identity* sections, e.g.: "Pull request operations: as in `github.md` (gh CLI)." Map identifiers both ways in the Conventions section (for example, a Linear ticket `ENG-123` referenced from a GitHub PR body, and the PR URL attached back to the ticket).
 - **Preserve the semantics, not the syntax.** A skill saying "close the issue with a comment linking the PR" must end with the ticket in the tracker's done/closed state and a visible cross-link — whatever commands that takes.
 - **Concepts that must map somewhere:** issue/PR identifiers and how they are written in text; how a PR declares which issue it resolves (and whether that auto-closes it); draft PRs (or the nearest equivalent, e.g. a "WIP" state); labels (or the tracker's tags/states — if the tracker models workflow as states instead of labels, say how each pipeline label maps to a state); assignees; comments; CI check status; review verdicts (approve / request changes); merge.
-- **Claim/lock protocol.** Skills coordinate via three claim signals: assignee = automation user, `in-progress` marker, and a `🤖`-prefixed claim comment with a timestamp. Define how each is expressed in this tracker; all three should be readable back by **get-issue**/**get-pr** so concurrent skills detect the lock. The `ci-monitoring` marker is deliberately **not** one of them: it records that a finished, fully reported run still owes a CI-result comment, and must never be read as a lock.
+- **Claim/lock protocol.** Skills coordinate via three claim signals: assignee = automation user, `in-progress` marker, and a `🤖`-prefixed claim comment with a timestamp. Define how each is expressed in this tracker; elect the comment before assignment and verify `in-progress` as the mandatory second check; all three should be readable back by **get-issue**/**get-pr** so concurrent skills detect the lock. For a `CURRENT_USER` ending in `[bot]` whose self-assignment is confirmed blocked, elect the run-identified comment first and verify `in-progress` as the second check without assignment; preserve other assignees and do not bypass unrelated permission failures. The `ci-monitoring` marker is deliberately **not** one of them: it records that a finished, fully reported run still owes a CI-result comment, and must never be read as a lock.
 - **Guards.** Reproduce the label-guard behavior: a label/tag mutation checks existence first and degrades to a logged skip when missing; `labels.enabled: false` in the config skips label operations entirely.
 - **Mutate through the narrowest API surface the tracker offers.** When a tracker exposes both a rich query layer and a plain resource API (GraphQL vs REST, a convenience CLI verb vs the underlying endpoint), write mutations against the plain one. A convenience verb often fetches unrelated fields alongside the write, so an unrelated deprecation or permission gap on one of those fields aborts the whole call — and the caller sees a message about the unrelated field while the label, assignee, or body it asked for was never written. `github.md`'s Prerequisites document one such case in detail (Projects (classic)); the general rule is: mutations must not depend on fields they do not change, and a mutation whose success matters to a later decision is read back.
 - **Cross-repo targets.** Every operation should accept an optional `{repo}` (owner/name, or this tracker's project identifier) and default to the current checkout's repository when omitted — some skills address repositories other than the current one and always pass the target explicitly. `github.md` documents this contract as its blanket `--repo` rule. A provider that cannot support cross-repo targets must say so explicitly here, so dependent skills fail loud instead of silently querying the wrong repository.
@@ -37,7 +37,7 @@ Copy this file to `.ai/trackers/{name}.md`, set `"tracker": "{name}"` in `.ai/ag
 ### Issues
 
 - **get-issue** — id, field list → issue data (title, body, state, author, url, labels/state, assignees, comments).
-- **search-issues** — text query, state → matching issues.
+- **search-issues** — text query, state → matching issues. An empty text query enumerates issues in the selected state; support pagination or disclose the listing cap.
 - **create-issue** — title, body, assignee, labels → created issue URL.
 - **close-issue** — id, reason, closing comment.
 - **comment-issue** — id, body.
@@ -48,6 +48,88 @@ Copy this file to `.ai/trackers/{name}.md`, set `"tracker": "{name}"` in `.ai/ag
 - **list-issue-comments** — id → conversation comments.
 - **update-comment** — comment id, new body → rewrite an existing conversation comment in place (issue and PR conversation comments alike). Powers marker-idempotent comments: a skill finds its `🤖 …` marker via **list-issue-comments** and updates that comment instead of posting a duplicate. When the tracker cannot edit comments, document that here and skills degrade to posting a replacement that states it supersedes the previous one.
 
+#### get-lock
+
+Implement create-only ownership where the tracker offers an atomic primitive;
+otherwise return explicit `UNSUPPORTED` to select comment election. `get-lock`
+returns null only for a proven absent lock; acquisition identifies the unique
+owner/run, and release must conditionally delete the exact expected generation.
+Never map permission/API failures to unsupported. Split providers route PRs and
+issues independently. See GitHub for concrete inputs/outputs and lease deletion.
+
+#### acquire-lock
+
+Implement create-only ownership where the tracker offers an atomic primitive;
+otherwise return explicit `UNSUPPORTED` to select comment election. `get-lock`
+returns null only for a proven absent lock; acquisition identifies the unique
+owner/run, and release must conditionally delete the exact expected generation.
+Never map permission/API failures to unsupported. Split providers route PRs and
+issues independently. See GitHub for concrete inputs/outputs and lease deletion.
+
+#### release-lock
+
+Implement create-only ownership where the tracker offers an atomic primitive;
+otherwise return explicit `UNSUPPORTED` to select comment election. `get-lock`
+returns null only for a proven absent lock; acquisition identifies the unique
+owner/run, and release must conditionally delete the exact expected generation.
+Never map permission/API failures to unsupported. Split providers route PRs and
+issues independently. See GitHub for concrete inputs/outputs and lease deletion.
+
+GitHub, GitLab and Forgejo ship atomic ref ownership; Linear/Jira issues
+explicitly retain comment election while their GitHub PRs delegate. GitLab uses
+reserved `refs/heads/om-locks/{kind}-{number}` branches; GitHub/Forgejo use
+`refs/om-locks/{kind}-{number}`. Bind metadata to the repository including host.
+Acquisition needs an explicit absent-generation condition; release needs the
+expected SHA, not an unconditional API delete. No permission-error fallback.
+Unknown server receipt time is `createdAt: null`, never a guessed commit date;
+optional `metadataCreatedAt` is diagnostic only. Time-based/UI recovery blocks
+without an authenticated server audit. Namespace changes can trigger CI/hooks.
+
+#### get-claim-reset
+
+`{kind}`, `{item}` → latest tracker-audited human `claim-reset` label application
+as `{id,createdAt,actor}`, or `null` if none. Read every event page, including past
+applications after label removal. Verify the event actor is a human permitted to
+manage item labels; bot applications and comment/body text never authorize reset.
+A failed/unsupported audit read is not `null`: stop recovery and report the gap.
+This cutoff permanently retires claim comments created strictly before it;
+same-second/unknown timestamps are uncertain and remain blocking. It does not
+relax QA, merge, scheduler reservations or command/process isolation.
+
+Implement a complete label-event audit with human permission verification, or
+explicitly return `UNSUPPORTED` (never a fabricated empty audit). Split trackers
+must route the issue and PR kinds to their own audit sources. Normal acquisition
+without a reset stays compatible; a requested unsupported reset blocks takeover.
+
+#### claim-winner
+
+`{kind}`, `{item}`, `LIVE_CLAIM_IDS` (JSON array of comment handles from a complete
+fresh **list-issue-comments** read, selected by the skill's live/stale policy) →
+`{id,user,body}` for the lowest server creation-order candidate, or `null` when
+none is visible. Missing/unreadable/incomplete data is an error, never an empty
+success. Require the caller's own id in the fresh candidate set before proceeding.
+Ignore explicitly `released`/`withdrawn` comments even if passed as live. Do not
+filter by actor: two contenders may share one bot account. Numeric ids compare
+numerically; opaque ids use creation time then stable id. The caller repeats the
+read/election and performs the post-label ownership check; this is not atomic.
+
+Implement the read/ranking through this provider's complete comment list. State
+the ordering key, normalize handles and author identity, and document visibility
+limitations. Split providers delegate PR election/withdrawal to the companion
+code-host descriptor while implementing issue election in their issue tracker.
+
+#### withdraw-claim
+
+`{kind}`, `{item}`, `{commentId}`, full terminal body file, expected authenticated
+actor and `Claim-Run` → rewrite only that run's original candidate through **update-comment**,
+then read it back through **list-issue-comments**. Retain its legacy first line,
+marker and run id; change `Claim-State: active` to `withdrawn` (loser) or `released`
+(owner after cleanup), with the reason/winner. Before writing, verify exact item,
+comment id, authenticated author and run id; a mismatch stops cleanup. Do not
+edit a foreign candidate or delete its label. Return the same id and verified
+terminal state; failed update/read-back is a blocker. Never fall back to a new
+comment leaving the old active candidate in place.
+
 ### Pull requests
 
 - **get-pr** — number, field list → PR data (see `github.md` for the full field set skills request). The set includes the request's own lifecycle and size facts: `createdAt`, `mergedAt`, `closedAt`, `additions`, `changedFiles`, and per-comment `createdAt` on `comments`. Serialize `state` as `OPEN`/`CLOSED`/`MERGED`, review states as `APPROVED`/`CHANGES_REQUESTED`/`COMMENTED`/`DISMISSED`, and every timestamp as ISO-8601.
@@ -55,15 +137,17 @@ Copy this file to `.ai/trackers/{name}.md`, set `"tracker": "{name}"` in `.ai/ag
 - **search-prs** — free-text query (e.g. an issue reference), state → matching PRs.
 - **create-pr** — base branch, draft flag, title, body → PR URL + number.
 - **update-pr** — number, new title and/or new body → the PR's own title/body rewritten in place (not a comment). For keeping a PR's description in sync with what it actually ships.
+- **close-pr** — number → close without merging, preserving head branch and linked issues. Callers post/update their evidence note first, guard current head/target/authorization, and confirm closed plus unmerged via **get-pr** after the write. Already merged or unknown results are not successful obsolete closures. On older descriptors without this operation, leave open and report the upgrade requirement.
 - **comment-pr** — number, body (multi-line bodies must preserve formatting).
 - **attach-image-evidence** — number, a comment body, a slug (e.g. `pr-<n>`), and a list of local image file paths → post a single comment that embeds the images so they render **inline** in the tracker, and return the comment URL. The mechanism is the tracker's business (an upload/attachment endpoint, a media API, or a pushed evidence branch referenced by raw URLs) — the skills only name the operation and pass image paths. Contract: never mutate the change's own branch to store evidence; when the tracker cannot render uploaded images (e.g. a private repo whose raw URLs need auth), still post the comment with links to the images and say so rather than failing the caller. This is how QA skills post screenshots without any host-specific logic living in the skill.
 - **assign-pr / unassign-pr** — number, user.
 - **label-pr / unlabel-pr** — number, label (through the guard; pipeline labels are mutually exclusive).
 - **get-pr-diff** — number → full diff or changed-file list.
 - **get-pr-files** — number → changed files with per-file status (added/modified/removed).
+- **get-pr-author-association** — number → `{login, association}` for the PR's author, with `association` normalized to one of `owner`, `member`, `collaborator` (repository access on a user-owned repository), `outside-collaborator` (repository access on an organization-owned repository without organization membership), `contributor` (a change merged before, no access), `first-time-contributor`, or `none`. Map the host's own notion onto this set, and document any value the host cannot tell apart. When the host cannot report the association, fail rather than guess, because consumers (`om-auto-merge-triage`) treat an unreadable association as ineligible.
 - **checkout-pr** — number → PR head available locally (fork PRs included).
 - **review-pr** — number, verdict (approve / request changes), body.
-- **merge-pr** — number; squash by default.
+- **merge-pr** — number; squash by default. Optional head-SHA guard (refuse the merge when the head moved since the caller's gate) and optional `bypass-protection` (merge despite host branch-protection rules, using the caller's admin rights). Callers pass `bypass-protection` only after their own gate has held; `om-auto-merge-buddy` uses it once all three automerge signals hold. A tracker without a bypass documents that it refuses instead. A bypass refused for missing rights may be retried once in the plain guarded form, and only by a caller whose flow documents that fallback (an immediate buddy visit); never any other retry.
 - **mark-pr-ready** — promote a draft PR.
 - **get-pr-checks** — number → CI check runs (name, state, link). Document whether this surface can under-report while CI is starting up — on trackers where a queued pipeline registers its jobs lazily, a short result means "not yet known", not "nothing to run", and consumers must cross-check the run level (**list-runs** below, filtered to the PR head SHA) before reading a green verdict out of it.
 - **get-required-checks** — base branch → required status checks; when unreadable, treat all reported checks as required.
@@ -76,10 +160,11 @@ Copy this file to `.ai/trackers/{name}.md`, set `"tracker": "{name}"` in `.ai/ag
 - **get-run** — run id → status, conclusion, per-job breakdown.
 - **get-run-failed-logs** — run id → log output of the failed steps (the diagnosis input for CI failures).
 - **rerun-failed** — run id → re-execute only the failed jobs (used to disambiguate flakes before code changes).
+- **approve-pending-runs** — PR head SHA (and PR number) → release CI runs the code host holds for maintainer approval (first-time or fork contributors) and return the released run ids; empty when nothing was held. Document what "held" means in this tracker and that releasing runs the contributor's CI code with this repository's runners and secrets. When the tracker has no such gate, implement it as a no-op that returns nothing. Declare its binding in the operation's prose as `Reviewed-SHA binding:` (bold) followed by one of `sha-bound`, `not-sha-bound` or `unavailable` in backticks: `sha-bound` only when the approval can run nothing but code from the given head SHA (it names runs created for that SHA, or the host rejects a mismatched expected SHA). A missing or other value is read as unbound, and `om-auto-review-pr` then never releases automatically.
 - **watch-run** — run id → block until the run completes, signaling success/failure; may degrade to polling **get-run**.
 
 ### Labels
 
 - **list-labels** — all label/tag names.
 - **create-label** — name, color, description; never delete or rename existing ones.
-- **ensure-label-taxonomy** — create every missing label from the config's taxonomy.
+- **ensure-label-taxonomy** — create every missing label from the config's taxonomy, plus `autofix.label` (default `cez-autofix`) in the issue tracker. Split providers document issue-label provisioning separately from code-host PR labels.

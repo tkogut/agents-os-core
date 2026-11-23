@@ -1,6 +1,6 @@
 ---
 name: om-apply-upgrade-notes
-description: Apply the skills collection's UPGRADE_NOTES.md after an upgrade. Re-syncs installed tracker and browser-provider descriptors while preserving local edits, reports custom-provider gaps, checks pipeline config and installed artifacts, and summarizes exactly what changed.
+description: Use when upgrading the skills collection, e.g. 'apply the upgrade notes'. Sync installed tracker and browser descriptors while preserving local edits, check pipeline config and installed artifacts, and report custom-provider gaps and changes.
 ---
 
 # Apply Upgrade Notes
@@ -12,7 +12,9 @@ skill run **installed into this repository** — notably tracker descriptors at
 it does not define. This skill reads the collection's `UPGRADE_NOTES.md`, brings
 installed artifacts up to date, and reports what it changed.
 
-It touches **only** pipeline artifacts under `.ai/` (and documented config files). It never edits
+It touches **only** pipeline artifacts under `.ai/`, documented config files, and
+artifacts explicitly named by an `UPGRADE_NOTES.md` installed-artifact row (for
+example the optional output style and hooks under `.claude/`). It never edits
 application source, never modifies the skills installation itself, and never discards a local
 customization without asking.
 

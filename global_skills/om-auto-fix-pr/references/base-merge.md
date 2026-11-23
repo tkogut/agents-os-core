@@ -3,10 +3,17 @@
 The step-3 procedure `om-auto-fix-pr` runs before any review or CI work, so the
 whole loop judges the real merge result against the current base.
 
+Resolve `TARGET_BRANCH` from this PR's **get-pr** `baseRefName` before this
+procedure, including on each later cycle. Validate it as a branch name and
+keep it quoted. An unavailable target is a blocker; never substitute the
+config's `baseBranch` or repository default. All diffs and required-check
+lookups use this same target. A replacement PR must preserve that target;
+if the PR is retargeted, discard previous gate readings and evaluate again.
+
 ## Same-repo PR head
 
-1. `git fetch origin "$BASE_BRANCH"` to get the latest base tip.
-2. Merge it into the checked-out PR branch: `git merge --no-edit "origin/$BASE_BRANCH"`.
+1. `git fetch origin "$TARGET_BRANCH"` to get the latest target tip.
+2. Merge it into the checked-out PR branch: `git merge --no-edit "origin/$TARGET_BRANCH"`.
 3. **Conflicts**: resolve trivial ones directly (import ordering, changelog/lock
    noise, non-overlapping edits). For anything non-trivial — overlapping logic,
    deleted-vs-modified files, semantic conflicts — do **not** hand-resolve blindly:
@@ -23,13 +30,17 @@ whole loop judges the real merge result against the current base.
 A fork head branch usually cannot be pushed to (no write access to the
 contributor's fork). Do **not** try to force the base merge onto it here. Instead,
 let step 4's `om-auto-review-pr` run its **fork carry-forward flow**: it bases a
-new branch in the main repo on the fetched PR head, merges/rebases against the
-base there, applies fixes, and opens a **replacement PR** that
+carry branch in the main repo on the fetched PR head, merges the base there,
+applies fixes, and finds or opens a **replacement PR** that
 `Supersedes #{prNumber}` with credit to the original author (the requirements this
 skill verifies on that replacement live in `references/pr-finalize.md`, fork
-supersede/credit section). From that point, `{prNumber}` in the rest of `om-auto-fix-pr`
-refers to the replacement PR, and the base-merge happens on the carry branch you
-can push.
+supersede/credit section). Resume the existing handoff before starting new fork
+work. Acquire the replacement claim and record both PR numbers before releasing
+the original claim. Continue on the verified replacement's carry branch even
+when a gate keeps the original open. Retain the pending blocker. Before
+the final report, have `om-auto-review-pr` reconcile the original's closure on
+the final replacement head. Report a published replacement and any closure
+blocker separately. A replacement number alone is not evidence of closure.
 
 ## Re-merging during the loop
 

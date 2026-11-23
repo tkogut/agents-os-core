@@ -1,6 +1,6 @@
 ---
 name: om-code-review
-description: Review a diff, branch, or PR against correctness, security, breaking-change, and quality standards — runs the validation gate, applies the built-in checklist plus any repo-local one, and produces severity-ranked findings with an approve/request-changes verdict. The review engine behind om-auto-review-pr and om-review-prs.
+description: Use when a diff, branch, or PR needs a correctness and security review, e.g. 'review this diff'. Run validation and the built-in plus repository checklist, check breaking changes and quality, and return severity-ranked findings with an approve/request-changes verdict. Powers om-auto-review-pr and om-review-prs.
 ---
 
 # Code Review
@@ -11,7 +11,7 @@ Review code changes against the repository's architecture, security, convention,
 
 **Input** — exactly one unit of review:
 
-- a PR number (fetch the diff and metadata via the tracker operations **get-pr-diff** / **get-pr**),
+- a PR number (fetch the diff and metadata via **get-pr-diff** / **get-pr**; the PR's validated `baseRefName` is authoritative for the diff and compatibility review, regardless of configured `BASE_BRANCH`; missing target → report a blocker, never guess),
 - a branch name (review its diff against the merge-base with `$BASE_BRANCH`),
 - an explicit commit range or diff,
 - nothing — default to the current branch's diff against the merge-base with `$BASE_BRANCH`, including uncommitted changes.
@@ -153,6 +153,7 @@ When reviewing, pay special attention to:
 - Apply the built-in checklist on every review; apply the repo-local `reviewChecklist` file and the repo-root `CODE_REVIEW.md` in addition whenever they exist.
 - When `BACKWARD_COMPATIBILITY.md` exists, verify every touched contract surface against it and flag violations as Critical with an explicit warning to the user.
 - When `product-brief.md` exists, verify the change against its Non-goals, Business rules, and Decisions the same way: a contradiction without a superseding entry in the same diff is a blocker that names the id; the only accepted fix is an explicit, owner-approved superseding entry.
+- On a PR review, check the category label and title against the change (`references/review-checklist.md` §13). A missing or wrong category is a **minor** finding naming the expected label — unless the caller has label permission and fixes it itself (`om-auto-review-pr`), in which case it is no finding at all; labels alone never request changes.
 - Findings must carry severity, file, line, and a concrete fix suggestion — vague findings are not actionable.
 - The verdict is mechanical: any blocker, or any major without a documented waiver, means request changes.
 - Review the diff you were given; do not expand scope by refactoring or restyling unrelated code as part of the review.
